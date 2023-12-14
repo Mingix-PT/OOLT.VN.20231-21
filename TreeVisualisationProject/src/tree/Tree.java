@@ -1,4 +1,4 @@
 package tree;
 
-public class Tree {
+public abstract class Tree {
 }
