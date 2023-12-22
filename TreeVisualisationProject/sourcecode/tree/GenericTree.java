@@ -1,9 +1,6 @@
 package tree;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public class GenericTree extends Tree {
     private List<GenericTree> children = new ArrayList<>();
@@ -51,7 +48,7 @@ public class GenericTree extends Tree {
 
     public List<GenericTree> bfsTraverse() {
         List<GenericTree> bfsResult = new ArrayList<>();
-        Queue<Tree> queueTree = new PriorityQueue<>();
+        Queue<Tree> queueTree = new ArrayDeque<>();
         queueTree.add(this);
         while (!queueTree.isEmpty()) {
             GenericTree topTree = (GenericTree) queueTree.poll();
