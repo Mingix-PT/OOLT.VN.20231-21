@@ -20,8 +20,7 @@ public class GenericTree extends Tree {
         dfsResult.add(this);
     }
 
-    @Override
-    public Tree search(int key) {
+    public GenericTree search(int key) {
         return null;
     }
 

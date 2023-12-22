@@ -13,7 +13,6 @@ public abstract class Tree {
     public int getKey () {
         return key;
     }
-    public abstract Tree search(int key);
     public abstract boolean insert(int parentKey, int key);
     public abstract boolean insert(int key);
 

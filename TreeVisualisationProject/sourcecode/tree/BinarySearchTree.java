@@ -23,8 +23,55 @@ public class BinarySearchTree extends Tree {
         return null;
     }
 
-    @Override
-    public Tree search(int key) {
+    public BinarySearchTree leftMostTree() {
+        if (this.leftChild == null) {
+            return this;
+        }
+        return leftChild.leftMostTree();
+    }
+
+    public BinarySearchTree rightMostTree() {
+        if (this.rightChild == null) {
+            return this;
+        }
+        return rightChild.rightMostTree();
+    }
+
+    private void setNullFromParent(int key) {
+        if (this.leftChild.key == key) {
+            leftChild = null;
+        }
+        else {
+            rightChild = null;
+
+        }
+    }
+
+    public BinarySearchTree searchParent(int key) {
+        if (this.key==key) {
+            return null;
+        }
+        else if (this.key > key) {
+            if (leftChild == null) {
+                return null;
+            }
+            if (leftChild.key == key) {
+                return this;
+            }
+            return leftChild.searchParent(key);
+        }
+        else {
+            if (rightChild == null) {
+                return null;
+            }
+            if (rightChild.key == key) {
+                return this;
+            }
+            return rightChild.searchParent(key);
+        }
+    }
+
+    public BinarySearchTree search(int key) {
         if (this.key == key) {
             return this;
         }
@@ -74,24 +121,53 @@ public class BinarySearchTree extends Tree {
 
     @Override
     public boolean delete(int key) {
-        BinarySearchTree treeFound = (BinarySearchTree) search(key);
-        // TO DO
-        return treeFound != null;
+        BinarySearchTree treeFound = search(key);
+        if (treeFound==null) {
+            return false;
+        }
+        BinarySearchTree parent = searchParent(key);
+        if (treeFound.getLeftChild()==null && treeFound.getRightChild()==null) {
+            parent.setNullFromParent(key);
+        }
+        else if (treeFound.getLeftChild()!=null && treeFound.getRightChild()==null) {
+            if (parent.leftChild == treeFound) {
+                parent.leftChild = treeFound.leftChild;
+            }
+            else {
+                parent.rightChild = treeFound.leftChild;
+            }
+        }
+        else if (treeFound.getLeftChild()==null && treeFound.getRightChild()!=null) {
+            if (parent.leftChild == treeFound) {
+                parent.leftChild = treeFound.rightChild;
+            }
+            else {
+                parent.rightChild = treeFound.rightChild;
+            }
+        }
+        else {
+            if (parent.leftChild == treeFound) {
+                BinarySearchTree right = treeFound.rightChild;
+                BinarySearchTree leftMostOfRight = right.leftMostTree();
+                parent.leftChild = right;
+                leftMostOfRight.leftChild = treeFound.leftChild;
+            }
+            else {
+                BinarySearchTree left = treeFound.leftChild;
+                BinarySearchTree rightMostOfLeft = left.rightMostTree();
+                parent.rightChild = left;
+                rightMostOfLeft.rightChild = treeFound.rightChild;
+            }
+        }
+        return true;
     }
 
     @Override
     public boolean update(int currentKey, int newKey) {
-        BinarySearchTree treeFound = (BinarySearchTree) search(currentKey);
-        if (treeFound == null) {
-            return false;
-        }
-        else {
-            treeFound.key = newKey;
-            return true;
-        }
+        return (delete(currentKey) && insert(newKey));
     }
 
-    public List<BinarySearchTree> getDfsTraverse () {
+    public List<BinarySearchTree> getDfsTraverseResult () {
         return dfsResult;
     }
 
@@ -99,7 +175,9 @@ public class BinarySearchTree extends Tree {
         if (tree==null) {
             return;
         }
-        System.out.print(tree.getKey() + " ");
+        // TO DO
+        System.out.print(tree.key + " ");
+        // Preorder traverse
         dfsTraverse(tree.leftChild);
         dfsTraverse(tree.rightChild);
     }
