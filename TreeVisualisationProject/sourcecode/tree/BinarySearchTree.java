@@ -92,43 +92,16 @@ public class BinarySearchTree extends Tree {
     }
 
     public List<BinarySearchTree> getDfsTraverse () {
-        dfsTraverse(null);
         return dfsResult;
     }
 
-    public void dfsTraverse(BinarySearchTree parentTree) {
-        if (!dfsResult.contains(this)) {
-            dfsResult.add(this);
-            if (leftChild != null) {
-                leftChild.dfsTraverse(this);
-            }
-            else {
-                if (rightChild != null) {
-                    rightChild.dfsTraverse(this);
-                }
-                else {
-                    if (parentTree == null) {
-                        return;
-                    }
-                    else {
-
-                    }
-                }
-            }
+    public static void dfsTraverse(BinarySearchTree tree) {
+        if (tree==null) {
+            return;
         }
-        else {
-            if (!dfsResult.contains(rightChild)) {
-                rightChild.dfsTraverse(this);
-            }
-            else {
-                if (parentTree == null) {
-                    return;
-                }
-                else {
-                    dfsTraverse(parentTree);
-                }
-            }
-        }
+        System.out.print(tree.getKey() + " ");
+        dfsTraverse(tree.leftChild);
+        dfsTraverse(tree.rightChild);
     }
 
     public List<BinarySearchTree> bfsTraverse() {

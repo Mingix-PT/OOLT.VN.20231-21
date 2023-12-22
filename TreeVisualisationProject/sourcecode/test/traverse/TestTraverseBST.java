@@ -12,9 +12,12 @@ public class TestTraverseBST {
                 System.out.println(i);
             }
         }
+
         List<BinarySearchTree> bfsList = tree.bfsTraverse();
         for (BinarySearchTree treeTemp : bfsList) {
             System.out.print(treeTemp.getKey()+" ");
         }
+        System.out.println("");
+        BinarySearchTree.dfsTraverse(tree);
     }
 }
