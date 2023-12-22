@@ -14,13 +14,11 @@ public class TestTraverseBST {
         tree.insert(8);
         tree.insert(6);
         tree.insert(10);
-        List<BinarySearchTree> bfsList = tree.bfsTraverse();
-        for (BinarySearchTree treeTemp : bfsList) {
-            System.out.print(treeTemp.getKey()+" ");
-        }
-        System.out.println();
-        BinarySearchTree.dfsTraverse(tree);
-        System.out.println();
+//        List<BinarySearchTree> bfsList = tree.bfsTraverse();
+//        for (BinarySearchTree treeTemp : bfsList) {
+//            System.out.print(treeTemp.getKey()+" ");
+//        }
+//        System.out.println();
 //        for (int i = 0;i<=10;i++) {
 //            if (tree.search(i)==null) {
 //                System.out.println("NULL");
@@ -30,6 +28,9 @@ public class TestTraverseBST {
 //            }
 //        }
 //        System.out.println("Parent of 0 is: " + tree.searchParent(0).getKey());
+        tree.delete(8);
         BinarySearchTreePrint.print(tree);
+        System.out.println();
+        BinarySearchTree.dfsTraverse(tree);
     }
 }

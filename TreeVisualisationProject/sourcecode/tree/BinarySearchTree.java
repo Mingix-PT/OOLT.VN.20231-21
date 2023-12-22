@@ -18,6 +18,22 @@ public class BinarySearchTree extends Tree {
         return rightChild;
     }
 
+    public boolean isLeaf() {
+        return (leftChild == null && rightChild == null);
+    }
+
+    public void setFromParent(BinarySearchTree currentTree, BinarySearchTree newTree) {
+        BinarySearchTree parent = searchParent(currentTree.key);
+        if (parent != null) {
+            if (parent.leftChild == currentTree) {
+                parent.leftChild = newTree;
+            }
+            else {
+                parent.rightChild = newTree;
+            }
+        }
+    }
+
     @Override
     public Tree createTree() {
         return null;
@@ -37,13 +53,12 @@ public class BinarySearchTree extends Tree {
         return rightChild.rightMostTree();
     }
 
-    private void setNullFromParent(int key) {
+    private void setNullChild(int key) {
         if (this.leftChild.key == key) {
             leftChild = null;
         }
         else {
             rightChild = null;
-
         }
     }
 
@@ -126,10 +141,10 @@ public class BinarySearchTree extends Tree {
             return false;
         }
         BinarySearchTree parent = searchParent(key);
-        if (treeFound.getLeftChild()==null && treeFound.getRightChild()==null) {
-            parent.setNullFromParent(key);
+        if (treeFound.isLeaf()) {
+            parent.setNullChild(key);
         }
-        else if (treeFound.getLeftChild()!=null && treeFound.getRightChild()==null) {
+        else if (treeFound.leftChild!=null && treeFound.rightChild==null) {
             if (parent.leftChild == treeFound) {
                 parent.leftChild = treeFound.leftChild;
             }
@@ -137,7 +152,7 @@ public class BinarySearchTree extends Tree {
                 parent.rightChild = treeFound.leftChild;
             }
         }
-        else if (treeFound.getLeftChild()==null && treeFound.getRightChild()!=null) {
+        else if (treeFound.leftChild==null && treeFound.rightChild!=null) {
             if (parent.leftChild == treeFound) {
                 parent.leftChild = treeFound.rightChild;
             }
@@ -146,18 +161,15 @@ public class BinarySearchTree extends Tree {
             }
         }
         else {
-            if (parent.leftChild == treeFound) {
-                BinarySearchTree right = treeFound.rightChild;
-                BinarySearchTree leftMostOfRight = right.leftMostTree();
-                parent.leftChild = right;
-                leftMostOfRight.leftChild = treeFound.leftChild;
+            BinarySearchTree right = treeFound.rightChild;
+            BinarySearchTree left = treeFound.leftChild;
+            BinarySearchTree leftMostOfRight = right.leftMostTree();
+            setFromParent();
+            if (parent != null) {
+                parent
             }
-            else {
-                BinarySearchTree left = treeFound.leftChild;
-                BinarySearchTree rightMostOfLeft = left.rightMostTree();
-                parent.rightChild = left;
-                rightMostOfLeft.rightChild = treeFound.rightChild;
-            }
+            leftMostOfRight.leftChild = left;
+            leftMostOfRight.rightChild = right;
         }
         return true;
     }
