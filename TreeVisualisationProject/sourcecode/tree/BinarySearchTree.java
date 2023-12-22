@@ -1,13 +1,11 @@
 package tree;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.*;
 
 public class BinarySearchTree extends Tree {
-    protected BinarySearchTree leftChild;
-    protected BinarySearchTree rightChild;
+    protected BinarySearchTree leftChild = null;
+    protected BinarySearchTree rightChild = null;
+    protected List<BinarySearchTree> dfsResult = new ArrayList<>();
     public BinarySearchTree(int key) {
         super(key);
     }
@@ -21,12 +19,12 @@ public class BinarySearchTree extends Tree {
     }
 
     @Override
-    protected Tree createTree() {
+    public Tree createTree() {
         return null;
     }
 
     @Override
-    protected Tree search(int key) {
+    public Tree search(int key) {
         if (this.key == key) {
             return this;
         }
@@ -50,7 +48,7 @@ public class BinarySearchTree extends Tree {
 
 
     @Override
-    protected boolean insert(int key) {
+    public boolean insert(int key) {
         if (this.key == key) {
             return false;
         }
@@ -75,18 +73,14 @@ public class BinarySearchTree extends Tree {
     }
 
     @Override
-    protected boolean delete(int key) {
+    public boolean delete(int key) {
         BinarySearchTree treeFound = (BinarySearchTree) search(key);
-        if (treeFound == null) {
-            return false;
-        }
-        else {
-            // TO DO
-        }
+        // TO DO
+        return treeFound != null;
     }
 
     @Override
-    protected boolean update(int currentKey, int newKey) {
+    public boolean update(int currentKey, int newKey) {
         BinarySearchTree treeFound = (BinarySearchTree) search(currentKey);
         if (treeFound == null) {
             return false;
@@ -97,15 +91,50 @@ public class BinarySearchTree extends Tree {
         }
     }
 
-    protected List<BinarySearchTree> dfsTraverse() {
-
-        return null;
+    public List<BinarySearchTree> getDfsTraverse () {
+        dfsTraverse(null);
+        return dfsResult;
     }
 
-    protected List<BinarySearchTree> bfsTraverse() {
+    public void dfsTraverse(BinarySearchTree parentTree) {
+        if (!dfsResult.contains(this)) {
+            dfsResult.add(this);
+            if (leftChild != null) {
+                leftChild.dfsTraverse(this);
+            }
+            else {
+                if (rightChild != null) {
+                    rightChild.dfsTraverse(this);
+                }
+                else {
+                    if (parentTree == null) {
+                        return;
+                    }
+                    else {
+
+                    }
+                }
+            }
+        }
+        else {
+            if (!dfsResult.contains(rightChild)) {
+                rightChild.dfsTraverse(this);
+            }
+            else {
+                if (parentTree == null) {
+                    return;
+                }
+                else {
+                    dfsTraverse(parentTree);
+                }
+            }
+        }
+    }
+
+    public List<BinarySearchTree> bfsTraverse() {
         List<BinarySearchTree> bfsResult = new ArrayList<>();
-        Queue<BinarySearchTree> queueTree = new PriorityQueue<>();
-        queueTree.add(this);
+        Queue<BinarySearchTree> queueTree = new ArrayDeque<>();
+        queueTree.offer(this);
         while (!queueTree.isEmpty()) {
             BinarySearchTree topTree = queueTree.poll();
             bfsResult.add(topTree);
@@ -118,11 +147,11 @@ public class BinarySearchTree extends Tree {
                 queueTree.add(right);
             }
         }
-        return null;
+        return bfsResult;
     }
 
     @Override
-    protected boolean insert(int parentKey, int key) {
+    public boolean insert(int parentKey, int key) {
         // Not available for binary search tree
         return false;
     }

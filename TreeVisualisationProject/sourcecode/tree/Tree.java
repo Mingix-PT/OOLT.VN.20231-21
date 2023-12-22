@@ -5,15 +5,18 @@ import java.util.List;
 public abstract class Tree {
     protected int key;
 
-    protected abstract Tree createTree();
+    public abstract Tree createTree();
 
     public Tree(int key) {
         this.key = key;
     }
-    protected abstract Tree search(int key);
-    protected abstract boolean insert(int parentKey, int key);
-    protected abstract boolean insert(int key);
+    public int getKey () {
+        return key;
+    }
+    public abstract Tree search(int key);
+    public abstract boolean insert(int parentKey, int key);
+    public abstract boolean insert(int key);
 
-    protected abstract boolean delete(int key);
-    protected abstract boolean update(int currentKey, int newKey);
+    public abstract boolean delete(int key);
+    public abstract boolean update(int currentKey, int newKey);
 }
