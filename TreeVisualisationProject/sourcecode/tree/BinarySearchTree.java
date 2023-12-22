@@ -22,7 +22,7 @@ public class BinarySearchTree extends Tree {
         return (leftChild == null && rightChild == null);
     }
 
-    public void setFromParent(BinarySearchTree currentTree, BinarySearchTree newTree) {
+    public void updateNode(BinarySearchTree currentTree, BinarySearchTree newTree) {
         BinarySearchTree parent = searchParent(currentTree.key);
         if (parent != null) {
             if (parent.leftChild == currentTree) {
@@ -162,14 +162,15 @@ public class BinarySearchTree extends Tree {
         }
         else {
             BinarySearchTree right = treeFound.rightChild;
-            BinarySearchTree left = treeFound.leftChild;
             BinarySearchTree leftMostOfRight = right.leftMostTree();
-            setFromParent();
-            if (parent != null) {
-                parent
+            if (parent != null) { // Not the root
+                updateNode(treeFound, leftMostOfRight);
+                leftMostOfRight.leftChild = treeFound.leftChild;
+            } else { // The root
+                BinarySearchTree temp = searchParent(leftMostOfRight.key);
+                temp.leftChild = null;
+                treeFound.key = leftMostOfRight.key;
             }
-            leftMostOfRight.leftChild = left;
-            leftMostOfRight.rightChild = right;
         }
         return true;
     }

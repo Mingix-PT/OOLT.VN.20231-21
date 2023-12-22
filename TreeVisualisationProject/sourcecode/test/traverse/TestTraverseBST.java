@@ -28,7 +28,7 @@ public class TestTraverseBST {
 //            }
 //        }
 //        System.out.println("Parent of 0 is: " + tree.searchParent(0).getKey());
-        tree.delete(8);
+        tree.delete(5);
         BinarySearchTreePrint.print(tree);
         System.out.println();
         BinarySearchTree.dfsTraverse(tree);
