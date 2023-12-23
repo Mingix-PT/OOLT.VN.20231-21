@@ -31,6 +31,6 @@ public class TestTraverseBST {
         tree.delete(5);
         BinarySearchTreePrint.print(tree);
         System.out.println();
-        BinarySearchTree.dfsTraverse(tree);
+        tree.dfsTraverse();
     }
 }
