@@ -1,7 +1,6 @@
 package test.traverse;
 
 import tree.BinarySearchTree;
-import tree.BinarySearchTreePrint;
 
 import java.util.List;
 
@@ -14,6 +13,8 @@ public class TestTraverseBST {
         tree.insert(8);
         tree.insert(6);
         tree.insert(10);
+        tree.dfsTraverse();
+        System.out.println();
 //        List<BinarySearchTree> bfsList = tree.bfsTraverse();
 //        for (BinarySearchTree treeTemp : bfsList) {
 //            System.out.print(treeTemp.getKey()+" ");
@@ -29,7 +30,7 @@ public class TestTraverseBST {
 //        }
 //        System.out.println("Parent of 0 is: " + tree.searchParent(0).getKey());
         tree.delete(5);
-        BinarySearchTreePrint.print(tree);
+        tree.print();
         System.out.println();
         tree.dfsTraverse();
     }

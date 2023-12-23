@@ -1,51 +1,51 @@
-package tree;
-
-import java.io.PrintStream;
-
-public class BinarySearchTreePrint {
-    public static String traversePreOrder(BinarySearchTree root) {
-
-        if (root == null) {
-            return "";
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(root.getKey());
-
-        String pointerRight = "└──";
-        String pointerLeft = (root.getRightChild() != null) ? "├──" : "└──";
-
-        traverseNodes(sb, "", pointerLeft, root.getLeftChild(), root.getRightChild() != null);
-        traverseNodes(sb, "", pointerRight, root.getRightChild(), false);
-
-        return sb.toString();
-    }
-
-    public static void traverseNodes(StringBuilder sb, String padding, String pointer, BinarySearchTree node,
-                                     boolean hasRightSibling) {
-        if (node != null) {
-            sb.append("\n");
-            sb.append(padding);
-            sb.append(pointer);
-            sb.append(node.getKey());
-
-            StringBuilder paddingBuilder = new StringBuilder(padding);
-            if (hasRightSibling) {
-                paddingBuilder.append("│  ");
-            } else {
-                paddingBuilder.append("   ");
-            }
-
-            String paddingForBoth = paddingBuilder.toString();
-            String pointerRight = "└──";
-            String pointerLeft = (node.getRightChild() != null) ? "├──" : "└──";
-
-            traverseNodes(sb, paddingForBoth, pointerLeft, node.getLeftChild(), node.getRightChild() != null);
-            traverseNodes(sb, paddingForBoth, pointerRight, node.getRightChild(), false);
-        }
-    }
-
-    public static void print(BinarySearchTree tree) {
-        System.out.print(traversePreOrder(tree));
-    }
-}
+//package tree;
+//
+//import java.io.PrintStream;
+//
+//public class BinarySearchTreePrint {
+//    public static String traversePreOrder(BinarySearchTree tree) {
+//
+//        if (tree == null) {
+//            return "";
+//        }
+//
+//        StringBuilder sb = new StringBuilder();
+//        sb.append(tree.treeRoot.getKey());
+//
+//        String pointerRight = "└──";
+//        String pointerLeft = (tree.treeRoot.getRightChild() != null) ? "├──" : "└──";
+//
+//        traverseTree(sb, "", pointerLeft, tree.treeRoot.getLeftChild(), tree.treeRoot.getRightChild() != null);
+//        traverseTree(sb, "", pointerRight, tree.getRightChild(), false);
+//
+//        return sb.toString();
+//    }
+//
+//    public static void traverseTree(StringBuilder sb, String padding, String pointer, BinarySearchTree.BinaryTreeNode tree,
+//                                     boolean hasRightSibling) {
+//        if (tree != null) {
+//            sb.append("\n");
+//            sb.append(padding);
+//            sb.append(pointer);
+//            sb.append(tree.treeRoot.getKey());
+//
+//            StringBuilder paddingBuilder = new StringBuilder(padding);
+//            if (hasRightSibling) {
+//                paddingBuilder.append("│  ");
+//            } else {
+//                paddingBuilder.append("   ");
+//            }
+//
+//            String paddingForBoth = paddingBuilder.toString();
+//            String pointerRight = "└──";
+//            String pointerLeft = (tree.treeRoot.getRightChild() != null) ? "├──" : "└──";
+//
+//            traverseTree(sb, paddingForBoth, pointerLeft, tree.treeRoot.getLeftChild(), tree.treeRoot.getRightChild() != null);
+//            traverseTree(sb, paddingForBoth, pointerRight, tree.t.getRightChild(), false);
+//        }
+//    }
+//
+//    public static void print(BinarySearchTree tree) {
+//        System.out.print(traversePreOrder(tree));
+//    }
+//}
