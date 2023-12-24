@@ -35,6 +35,22 @@ public class GenericTree extends Tree {
         return null;
     }
 
+    @Override
+    public int height() {
+        return height(treeRoot);
+    }
+
+    private int height(GenericTreeNode root) {
+        if (root.isLeaf()) {
+            return 0;
+        }
+        List<Integer> childrenHeights = new ArrayList<>();
+        for (GenericTreeNode child : root.children) {
+            childrenHeights.add(height(child));
+        }
+        return 1 + Collections.max(childrenHeights);
+    }
+
     private GenericTreeNode search(int key) {
         // Search using BFS traverse
         Queue<GenericTreeNode> queueTree = new ArrayDeque<>();
@@ -110,13 +126,14 @@ public class GenericTree extends Tree {
     @Override
     public void dfsTraverse() {
         dfsTraverse(treeRoot);
+        System.out.println();
     }
 
     private void dfsTraverse(GenericTreeNode node) {
         if (node == null) {
             return;
         }
-        System.out.println(node.key + " ");
+        System.out.print(node.key + " ");
         for (GenericTreeNode eachChild : node.children) {
             dfsTraverse(eachChild);
         }
@@ -128,6 +145,7 @@ public class GenericTree extends Tree {
         for (GenericTreeNode node : bfsResult) {
             System.out.print(node.key + " ");
         }
+        System.out.println();
     }
 
     private List<GenericTreeNode> bfsTraverse(GenericTreeNode root) {
@@ -148,6 +166,7 @@ public class GenericTree extends Tree {
         return false;
     }
 
+    // Print tree - idea by Copilot Chat
     public void printTree() {
         if (treeRoot != null) {
             System.out.println(treeRoot.key);

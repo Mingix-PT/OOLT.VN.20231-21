@@ -49,6 +49,19 @@ public class BinarySearchTree extends Tree {
         }
         return rightMostNode(root.rightChild);
     }
+
+    @Override
+    public int height() {
+        return height(treeRoot);
+    }
+
+    protected int height(BinaryTreeNode root) {
+        if (root.isLeaf()) {
+            return 0;
+        }
+        return 1 + Math.max(height(root.leftChild), height(root.rightChild));
+    }
+
     protected BinaryTreeNode treeRoot;
     public BinarySearchTree(int key) {
         this.treeRoot = new BinaryTreeNode(key);
@@ -199,6 +212,7 @@ public class BinarySearchTree extends Tree {
     @Override
     public void dfsTraverse() {
         dfsTraverse(treeRoot);
+        System.out.println();
     }
     protected static void dfsTraverse(BinaryTreeNode node) {
         if (node==null) {
@@ -217,6 +231,7 @@ public class BinarySearchTree extends Tree {
         for (BinaryTreeNode node : bfsResult) {
             System.out.print(node.key + " ");
         }
+        System.out.println();
     }
 
     protected List<BinaryTreeNode> bfsTraverse(BinaryTreeNode node) {
