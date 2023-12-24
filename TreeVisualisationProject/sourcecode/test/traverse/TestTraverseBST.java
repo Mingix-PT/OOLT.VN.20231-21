@@ -30,6 +30,7 @@ public class TestTraverseBST {
 //        }
 //        System.out.println("Parent of 0 is: " + tree.searchParent(0).getKey());
         tree.delete(5);
+        tree.insert(5);
         tree.print();
         System.out.println();
         tree.dfsTraverse();
