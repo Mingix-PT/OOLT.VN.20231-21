@@ -3,7 +3,7 @@ package tree;
 import java.util.*;
 
 public class GenericTree extends Tree {
-    protected class GenericTreeNode {
+    private class GenericTreeNode {
         private int key;
         private List<GenericTreeNode> children = new ArrayList<>();
 
@@ -23,12 +23,12 @@ public class GenericTree extends Tree {
             return children.isEmpty();
         }
     }
-    
+
     private GenericTreeNode treeRoot;
+
     public GenericTree(int key) {
         treeRoot = new GenericTreeNode(key);
     }
-    private List<GenericTree> dfsResult = new ArrayList<>();
 
     @Override
     public Tree createTree() {
@@ -70,6 +70,9 @@ public class GenericTree extends Tree {
 
     @Override
     public boolean insert(int parentKey, int key) {
+        if (search(key) != null) {
+            return false;
+        }
         GenericTreeNode parentNode = search(parentKey);
         if (parentNode == null) {
             return false;
@@ -96,7 +99,12 @@ public class GenericTree extends Tree {
 
     @Override
     public boolean update(int currentKey, int newKey) {
-        return false;
+        GenericTreeNode nodeFound = search(currentKey);
+        if (nodeFound == null) {
+            return false;
+        }
+        nodeFound.key = newKey;
+        return true;
     }
 
     @Override
@@ -105,7 +113,7 @@ public class GenericTree extends Tree {
     }
 
     private void dfsTraverse(GenericTreeNode node) {
-        if (node==null) {
+        if (node == null) {
             return;
         }
         System.out.println(node.key + " ");
@@ -133,9 +141,34 @@ public class GenericTree extends Tree {
         }
         return bfsResult;
     }
+
     @Override
     public boolean insert(int key) {
         // Not available for generic tree
         return false;
+    }
+
+    public void printTree() {
+        if (treeRoot != null) {
+            System.out.println(treeRoot.key);
+            for (int i = 0; i < treeRoot.children.size() - 1; i++) {
+                printNode(treeRoot.children.get(i), "", false);
+            }
+            if (!treeRoot.children.isEmpty()) {
+                printNode(treeRoot.children.get(treeRoot.children.size() - 1), "", true);
+            }
+        }
+    }
+
+    private void printNode(GenericTreeNode node, String prefix, boolean isTail) {
+        if (node != null) {
+            System.out.println(prefix + (isTail ? "└── " : "├── ") + node.key);
+            for (int i = 0; i < node.children.size() - 1; i++) {
+                printNode(node.children.get(i), prefix + (isTail ? "    " : "│   "), false);
+            }
+            if (!node.children.isEmpty()) {
+                printNode(node.children.get(node.children.size() - 1), prefix + (isTail ? "    " : "│   "), true);
+            }
+        }
     }
 }

@@ -196,6 +196,7 @@ public class BinarySearchTree extends Tree {
         return (delete(currentKey) && insert(newKey));
     }
 
+    @Override
     public void dfsTraverse() {
         dfsTraverse(treeRoot);
     }

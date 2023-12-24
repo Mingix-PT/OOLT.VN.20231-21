@@ -5,6 +5,7 @@ import java.util.List;
 public abstract class Tree {
 
     public abstract Tree createTree();
+    public abstract int height();
 
     public abstract boolean insert(int parentKey, int key);
     public abstract boolean insert(int key);
