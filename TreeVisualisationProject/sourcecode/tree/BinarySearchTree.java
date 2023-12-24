@@ -29,6 +29,12 @@ public class BinarySearchTree extends Tree {
         public BinaryTreeNode getRightChild() {
             return rightChild;
         }
+
+        public void setNode(BinaryTreeNode node) {
+            this.key = node.key;
+            this.leftChild = node.leftChild;
+            this.rightChild = node.rightChild;
+        }
     }
     protected BinaryTreeNode leftMostNode(BinaryTreeNode root) {
         if (root.leftChild == null) {
@@ -47,15 +53,26 @@ public class BinarySearchTree extends Tree {
     public BinarySearchTree(int key) {
         this.treeRoot = new BinaryTreeNode(key);
     }
-    protected List<BinarySearchTree> dfsResult = new ArrayList<>();
 
     @Override
     public Tree createTree() {
         return null;
     }
 
+    protected void setNodeToChild(BinaryTreeNode node) {
+        if (node.leftChild == null && node.rightChild != null) {
+            node.setNode(node.rightChild);
+        }
+        else if (node.leftChild != null && node.rightChild == null) {
+            node.setNode(node.leftChild);
+        }
+        else if (node.isLeaf()) {
+            deleteFromParent(node);
+        }
+    }
 
-    protected void setNullChild(BinaryTreeNode parentNode, BinaryTreeNode childNode) {
+    protected void deleteFromParent(BinaryTreeNode childNode) {
+        BinaryTreeNode parentNode = searchParent(treeRoot, childNode.key);
         if (parentNode.leftChild == childNode) {
             parentNode.leftChild = null;
         }
@@ -138,20 +155,13 @@ public class BinarySearchTree extends Tree {
 
     @Override
     public boolean delete(int key) {
-        return delete(treeRoot, key);
-    }
-
-    protected boolean delete(BinaryTreeNode root, int key) {
-        BinaryTreeNode nodeFound = search(root, key);
+        BinaryTreeNode nodeFound = search(treeRoot, key);
         if (nodeFound==null) {
             return false;
         }
         BinaryTreeNode parent = searchParent(treeRoot, key);
-        if (nodeFound.isLeaf()) {
-            setNullChild(parent, nodeFound);
-        }
-        else if (nodeFound.leftChild==null || nodeFound.rightChild==null) {
-            setNullChild(parent, nodeFound);
+        if (nodeFound.leftChild==null || nodeFound.rightChild==null) {
+            setNodeToChild(nodeFound);
         }
         else {
             BinaryTreeNode right = nodeFound.rightChild;
@@ -202,7 +212,10 @@ public class BinarySearchTree extends Tree {
 
     @Override
     public void bfsTraverse() {
-
+        List<BinaryTreeNode> bfsResult = bfsTraverse(treeRoot);
+        for (BinaryTreeNode node : bfsResult) {
+            System.out.print(node.key + " ");
+        }
     }
 
     protected List<BinaryTreeNode> bfsTraverse(BinaryTreeNode node) {
