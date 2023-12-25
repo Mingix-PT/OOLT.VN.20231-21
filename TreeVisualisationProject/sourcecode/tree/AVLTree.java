@@ -22,7 +22,7 @@ public class AVLTree extends BinarySearchTree {
         if (node == null) {
             return -9999;
         }
-        return depth(node.leftChild.key) - depth(node.rightChild.key);
+        return depth(node.leftChild) - depth(node.rightChild);
     }
 
     private boolean isBalance(BinaryTreeNode node) {
@@ -56,24 +56,9 @@ public class AVLTree extends BinarySearchTree {
         }
     }
 
-    private String rebalanceCase (BinaryTreeNode node) {
-        if (balanceFactor(node.leftChild.key) == 2 && balanceFactor(node.key) == 1) {
-            return "LL";
-        }
-        if (balanceFactor(node.leftChild.key) == 2 && balanceFactor(node.key) == -1) {
-            return "LR";
-        }
-        if (balanceFactor(node.leftChild.key) == -2 && balanceFactor(node.key) == -1) {
-            return "RR";
-        }
-        if (balanceFactor(node.leftChild.key) == -2 && balanceFactor(node.key) == 1) {
-            return "RL";
-        }
-        return null;
-    }
-
-    public boolean insertAVL (int key) {
-        if (!insert(key)) {
+    @Override
+    public boolean insert (int key) {
+        if (!super.insert(key)) {
             return false;
         }
         BinaryTreeNode node = search(treeRoot, key);
@@ -87,16 +72,16 @@ public class AVLTree extends BinarySearchTree {
     }
 
     private void rebalanceNode (BinaryTreeNode node) {
-        if (balanceFactor(node.leftChild.key) > 1 && balanceFactor(node.key) == 1) {
+        if (balanceFactor(node.leftChild) > 1 && balanceFactor(node) == 1) {
             leftLeftBalance(node);
         }
-        else if (balanceFactor(node.leftChild.key) > 1 && balanceFactor(node.key) == -1) {
+        else if (balanceFactor(node.leftChild) > 1 && balanceFactor(node) == -1) {
             leftRightBalance(node);
         }
-        else if (balanceFactor(node.leftChild.key) < -1 && balanceFactor(node.key) == -1) {
+        else if (balanceFactor(node.leftChild) < -1 && balanceFactor(node) == -1) {
             rightRightBalance(node);
         }
-        else if (balanceFactor(node.leftChild.key) < -1 && balanceFactor(node.key) == 1) {
+        else if (balanceFactor(node.leftChild) < -1 && balanceFactor(node) == 1) {
             rightLeftBalance(node);
         }
     }

@@ -80,6 +80,18 @@ public class BinarySearchTree extends Tree {
         return distance;
     }
 
+    protected int depth(BinaryTreeNode node) {
+        if (node == null) {
+            return -1;
+        }
+        int distance = -1;
+        while (node != null) {
+            distance++;
+            node = searchParent(treeRoot, node.key);
+        }
+        return distance;
+    }
+
     @Override
     public Tree createTree() {
         return null;
