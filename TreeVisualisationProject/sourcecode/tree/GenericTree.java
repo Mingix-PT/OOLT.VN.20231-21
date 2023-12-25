@@ -40,6 +40,20 @@ public class GenericTree extends Tree {
         return height(treeRoot);
     }
 
+    @Override
+    public int depth(int key) {
+        GenericTreeNode nodeFound = search(key);
+        if (nodeFound == null) {
+            return -1;
+        }
+        int distance = -1;
+        while (nodeFound != null) {
+            nodeFound = searchParent(nodeFound.key);
+            distance++;
+        }
+        return distance;
+    }
+
     private int height(GenericTreeNode root) {
         if (root.isLeaf()) {
             return 0;

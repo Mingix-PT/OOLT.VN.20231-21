@@ -4,9 +4,9 @@ import java.util.*;
 
 public class BinarySearchTree extends Tree {
     protected class BinaryTreeNode {
-        private int key;
-        private BinaryTreeNode leftChild;
-        private BinaryTreeNode rightChild;
+        protected int key;
+        protected BinaryTreeNode leftChild;
+        protected BinaryTreeNode rightChild;
 
         public BinaryTreeNode(int key) {
             this.key = key;
@@ -65,6 +65,19 @@ public class BinarySearchTree extends Tree {
     protected BinaryTreeNode treeRoot;
     public BinarySearchTree(int key) {
         this.treeRoot = new BinaryTreeNode(key);
+    }
+
+    public int depth(int key) {
+        BinaryTreeNode nodeFound = search(treeRoot, key);
+        if (nodeFound == null) {
+            return -1;
+        }
+        int distance = -1;
+        while (nodeFound != null) {
+            distance++;
+            nodeFound = searchParent(treeRoot, nodeFound.key);
+        }
+        return distance;
     }
 
     @Override

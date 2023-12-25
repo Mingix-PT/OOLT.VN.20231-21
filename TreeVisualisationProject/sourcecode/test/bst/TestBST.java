@@ -32,9 +32,9 @@ public class TestBST {
 //        }
 //        System.out.println("Parent of 0 is: " + tree.searchParent(0).getKey());
 //        tree.update(5,5);
-        tree.delete(5);
-        tree.print();
-        System.out.println();
-        tree.bfsTraverse();
+//        tree.delete(5);
+//        tree.print();
+        System.out.println(tree.depth(7));
+//        tree.bfsTraverse();
     }
 }
