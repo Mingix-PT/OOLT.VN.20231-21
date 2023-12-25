@@ -179,12 +179,13 @@ public class BinarySearchTree extends Tree {
         else {
             BinaryTreeNode right = nodeFound.rightChild;
             BinaryTreeNode leftMostOfRight = leftMostNode(right);
+            BinaryTreeNode parentLeftMostOfRight = searchParent(treeRoot, leftMostOfRight.key);
+            parentLeftMostOfRight.leftChild = leftMostOfRight.rightChild;
             if (parent != null) { // Not the root
                 updateNode(nodeFound, leftMostOfRight);
                 leftMostOfRight.leftChild = nodeFound.leftChild;
-            } else { // The root
-                BinaryTreeNode temp = searchParent(treeRoot, leftMostOfRight.key);
-                temp.leftChild = null;
+            }
+            else { // The root
                 leftMostOfRight.leftChild = nodeFound.leftChild;
                 leftMostOfRight.rightChild = nodeFound.rightChild;
                 treeRoot = leftMostOfRight;

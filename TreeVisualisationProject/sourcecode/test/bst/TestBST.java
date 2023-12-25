@@ -13,7 +13,9 @@ public class TestBST {
         tree.insert(1);
         tree.insert(0);
         tree.insert(-1);
+        tree.insert(7);
         tree.bfsTraverse();
+        tree.print();
         System.out.println();
 //        List<BinarySearchTree> bfsList = tree.bfsTraverse();
 //        for (BinarySearchTree treeTemp : bfsList) {
