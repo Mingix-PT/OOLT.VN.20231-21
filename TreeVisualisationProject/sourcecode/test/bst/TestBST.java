@@ -5,7 +5,9 @@ import tree.BinarySearchTree;
 public class TestBST {
     public static void main (String[] args) {
         BinarySearchTree tree = new BinarySearchTree(5);
+        System.out.println(tree.height());
         tree.insert(2);
+        System.out.println(tree.height());
         tree.insert(4);
         tree.insert(8);
         tree.insert(6);

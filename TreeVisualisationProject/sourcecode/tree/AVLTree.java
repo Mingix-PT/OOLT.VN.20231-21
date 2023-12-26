@@ -1,16 +1,31 @@
 package tree;
 
+import java.util.ArrayDeque;
+import java.util.Queue;
+
 public class AVLTree extends BinarySearchTree {
     public AVLTree(int key) {
         super(key);
     }
 
+    private int rank(int key) {
+        BinaryTreeNode nodeFound = search(treeRoot, key);
+        return height(nodeFound) + 1;
+    }
+
+    private int rank(BinaryTreeNode node) {
+        if (node == null) {
+            return 0;
+        }
+        return height(node) + 1;
+    }
+
     public int balanceFactor(int key) {
         BinaryTreeNode nodeFound = search(treeRoot, key);
         if (nodeFound == null) {
-            return -9999;
+            return -999;
         }
-        return depth(nodeFound.leftChild.key) - depth(nodeFound.rightChild.key);
+        return rank(nodeFound.leftChild.key) - rank(nodeFound.rightChild.key);
     }
 
     public boolean isBalance(int key) {
@@ -20,9 +35,11 @@ public class AVLTree extends BinarySearchTree {
 
     private int balanceFactor(BinaryTreeNode node) {
         if (node == null) {
-            return -9999;
+            return -999;
         }
-        return depth(node.leftChild) - depth(node.rightChild);
+        int rankLeft = rank(node.leftChild);
+        int rankRight = rank(node.rightChild);
+        return rankLeft - rankRight;
     }
 
     private boolean isBalance(BinaryTreeNode node) {
@@ -35,7 +52,10 @@ public class AVLTree extends BinarySearchTree {
         parentNode.leftChild = childNode.rightChild;
         childNode.rightChild = parentNode;
         BinaryTreeNode grandParentNode = searchParent(treeRoot, parentNode.key);
-        if (grandParentNode.leftChild == parentNode) {
+        if (grandParentNode == null) {
+            treeRoot = childNode;
+        }
+        else if (grandParentNode.leftChild == parentNode) {
             grandParentNode.leftChild = childNode;
         }
         else {
@@ -72,16 +92,16 @@ public class AVLTree extends BinarySearchTree {
     }
 
     private void rebalanceNode (BinaryTreeNode node) {
-        if (balanceFactor(node.leftChild) > 1 && balanceFactor(node) == 1) {
+        if (rank(node.leftChild) > 1 && rank(node.rightChild) == 1) {
             leftLeftBalance(node);
         }
-        else if (balanceFactor(node.leftChild) > 1 && balanceFactor(node) == -1) {
+        else if (rank(node.leftChild) > 1 && rank(node.rightChild) == -1) {
             leftRightBalance(node);
         }
-        else if (balanceFactor(node.leftChild) < -1 && balanceFactor(node) == -1) {
+        else if (rank(node.leftChild) < -1 && rank(node.rightChild) == -1) {
             rightRightBalance(node);
         }
-        else if (balanceFactor(node.leftChild) < -1 && balanceFactor(node) == 1) {
+        else if (rank(node.leftChild) < -1 && rank(node.rightChild) == 1) {
             rightLeftBalance(node);
         }
     }
@@ -105,4 +125,19 @@ public class AVLTree extends BinarySearchTree {
         rotateLeft(node);
     }
 
+    public void balanceFactorTree () {
+        System.out.println();
+        Queue<BinaryTreeNode> queue = new ArrayDeque<>();
+        queue.add(treeRoot);
+        while (!queue.isEmpty()) {
+            BinaryTreeNode topNode = queue.poll();
+            System.out.println("Node: " + topNode.key + " Rank: " + rank(topNode) + " Balance Factor: " + balanceFactor(topNode));
+            if (topNode.leftChild != null) {
+                queue.add(topNode.leftChild);
+            }
+            if (topNode.rightChild != null) {
+                queue.add(topNode.rightChild);
+            }
+        }
+    }
 }
