@@ -326,6 +326,7 @@ public class BinarySearchTree extends Tree {
 
     public void print() {
         System.out.print(traversePreOrder(this));
+        System.out.println();
     }
 
     @Override

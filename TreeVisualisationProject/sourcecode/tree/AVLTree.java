@@ -10,6 +10,9 @@ public class AVLTree extends BinarySearchTree {
 
     private int rank(int key) {
         BinaryTreeNode nodeFound = search(treeRoot, key);
+        if (nodeFound == null) {
+            return 0;
+        }
         return height(nodeFound) + 1;
     }
 
@@ -20,7 +23,7 @@ public class AVLTree extends BinarySearchTree {
         return height(node) + 1;
     }
 
-    public int balanceFactor(int key) {
+    private int balanceFactor(int key) {
         BinaryTreeNode nodeFound = search(treeRoot, key);
         if (nodeFound == null) {
             return -999;
@@ -28,7 +31,7 @@ public class AVLTree extends BinarySearchTree {
         return rank(nodeFound.leftChild.key) - rank(nodeFound.rightChild.key);
     }
 
-    public boolean isBalance(int key) {
+    private boolean isBalance(int key) {
         int balanceFactor = balanceFactor(key);
         return balanceFactor == 1 || balanceFactor == 0 || balanceFactor == -1;
     }
@@ -68,7 +71,10 @@ public class AVLTree extends BinarySearchTree {
         parentNode.rightChild = childNode.leftChild;
         childNode.leftChild = parentNode;
         BinaryTreeNode grandParentNode = searchParent(treeRoot, parentNode.key);
-        if (grandParentNode.leftChild == parentNode) {
+        if (grandParentNode == null) {
+            treeRoot = childNode;
+        }
+        else if (grandParentNode.leftChild == parentNode) {
             grandParentNode.leftChild = childNode;
         }
         else {
@@ -91,17 +97,34 @@ public class AVLTree extends BinarySearchTree {
         return true;
     }
 
+    @Override
+    public boolean delete (int key) {
+        BinaryTreeNode parentNode = searchParent(treeRoot, key);
+        if (!super.delete(key)) {
+            return false;
+        }
+        while (parentNode != null) {
+            if (!isBalance(parentNode)) {
+                rebalanceNode(parentNode);
+            }
+            parentNode = searchParent(treeRoot, parentNode.key);
+        }
+        return true;
+    }
+
     private void rebalanceNode (BinaryTreeNode node) {
-        if (rank(node.leftChild) > 1 && rank(node.rightChild) == 1) {
+        System.out.println("Node: " + node.key + " BF" + balanceFactor(node));
+        System.out.println("Left: " + rank(node.leftChild) + " Right: " + rank(node.rightChild));
+        if (balanceFactor(node) > 1 && balanceFactor(node.leftChild) > 0) {
             leftLeftBalance(node);
         }
-        else if (rank(node.leftChild) > 1 && rank(node.rightChild) == -1) {
+        else if (balanceFactor(node) > 1 && balanceFactor(node.leftChild) < 0) {
             leftRightBalance(node);
         }
-        else if (rank(node.leftChild) < -1 && rank(node.rightChild) == -1) {
+        else if (balanceFactor(node) < -1 && balanceFactor(node.rightChild) < 0) {
             rightRightBalance(node);
         }
-        else if (rank(node.leftChild) < -1 && rank(node.rightChild) == 1) {
+        else if (balanceFactor(node) < -1 && balanceFactor(node.rightChild) > 0) {
             rightLeftBalance(node);
         }
     }

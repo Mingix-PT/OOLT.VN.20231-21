@@ -12,6 +12,9 @@ public class TestAVL {
         tree.insert(3);
         tree.insert(0);
         tree.print();
-        tree.dfsTraverse();
+        tree.delete(1);
+        tree.delete(0);
+        tree.insert(7);
+        tree.print();
     }
 }
