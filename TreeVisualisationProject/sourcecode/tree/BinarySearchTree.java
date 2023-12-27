@@ -36,8 +36,13 @@ public class BinarySearchTree extends Tree {
             this.rightChild = node.rightChild;
         }
     }
+
+    protected List<Integer> inorderTraverseList = new ArrayList<>();
     public BinarySearchTree(int key) {
         this.treeRoot = new BinaryTreeNode(key);
+    }
+    public BinarySearchTree() {
+        this.treeRoot = null;
     }
     protected BinaryTreeNode leftMostNode(BinaryTreeNode root) {
         if (root.leftChild == null) {
@@ -168,6 +173,10 @@ public class BinarySearchTree extends Tree {
     }
 
     protected boolean insert(BinaryTreeNode root, int key) {
+        if (treeRoot == null) {
+            treeRoot = new BinaryTreeNode(key);
+            return true;
+        }
         if (root.key == key) {
             return false;
         }
@@ -278,6 +287,15 @@ public class BinarySearchTree extends Tree {
             }
         }
         return bfsResult;
+    }
+    protected void inorderTraverse (BinaryTreeNode root) {
+        if (root == null) {
+            return;
+        }
+        inorderTraverse(root.leftChild);
+        System.out.print(root.key + " ");
+        inorderTraverseList.add(root.key);
+        inorderTraverse(root.rightChild);
     }
 
     protected static void traverseTree(StringBuilder sb, String padding, String pointer, BinaryTreeNode tree,
