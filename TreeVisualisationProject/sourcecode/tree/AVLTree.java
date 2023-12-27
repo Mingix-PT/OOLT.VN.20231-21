@@ -8,6 +8,10 @@ public class AVLTree extends BinarySearchTree {
         super(key);
     }
 
+    public AVLTree() {
+        super();
+    }
+
     private int rank(int key) {
         BinaryTreeNode nodeFound = search(treeRoot, key);
         if (nodeFound == null) {

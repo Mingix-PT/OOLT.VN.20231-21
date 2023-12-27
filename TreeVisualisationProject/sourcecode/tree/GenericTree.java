@@ -120,9 +120,20 @@ public class GenericTree extends Tree {
         GenericTreeNode parent = searchParent(key);
         if (parent == null) {
             // The root
-            treeRoot = null;
+            if (treeRoot.children.isEmpty()) {
+                treeRoot = null;
+            }
+            else {
+                GenericTreeNode firstChild = treeRoot.children.getFirst();
+                treeRoot.children.remove(firstChild);
+                if (!treeRoot.children.isEmpty()) {
+                    firstChild.children.addAll(treeRoot.children);
+                }
+                treeRoot = firstChild;
+            }
             return true;
         }
+        parent.children.addAll(nodeFound.children);
         parent.children.remove(nodeFound);
         return true;
     }
@@ -156,13 +167,21 @@ public class GenericTree extends Tree {
     @Override
     public void bfsTraverse() {
         List<GenericTreeNode> bfsResult = bfsTraverse(treeRoot);
-        for (GenericTreeNode node : bfsResult) {
-            System.out.print(node.key + " ");
+        if (bfsResult != null) {
+            for (GenericTreeNode node : bfsResult) {
+                System.out.print(node.key + " ");
+            }
+            System.out.println();
         }
-        System.out.println();
+        else {
+            System.out.println("Tree is empty!");
+        }
     }
 
     private List<GenericTreeNode> bfsTraverse(GenericTreeNode root) {
+        if (treeRoot == null) {
+            return null;
+        }
         List<GenericTreeNode> bfsResult = new ArrayList<>();
         Queue<GenericTreeNode> queueTree = new ArrayDeque<>();
         queueTree.add(root);

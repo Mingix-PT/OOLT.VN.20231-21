@@ -14,8 +14,7 @@ public class TestGenericTree {
         tree.insert(5,8);
         tree.printTree();
         System.out.println("Tree height: " + tree.height());
-        tree.delete(2);
-        tree.update(1,2);
+        tree.delete(10);
         tree.printTree();
         tree.bfsTraverse();
         tree.dfsTraverse();
