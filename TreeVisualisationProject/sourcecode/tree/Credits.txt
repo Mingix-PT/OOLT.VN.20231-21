@@ -1,0 +1,7 @@
+Binary Search Tree Printer: https://www.baeldung.com/java-print-binary-tree-diagram
+    Upper node is left child, lower node is right child
+
+Generic Tree Printer: Copilot
+
+CompleteBalanceBinarySearchTree method: https://stackoverflow.com/questions/52724898/a-complete-binary-search-tree-with-level-order-insert-in-java/52749727?fbclid=IwAR0CFzrigTpPCBsZP1fmWzLqr58oJercCy00ov7ldgTYaWBS-ovJd3GMmZ0#52749727
+    By Mr K.Nicholas: https://stackoverflow.com/users/3795036/k-nicholas
