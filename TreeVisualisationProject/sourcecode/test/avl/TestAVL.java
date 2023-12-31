@@ -1,7 +1,7 @@
 package test.avl;
 
 import tree.AVLTree;
-import tree.BinarySearchTree;
+
 
 public class TestAVL {
     public static void main (String[] args) {

@@ -34,7 +34,7 @@ public class AVLTree extends BinarySearchTree {
         }
         return rank(nodeFound.leftChild.key) - rank(nodeFound.rightChild.key);
     }
-
+    @SuppressWarnings("unused")
     private boolean isBalance(int key) {
         int balanceFactor = balanceFactor(key);
         return balanceFactor == 1 || balanceFactor == 0 || balanceFactor == -1;
