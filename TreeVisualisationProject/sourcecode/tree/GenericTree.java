@@ -11,9 +11,11 @@ public class GenericTree extends Tree {
             this.key = key;
         }
 
+        @SuppressWarnings("unused")
         public int getKey() {
             return key;
         }
+        
 
         public List<GenericTreeNode> getChildren() {
             return children;
@@ -124,7 +126,7 @@ public class GenericTree extends Tree {
                 treeRoot = null;
             }
             else {
-                GenericTreeNode firstChild = treeRoot.children.getFirst();
+                GenericTreeNode firstChild = treeRoot.children.get(0);
                 treeRoot.children.remove(firstChild);
                 if (!treeRoot.children.isEmpty()) {
                     firstChild.children.addAll(treeRoot.children);

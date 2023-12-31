@@ -20,10 +20,14 @@ public class TreeVisualizationApp extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        // Khởi tạo GenericTree và TreeCanvas với kích thước mong muốn
         tree = new GenericTree();
-        treeCanvas = new TreeCanvas(tree);
-        treeCanvas.setWidth(600);
-        treeCanvas.setHeight(400);
+        treeCanvas = new TreeCanvas(tree, 1200, 800);
+
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setContent(treeCanvas);
+        scrollPane.setPrefSize(1200, 800); // Đặt kích thước ưa thích cho ScrollPane
+
         root = new BorderPane();
 
         // Khởi tạo MenuBar và các Menu
@@ -41,6 +45,8 @@ public class TreeVisualizationApp extends Application {
 
         menuBar.getMenus().addAll(fileMenu, helpMenu);
         root.setTop(menuBar);
+
+        root.setCenter(scrollPane); // Đặt ScrollPane chứa treeCanvas vào giữa BorderPane
 
         // Khởi tạo ComboBox và Label cho việc chọn cấu trúc dữ liệu
         treeComboBox = new ComboBox<>();
@@ -66,6 +72,8 @@ public class TreeVisualizationApp extends Application {
         VBox topContainer = new VBox(menuBar, currentStructureContainer);
         root.setTop(topContainer);
 
+        primaryStage.setScene(new Scene(root, 1200, 800)); // Đặt kích thước Scene phù hợp với ScrollPane và Canvas
+        primaryStage.show();
 
     // Set ComboBox action
     treeComboBox.setOnAction(e -> {
@@ -79,7 +87,6 @@ public class TreeVisualizationApp extends Application {
         }
     });
 
-        primaryStage.setScene(new Scene(root, 800, 600));
         primaryStage.show();
         // Modify exitItem's action event
         exitItem.setOnAction(e -> confirmAndExit(primaryStage));
