@@ -1,4 +1,4 @@
-
+package ui;
 public class GenericTree {
     Node root;
 
