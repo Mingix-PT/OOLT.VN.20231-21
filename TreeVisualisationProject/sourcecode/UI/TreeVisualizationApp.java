@@ -44,7 +44,7 @@ public class TreeVisualizationApp extends Application {
 
         // Khởi tạo ComboBox và Label cho việc chọn cấu trúc dữ liệu
         treeComboBox = new ComboBox<>();
-        String[] structures = {"Generic tree", "Binary Search Tree (BST)", "Adelson-Velskii Landis Tree (AVL)", "Balanced Binary Tree"};
+        String[] structures = {"Generic Tree", "Binary Search Tree (BST)", "Adelson-Velskii Landis Tree (AVL)", "Balanced Binary Tree"};
         treeComboBox.getItems().addAll(structures);
         Label selectLabel = new Label("Chọn cấu trúc dữ liệu:");
         comboBoxContainer = new VBox(10, selectLabel, treeComboBox);
@@ -128,7 +128,7 @@ public class TreeVisualizationApp extends Application {
     
         // Tùy chỉnh và hiển thị toolPanel dựa trên cấu trúc dữ liệu mới
         switch (structure) {
-            case "Generic tree":
+            case "Generic Tree":
                 setupToolPanelForGenericTree();
                 break;
             case "Binary Search Tree (BST)":
@@ -155,7 +155,7 @@ public class TreeVisualizationApp extends Application {
     }
 
     private void setupToolPanelForGenericTree() {
-        // Cấu hình toolPanel cho Generic tree
+        // Cấu hình toolPanel cho Generic Tree
         // Thêm/Xóa các nút cần thiết
     }
     
