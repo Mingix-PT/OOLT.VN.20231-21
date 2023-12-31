@@ -7,7 +7,7 @@ import javafx.scene.text.Font;
 
 public class TreeCanvas extends Canvas {
     private GenericTree tree;
-
+  
     // Cập nhật constructor để nhận kích thước làm tham số
     public TreeCanvas(GenericTree tree, double width, double height) {
         this.tree = tree;
