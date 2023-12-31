@@ -1,7 +1,5 @@
 package tree;
 
-
-
 public abstract class Tree {
 
     public abstract Tree createTree();

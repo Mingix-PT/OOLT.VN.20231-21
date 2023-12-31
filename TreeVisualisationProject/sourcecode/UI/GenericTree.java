@@ -1,3 +1,4 @@
+
 public class GenericTree {
     Node root;
 
