@@ -15,7 +15,6 @@ public class GenericTree extends Tree {
         public int getKey() {
             return key;
         }
-        
 
         public List<GenericTreeNode> getChildren() {
             return children;
@@ -103,13 +102,16 @@ public class GenericTree extends Tree {
     @Override
     public boolean insert(int parentKey, int key) {
         if (search(key) != null) {
+            System.out.println("Insert failed: Key " + key + " already exists in the tree.");
             return false;
         }
         GenericTreeNode parentNode = search(parentKey);
         if (parentNode == null) {
+            System.out.println("Insert failed: Parent key " + parentKey + " does not exist in the tree.");
             return false;
         }
         parentNode.children.add(new GenericTreeNode(key));
+        System.out.println("Successfully inserted key " + key + " under parent key " + parentKey);
         return true;
     }
 
@@ -124,8 +126,7 @@ public class GenericTree extends Tree {
             // The root
             if (treeRoot.children.isEmpty()) {
                 treeRoot = null;
-            }
-            else {
+            } else {
                 GenericTreeNode firstChild = treeRoot.children.get(0);
                 treeRoot.children.remove(firstChild);
                 if (!treeRoot.children.isEmpty()) {
@@ -174,8 +175,7 @@ public class GenericTree extends Tree {
                 System.out.print(node.key + " ");
             }
             System.out.println();
-        }
-        else {
+        } else {
             System.out.println("Tree is empty!");
         }
     }
@@ -204,24 +204,18 @@ public class GenericTree extends Tree {
     // Print tree - idea by Copilot Chat
     public void printTree() {
         if (treeRoot != null) {
-            System.out.println(treeRoot.key);
-            for (int i = 0; i < treeRoot.children.size() - 1; i++) {
-                printNode(treeRoot.children.get(i), "", false);
-            }
-            if (!treeRoot.children.isEmpty()) {
-                printNode(treeRoot.children.get(treeRoot.children.size() - 1), "", true);
-            }
+            printNode(treeRoot, "");
         }
     }
 
-    private void printNode(GenericTreeNode node, String prefix, boolean isTail) {
+    private void printNode(GenericTreeNode node, String prefix) {
         if (node != null) {
-            System.out.println(prefix + (isTail ? "└── " : "├── ") + node.key);
+            System.out.println(prefix + (prefix.isEmpty() ? "" : "└── ") + node.key);
             for (int i = 0; i < node.children.size() - 1; i++) {
-                printNode(node.children.get(i), prefix + (isTail ? "    " : "│   "), false);
+                printNode(node.children.get(i), prefix + "    ");
             }
             if (!node.children.isEmpty()) {
-                printNode(node.children.get(node.children.size() - 1), prefix + (isTail ? "    " : "│   "), true);
+                printNode(node.children.get(node.children.size() - 1), prefix + "    ");
             }
         }
     }

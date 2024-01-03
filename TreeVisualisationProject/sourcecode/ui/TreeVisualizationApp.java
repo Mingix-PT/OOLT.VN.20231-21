@@ -1,36 +1,43 @@
 package ui;
 
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.geometry.Pos;
-import javafx.stage.Stage;
-import javafx.util.Pair;
 import java.util.Optional;
 
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.geometry.Pos;
+import javafx.stage.Stage;
+import ui.GenericTree.GenericTreeNode;
+
 public class TreeVisualizationApp extends Application {
+    private GenericTree tree;
     private VBox toolPanel;
     private BorderPane root;
     private ComboBox<String> treeComboBox;
     private VBox comboBoxContainer;
     private MenuButton changeStructureButton;
     private Label currentStructureLabel;
-
-    private GenericTree tree;
-    private TreeCanvas treeCanvas;
+    private Canvas canvas;
+    private GraphicsContext gc;
 
     @Override
     public void start(Stage primaryStage) {
-        // Khởi tạo GenericTree và TreeCanvas với kích thước mong muốn
-        tree = new GenericTree();
-        treeCanvas = new TreeCanvas(tree, 1200, 800);
+        tree = new GenericTree(10);
+
+        root = new BorderPane(); // Khởi tạo root trước khi sử dụng
+
+        // Tạo canvas
+        canvas = new Canvas(1200, 800);
+        gc = canvas.getGraphicsContext2D();
 
         ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setContent(treeCanvas);
+        scrollPane.setContent(canvas); // Thêm canvas vào ScrollPane
         scrollPane.setPrefSize(1200, 800); // Đặt kích thước ưa thích cho ScrollPane
-
-        root = new BorderPane();
 
         // Khởi tạo MenuBar và các Menu
         MenuBar menuBar = new MenuBar();
@@ -48,11 +55,12 @@ public class TreeVisualizationApp extends Application {
         menuBar.getMenus().addAll(fileMenu, helpMenu);
         root.setTop(menuBar);
 
-        root.setCenter(scrollPane); // Đặt ScrollPane chứa treeCanvas vào giữa BorderPane
+        root.setCenter(scrollPane); // Đặt ScrollPane vào giữa BorderPane
 
         // Khởi tạo ComboBox và Label cho việc chọn cấu trúc dữ liệu
         treeComboBox = new ComboBox<>();
-        String[] structures = {"Generic Tree", "Binary Search Tree (BST)", "Adelson-Velskii Landis Tree (AVL)", "Balanced Binary Tree"};
+        String[] structures = { "Generic Tree", "Binary Search Tree (BST)", "Adelson-Velskii Landis Tree (AVL)",
+                "Balanced Binary Tree" };
         treeComboBox.getItems().addAll(structures);
         Label selectLabel = new Label("Chọn cấu trúc dữ liệu:");
         comboBoxContainer = new VBox(10, selectLabel, treeComboBox);
@@ -60,7 +68,7 @@ public class TreeVisualizationApp extends Application {
 
         StackPane centerPane = new StackPane(comboBoxContainer);
         centerPane.setAlignment(Pos.CENTER);
-        
+
         root.setCenter(centerPane);
 
         initializeToolPanel(structures);
@@ -70,24 +78,28 @@ public class TreeVisualizationApp extends Application {
         currentStructureLabel.setAlignment(Pos.CENTER);
         HBox currentStructureContainer = new HBox(currentStructureLabel);
         currentStructureContainer.setAlignment(Pos.CENTER);
-        
+
         VBox topContainer = new VBox(menuBar, currentStructureContainer);
         root.setTop(topContainer);
 
-        primaryStage.setScene(new Scene(root, 1200, 800)); // Đặt kích thước Scene phù hợp với ScrollPane và Canvas
+        primaryStage.setScene(new Scene(root, 1200, 800)); // Đặt kích thước Scene
         primaryStage.show();
 
-    // Set ComboBox action
-    treeComboBox.setOnAction(e -> {
-        String selectedStructure = treeComboBox.getValue();
-        if (selectedStructure != null) {
-            comboBoxContainer.setVisible(false);  // Ẩn comboBoxContainer
-            handleStructureChange(selectedStructure);  // Tùy chỉnh toolPanel dựa trên cấu trúc được chọn
-            root.setCenter(treeCanvas);  // Đặt treeCanvas làm trung tâm để hiển thị cây
-            updateCurrentStructureLabel(selectedStructure);  // Cập nhật label
-            treeCanvas.refresh();  // Làm mới treeCanvas để vẽ cây mới
-        }
-    });
+        updateTreeVisualization(); // Vẽ cây khi ứng dụng khởi chạy
+
+        // Set ComboBox action
+        treeComboBox.setOnAction(e -> {
+            String selectedStructure = treeComboBox.getValue();
+            if (selectedStructure != null) {
+                comboBoxContainer.setVisible(false); // Ẩn comboBoxContainer
+                handleStructureChange(selectedStructure); // Tùy chỉnh toolPanel dựa trên cấu trúc được chọn
+                root.setCenter(canvas); // Đặt treeCanvas làm trung tâm để hiển thị câ
+                updateCurrentStructureLabel(selectedStructure); // Cập nhật label
+                gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+                updateTreeVisualization();
+
+            }
+        });
 
         primaryStage.show();
         // Modify exitItem's action event
@@ -104,16 +116,14 @@ public class TreeVisualizationApp extends Application {
         toolPanel = new VBox(10);
         toolPanel.setAlignment(Pos.CENTER_LEFT);
 
-        // Tạo và thêm MenuButton vào toolPanel
         changeStructureButton = new MenuButton("Đổi cấu trúc dữ liệu");
         for (String structure : structures) {
             MenuItem structureItem = new MenuItem(structure);
             structureItem.setOnAction(e -> handleStructureChange(structure));
             changeStructureButton.getItems().add(structureItem);
         }
-        toolPanel.getChildren().add(changeStructureButton);
 
-        // Thêm các nút khác vào toolPanel
+        // Tạo nút mới cho mỗi chức năng
         Button createButton = new Button("Create");
         Button insertButton = new Button("Insert");
         insertButton.setOnAction(e -> showInsertDialog());
@@ -121,20 +131,20 @@ public class TreeVisualizationApp extends Application {
         Button updateButton = new Button("Update");
         Button traverseButton = new Button("Traverse");
         Button searchButton = new Button("Search");
-        toolPanel.getChildren().addAll(createButton, insertButton, deleteButton, updateButton, traverseButton, searchButton);
 
-        toolPanel.setVisible(false);
+        // Thêm tất cả các nút vào toolPanel một lần
+        toolPanel.getChildren().addAll(changeStructureButton, createButton, insertButton, deleteButton, updateButton,
+                traverseButton, searchButton);
     }
 
     private void handleStructureChange(String structure) {
         updateCurrentStructureLabel(structure); // Cập nhật label khi đổi cấu trúc
         System.out.println("Selected: " + structure);
-    
-        treeCanvas.reset(); // Reset TreeCanvas và GenericTree
 
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         // Ẩn comboBoxContainer
         comboBoxContainer.setVisible(false);
-    
+
         // Tùy chỉnh và hiển thị toolPanel dựa trên cấu trúc dữ liệu mới
         switch (structure) {
             case "Generic Tree":
@@ -153,12 +163,13 @@ public class TreeVisualizationApp extends Application {
                 // Xử lý trường hợp không có cấu trúc dữ liệu được chọn
                 break;
         }
-    
+
         // Hiển thị toolPanel
         root.setLeft(toolPanel);
         toolPanel.setVisible(true);
-        root.setCenter(treeCanvas); // Đặt lại treeCanvas làm trung tâm để hiển thị trạng thái mới của cây
+
     }
+
     private void updateCurrentStructureLabel(String structure) {
         currentStructureLabel.setText("Cấu trúc dữ liệu hiện tại: " + structure);
     }
@@ -167,22 +178,21 @@ public class TreeVisualizationApp extends Application {
         // Cấu hình toolPanel cho Generic Tree
         // Thêm/Xóa các nút cần thiết
     }
-    
+
     private void setupToolPanelForBST() {
         // Cấu hình toolPanel cho Binary Search Tree
         // Thêm/Xóa các nút cần thiết
     }
-    
+
     private void setupToolPanelForAVL() {
         // Cấu hình toolPanel cho Adelson-Velskii Landis Tree
         // Thêm/Xóa các nút cần thiết
     }
-    
+
     private void setupToolPanelForBalancedBinaryTree() {
         // Cấu hình toolPanel cho Balanced Binary Tree
         // Thêm/Xóa các nút cần thiết
     }
-    
 
     private void handleAbout() {
         // Handle About menu option
@@ -197,62 +207,95 @@ public class TreeVisualizationApp extends Application {
             stage.close();
         }
     }
-private void showInsertDialog() {
-    // Tạo một dialog mới
-    Dialog<Pair<String, String>> dialog = new Dialog<>();
-    dialog.setTitle("Insert Node");
 
-    // Thêm nút OK và Cancel
-    ButtonType insertButtonType = new ButtonType("Insert", ButtonBar.ButtonData.OK_DONE);
-    dialog.getDialogPane().getButtonTypes().addAll(insertButtonType, ButtonType.CANCEL);
+    private void showInsertDialog() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Insert Node");
+        dialog.setHeaderText("Insert a new node");
+        dialog.setContentText("Please enter the parent key and new key (separated by space):");
 
-    // Tạo form nhập liệu
-    GridPane grid = new GridPane();
-    grid.setHgap(10);
-    grid.setVgap(10);
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(keys -> {
+            String[] parts = keys.split(" "); // Tách chuỗi bằng dấu cách
+            if (parts.length == 2) { // Kiểm tra xem có đúng hai phần tử không
+                try {
+                    int parentKey = Integer.parseInt(parts[0].trim());
+                    int newKey = Integer.parseInt(parts[1].trim());
+                    boolean inserted = tree.insert(parentKey, newKey);
+                    if (inserted) {
+                        // Cập nhật và vẽ lại cây
+                        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Xóa canvas
+                        updateTreeVisualization(); // Update the tree visualization
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Insert Error",
+                                "Could not insert the node. Please check the keys.");
+                    }
+                } catch (NumberFormatException e) {
+                    showAlert(Alert.AlertType.ERROR, "Invalid Input", "Please enter valid integer values.");
+                }
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Invalid Format",
+                        "Input does not match the required format. Please enter two integers separated by a space.");
+            }
+        });
+    }
 
-    TextField parentValueField = new TextField();
-    parentValueField.setPromptText("Parent Node Value");
-    TextField childValueField = new TextField();
-    childValueField.setPromptText("New Node Value");
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 
-    grid.add(new Label("Parent Node Value:"), 0, 0);
-    grid.add(parentValueField, 1, 0);
-    grid.add(new Label("New Node Value:"), 0, 1);
-    grid.add(childValueField, 1, 1);
+    private void updateTreeVisualization() {
+        tree.printTree();
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight()); // Clear the canvas
+        drawTree(gc, tree.getRoot(), canvas.getWidth() / 2, 40, canvas.getWidth() / 4); // Redraw the tree
+    }
 
-    dialog.getDialogPane().setContent(grid);
-
-    // Convert the result to a pair when the insert button is clicked
-    dialog.setResultConverter(dialogButton -> {
-        if (dialogButton == insertButtonType) {
-            return new Pair<>(parentValueField.getText(), childValueField.getText());
+    private void drawTree(GraphicsContext gc, GenericTreeNode node, double x, double y, double horizontalSpacing) {
+        if (node == null) return;
+    
+        // Kích thước của vòng tròn
+        double radius = 20;
+    
+        // Vẽ vòng tròn với viền đậm
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(3); // Độ đậm của viền
+        gc.strokeOval(x - radius, y - radius, 2 * radius, 2 * radius);
+    
+        // Văn bản nằm ở giữa vòng tròn
+        String text = Integer.toString(node.key);
+        gc.setFill(Color.BLACK);
+        gc.setFont(new Font(17)); // Cài đặt font mới với kích thước đã tăng
+        double textWidth = text.length() * 7; // Ước lượng chiều rộng của văn bản
+        double textHeight = 20; // Ước lượng chiều cao của văn bản
+        gc.fillText(text, x - textWidth / 2, y + textHeight / 4);
+    
+        // Tính toán vị trí và vẽ các nút con
+        final double childY = y + 80; // Khoảng cách dọc giữa các nút
+        int numChildren = node.children.size();
+        
+        // Tăng khoảng cách ngang giữa các nút con
+        double newHorizontalSpace = horizontalSpacing * (numChildren + 1);
+    
+        for (int i = 0; i < numChildren; i++) {
+            double childX = x - (newHorizontalSpace / 2) + newHorizontalSpace / (numChildren + 1) * (i + 1);
+    
+            // Tính tọa độ kết thúc của đường nối sao cho nó chỉ đến viền của đường tròn
+            double lineEndX = childX;
+            double lineEndY = childY - radius; // Điều chỉnh để đường nối chỉ đến viền trên cùng của đường tròn dưới
+    
+            // Vẽ đường nối đến viền của nút con
+            gc.strokeLine(x, y + radius, lineEndX, lineEndY);
+    
+            // Vẽ đệ quy nút con
+            drawTree(gc, node.children.get(i), childX, childY, horizontalSpacing / 2);
         }
-        return null;
-    });
+    }
+    
 
-    // Show the dialog and capture the result
-    Optional<Pair<String, String>> result = dialog.showAndWait();
-
-    result.ifPresent(parentChildPair -> {
-        try {
-            int parentValue = Integer.parseInt(parentChildPair.getKey());
-            int childValue = Integer.parseInt(parentChildPair.getValue());
-            tree.insert(parentValue, childValue);
-            treeCanvas.refresh(); // Refresh the canvas to show the new node
-        } catch (NumberFormatException ex) {
-            showAlert("Invalid input", "Please enter valid integers for parent and child values.");
-        }
-    });
-}
-
-private void showAlert(String title, String message) {
-    Alert alert = new Alert(Alert.AlertType.ERROR);
-    alert.setTitle(title);
-    alert.setHeaderText(null);
-    alert.setContentText(message);
-    alert.showAndWait();
-}
     public static void main(String[] args) {
         launch(args);
     }

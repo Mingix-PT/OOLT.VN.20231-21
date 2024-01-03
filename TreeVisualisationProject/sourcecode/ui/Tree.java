@@ -1,4 +1,4 @@
-package tree;
+package ui;
 
 public abstract class Tree {
 

@@ -34,6 +34,7 @@ public class AVLTree extends BinarySearchTree {
         }
         return rank(nodeFound.leftChild.key) - rank(nodeFound.rightChild.key);
     }
+
     @SuppressWarnings("unused")
     private boolean isBalance(int key) {
         int balanceFactor = balanceFactor(key);
@@ -54,40 +55,36 @@ public class AVLTree extends BinarySearchTree {
         return balanceFactor == 1 || balanceFactor == 0 || balanceFactor == -1;
     }
 
-    private void rotateRight (BinaryTreeNode parentNode) {
+    private void rotateRight(BinaryTreeNode parentNode) {
         BinaryTreeNode childNode = parentNode.leftChild;
         parentNode.leftChild = childNode.rightChild;
         childNode.rightChild = parentNode;
         BinaryTreeNode grandParentNode = searchParent(treeRoot, parentNode.key);
         if (grandParentNode == null) {
             treeRoot = childNode;
-        }
-        else if (grandParentNode.leftChild == parentNode) {
+        } else if (grandParentNode.leftChild == parentNode) {
             grandParentNode.leftChild = childNode;
-        }
-        else {
+        } else {
             grandParentNode.rightChild = childNode;
         }
     }
 
-    private void rotateLeft (BinaryTreeNode parentNode) {
+    private void rotateLeft(BinaryTreeNode parentNode) {
         BinaryTreeNode childNode = parentNode.rightChild;
         parentNode.rightChild = childNode.leftChild;
         childNode.leftChild = parentNode;
         BinaryTreeNode grandParentNode = searchParent(treeRoot, parentNode.key);
         if (grandParentNode == null) {
             treeRoot = childNode;
-        }
-        else if (grandParentNode.leftChild == parentNode) {
+        } else if (grandParentNode.leftChild == parentNode) {
             grandParentNode.leftChild = childNode;
-        }
-        else {
+        } else {
             grandParentNode.rightChild = childNode;
         }
     }
 
     @Override
-    public boolean insert (int key) {
+    public boolean insert(int key) {
         if (!super.insert(key)) {
             return false;
         }
@@ -102,7 +99,7 @@ public class AVLTree extends BinarySearchTree {
     }
 
     @Override
-    public boolean delete (int key) {
+    public boolean delete(int key) {
         BinaryTreeNode parentNode = searchParent(treeRoot, key);
         if (!super.delete(key)) {
             return false;
@@ -116,49 +113,46 @@ public class AVLTree extends BinarySearchTree {
         return true;
     }
 
-    private void rebalanceNode (BinaryTreeNode node) {
+    private void rebalanceNode(BinaryTreeNode node) {
         System.out.println("Node: " + node.key + " BF" + balanceFactor(node));
         System.out.println("Left: " + rank(node.leftChild) + " Right: " + rank(node.rightChild));
         if (balanceFactor(node) > 1 && balanceFactor(node.leftChild) > 0) {
             leftLeftBalance(node);
-        }
-        else if (balanceFactor(node) > 1 && balanceFactor(node.leftChild) < 0) {
+        } else if (balanceFactor(node) > 1 && balanceFactor(node.leftChild) < 0) {
             leftRightBalance(node);
-        }
-        else if (balanceFactor(node) < -1 && balanceFactor(node.rightChild) < 0) {
+        } else if (balanceFactor(node) < -1 && balanceFactor(node.rightChild) < 0) {
             rightRightBalance(node);
-        }
-        else if (balanceFactor(node) < -1 && balanceFactor(node.rightChild) > 0) {
+        } else if (balanceFactor(node) < -1 && balanceFactor(node.rightChild) > 0) {
             rightLeftBalance(node);
         }
     }
 
-    private void leftLeftBalance (BinaryTreeNode node) {
+    private void leftLeftBalance(BinaryTreeNode node) {
         rotateRight(node);
     }
 
-
-    private void leftRightBalance (BinaryTreeNode node) {
+    private void leftRightBalance(BinaryTreeNode node) {
         rotateLeft(node.leftChild);
         rotateRight(node);
     }
 
-    private void rightRightBalance (BinaryTreeNode node) {
+    private void rightRightBalance(BinaryTreeNode node) {
         rotateLeft(node);
     }
 
-    private void rightLeftBalance (BinaryTreeNode node) {
+    private void rightLeftBalance(BinaryTreeNode node) {
         rotateRight(node.rightChild);
         rotateLeft(node);
     }
 
-    public void balanceFactorTree () {
+    public void balanceFactorTree() {
         System.out.println();
         Queue<BinaryTreeNode> queue = new ArrayDeque<>();
         queue.add(treeRoot);
         while (!queue.isEmpty()) {
             BinaryTreeNode topNode = queue.poll();
-            System.out.println("Node: " + topNode.key + " Rank: " + rank(topNode) + " Balance Factor: " + balanceFactor(topNode));
+            System.out.println(
+                    "Node: " + topNode.key + " Rank: " + rank(topNode) + " Balance Factor: " + balanceFactor(topNode));
             if (topNode.leftChild != null) {
                 queue.add(topNode.leftChild);
             }
