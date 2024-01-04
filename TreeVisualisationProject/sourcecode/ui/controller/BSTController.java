@@ -50,9 +50,9 @@ public class BSTController {
                 bst.insert((int) (Math.random() * 100));
             }
             bst.print();
-            drawTree(treePane, bst.getTreeRoot());
+            drawTree(bst.getTreeRoot(), treePane.getWidth() / 2,treePane.getHeight()*0.1, bst.height()*30);
         }
-        catch (Exception e) {
+        catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Invalid input", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -89,82 +89,52 @@ public class BSTController {
         }
     }
 
-    private void drawTree(Pane pane, BinaryTreeNode root) {
-        double paneWidth = pane.getWidth();
-        double paneHeight = pane.getHeight();
-        int treeDepth = getTreeDepth(root);
-
-        double horizontalSpacing = paneWidth / (Math.pow(2, treeDepth + 1)); // Adjust as needed
-        double verticalSpacing = paneHeight / (treeDepth + 1); // Adjust as needed
-        double yOffset = verticalSpacing / 2; // Adjust as needed
-
-        drawLines(pane, root, paneWidth / 2, yOffset, horizontalSpacing, verticalSpacing);
-        drawNodes(pane, root, paneWidth / 2, yOffset, horizontalSpacing, verticalSpacing);
-    }
-
-    private void drawLines(Pane pane, BinaryTreeNode root, double x, double y, double horizontalSpacing, double verticalSpacing) {
-        if (root == null) {
-            return;
-        }
-
-        double nodeHeight = 30; // Replace with the actual height of the nodes
-
-        // Draw the line to the left child
-        if (root.leftChild != null) {
-            Line line = new Line(x, y + nodeHeight / 2, x - horizontalSpacing, y + verticalSpacing - nodeHeight / 2);
-            pane.getChildren().add(line);
-            drawLines(pane, root.leftChild, x - horizontalSpacing, y + verticalSpacing, horizontalSpacing / 2, verticalSpacing);
-        }
-
-        // Draw the line to the right child
-        if (root.rightChild != null) {
-            Line line = new Line(x, y + nodeHeight / 2, x + horizontalSpacing, y + verticalSpacing - nodeHeight / 2);
-            pane.getChildren().add(line);
-            drawLines(pane, root.rightChild, x + horizontalSpacing, y + verticalSpacing, horizontalSpacing / 2, verticalSpacing);
-        }
-    }
-
-    private int getTreeDepth(BinaryTreeNode node) {
-        if (node == null) {
-            return 0;
-        } else {
-            return 1 + Math.max(getTreeDepth(node.leftChild), getTreeDepth(node.rightChild));
-        }
-    }
-
-    private void drawNodes(Pane pane, BinaryTreeNode root, double x, double y, double horizontalSpacing, double verticalSpacing) {
-        if (root == null) {
-            return;
-        }
+    private void drawTree(BinaryTreeNode node, double x, double y, double horizontalSpacing) {
+        if (node == null) return;
 
         try {
+            double nodeHeight = 30; // Replace with the actual height of the nodes
+            double yAdjustment = 30; // Adjust vertical spacing between nodes
             // Load the TreeNode.fxml
-            final String NODE_FXML_FILE_PATH = "/ui/view/TreeNode.fxml";
-            FXMLLoader fxmlLoader = new FXMLLoader();
-            fxmlLoader.setLocation(getClass().getResource(NODE_FXML_FILE_PATH));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/view/TreeNode.fxml"));
             TreeNodeController treeNodeController = new TreeNodeController();
-            fxmlLoader.setController(treeNodeController);
-            AnchorPane nodePane = fxmlLoader.load();
+            loader.setController(treeNodeController);
+            Pane nodePane = loader.load();
 
-            // Set the node key
-            treeNodeController.setKey(root.key);
+            // Get the controller and set the node key
+            TreeNodeController controller = loader.getController();
+            controller.setKey(node.key);
 
-            // Position the node
             nodePane.setLayoutX(x);
             nodePane.setLayoutY(y);
 
             // Add the node to the pane
-            pane.getChildren().add(nodePane);
+            treePane.getChildren().add(nodePane);
 
-            // Draw the left child
-            drawNodes(pane, root.leftChild, x - horizontalSpacing, y + verticalSpacing, horizontalSpacing / 2, verticalSpacing);
+            // Calculate position and draw child nodes
+            final double childY = y + 80; // Vertical distance between nodes
 
-            // Draw the right child
-            drawNodes(pane, root.rightChild, x + horizontalSpacing, y + verticalSpacing, horizontalSpacing / 2, verticalSpacing);
+            // Draw the line to the left child and the left child itself
+            if (node.leftChild != null) {
+                double childX = x - horizontalSpacing;
+                Line line = new Line(x + nodeHeight/2 , y - yAdjustment + 2 * nodeHeight, childX + nodeHeight/2, childY  + nodeHeight/2);
+                treePane.getChildren().add(line);
+                drawTree(node.leftChild, childX, childY, horizontalSpacing/2);
+            }
+
+            // Draw the line to the right child and the right child itself
+            if (node.rightChild != null) {
+                double childX = x + horizontalSpacing;
+                Line line = new Line(x + nodeHeight/2, y - yAdjustment + 2*nodeHeight, childX + nodeHeight/2, childY  + nodeHeight/2);
+                treePane.getChildren().add(line);
+                drawTree(node.rightChild, childX, childY, horizontalSpacing/2);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }    void clearPane() {
+    }
+
+    void clearPane() {
         treePane.getChildren().clear();
     }
 }
