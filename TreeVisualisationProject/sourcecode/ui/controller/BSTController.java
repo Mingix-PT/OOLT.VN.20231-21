@@ -1,10 +1,16 @@
 package ui.controller;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import tree.BinarySearchTree;
@@ -42,7 +48,6 @@ public class BSTController {
     void createRandomTree(ActionEvent event) {
         try
         {
-            clearPane();
             String input = JOptionPane.showInputDialog("Enter the height of the tree: ");
             int height = Integer.parseInt(input);
             bst = new BinarySearchTree();
@@ -50,7 +55,8 @@ public class BSTController {
                 bst.insert((int) (Math.random() * 100));
             }
             bst.print();
-            drawTree(bst.getTreeRoot(), treePane.getWidth() / 2,treePane.getHeight()*0.1, bst.height()*30);
+            clearPane();
+            drawTree(bst.getTreeRoot(), treePane.getWidth() / 2,treePane.getHeight()*0.1, bst.height()*40);
         }
         catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Invalid input", "Error", JOptionPane.ERROR_MESSAGE);
@@ -69,7 +75,28 @@ public class BSTController {
 
     @FXML
     void searchNode(ActionEvent event) {
-
+        try{
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Search");
+            dialog.setHeaderText("Search");
+            String input = dialog.showAndWait().get();
+            int key = Integer.parseInt(input);
+            if (searchUI(bst.getTreeRoot(), key)) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Found", ButtonType.OK);
+                alert.showAndWait();
+                dialog.setContentText("Found");
+            }
+            else {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Not found", ButtonType.OK);
+                alert.showAndWait();
+                dialog.setContentText("");
+            }
+        }
+        catch (NumberFormatException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid input", ButtonType.OK);
+            alert.showAndWait();
+        }
     }
 
     @FXML
@@ -136,5 +163,48 @@ public class BSTController {
 
     void clearPane() {
         treePane.getChildren().clear();
+    }
+
+    public boolean searchUI(BinaryTreeNode root,int key) {
+        if (root == null) {
+            return false;
+        }
+        else {
+            highlightNode(root.key);
+            if (root.key == key) {
+                return true;
+            }
+            else if (root.key > key) {
+                highlightNode(root.leftChild.key);
+                return searchUI(root.leftChild, key);
+            }
+            else {
+                highlightNode(root.rightChild.key);
+                return searchUI(root.rightChild, key);
+            }
+        }
+    }
+
+    void highlightNode(int key) {
+        // TODO
+        ObservableList<Node> nodes = treePane.getChildren();
+        for (Node node : nodes) {
+            if (node instanceof AnchorPane anchorPane) {
+                ObservableList<Node> children = anchorPane.getChildren();
+                for (Node child : children) {
+                    if (child instanceof HBox hBox) {
+                        ObservableList<Node> hBoxChildren = hBox.getChildren();
+                        for (Node hBoxChild : hBoxChildren) {
+                            if (hBoxChild instanceof Label label) {
+                                if (label.getText().equals(String.valueOf(key))) {
+                                    hBox.setStyle("-fx-border-color: #ff0000");
+                                    label.setStyle("-fx-text-fill: #ff0000");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

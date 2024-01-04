@@ -14,4 +14,9 @@ public class TreeNodeController {
     public void setKey(int key) {
         treeNodeKey.setText(String.valueOf(key));
     }
+
+    public void highlight() {
+        hBox.setStyle("-fx-background-color: #ff0000");
+        treeNodeKey.setStyle("-fx-text-fill: #ff0000");
+    }
 }

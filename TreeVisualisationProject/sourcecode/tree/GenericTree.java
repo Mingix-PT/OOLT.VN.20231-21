@@ -3,28 +3,6 @@ package tree;
 import java.util.*;
 
 public class GenericTree extends Tree {
-    private class GenericTreeNode {
-        private int key;
-        private List<GenericTreeNode> children = new ArrayList<>();
-
-        public GenericTreeNode(int key) {
-            this.key = key;
-        }
-
-        @SuppressWarnings("unused")
-        public int getKey() {
-            return key;
-        }
-
-        public List<GenericTreeNode> getChildren() {
-            return children;
-        }
-
-        public boolean isLeaf() {
-            return children.isEmpty();
-        }
-    }
-
     private GenericTreeNode treeRoot;
 
     public GenericTree(int key) {
@@ -43,7 +21,7 @@ public class GenericTree extends Tree {
 
     @Override
     public int depth(int key) {
-        GenericTreeNode nodeFound = search(key);
+        GenericTreeNode nodeFound = search(treeRoot, key);
         if (nodeFound == null) {
             return -1;
         }
@@ -66,7 +44,10 @@ public class GenericTree extends Tree {
         return 1 + Collections.max(childrenHeights);
     }
 
-    private GenericTreeNode search(int key) {
+    public boolean search(int key) {
+        return search(treeRoot, key) != null;
+    }
+    private GenericTreeNode search(GenericTreeNode root, int key) {
         // Search using BFS traverse
         Queue<GenericTreeNode> queueTree = new ArrayDeque<>();
         queueTree.add(treeRoot);
@@ -101,11 +82,11 @@ public class GenericTree extends Tree {
 
     @Override
     public boolean insert(int parentKey, int key) {
-        if (search(key) != null) {
+        if (search(treeRoot, key) != null) {
             System.out.println("Insert failed: Key " + key + " already exists in the tree.");
             return false;
         }
-        GenericTreeNode parentNode = search(parentKey);
+        GenericTreeNode parentNode = search(treeRoot, parentKey);
         if (parentNode == null) {
             System.out.println("Insert failed: Parent key " + parentKey + " does not exist in the tree.");
             return false;
@@ -117,7 +98,7 @@ public class GenericTree extends Tree {
 
     @Override
     public boolean delete(int key) {
-        GenericTreeNode nodeFound = search(key);
+        GenericTreeNode nodeFound = search(treeRoot, key);
         if (nodeFound == null) {
             return false;
         }
@@ -143,7 +124,7 @@ public class GenericTree extends Tree {
 
     @Override
     public boolean update(int currentKey, int newKey) {
-        GenericTreeNode nodeFound = search(currentKey);
+        GenericTreeNode nodeFound = search(treeRoot, currentKey);
         if (nodeFound == null) {
             return false;
         }

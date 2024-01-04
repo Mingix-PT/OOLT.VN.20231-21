@@ -33,6 +33,11 @@ public class BinarySearchTree extends Tree {
         return height(treeRoot);
     }
 
+    @Override
+    public boolean search(int key) {
+        return search(treeRoot, key) != null;
+    }
+
     protected int height(BinaryTreeNode root) {
         if (root == null || root.isLeaf()) {
             return 0;
@@ -115,6 +120,10 @@ public class BinarySearchTree extends Tree {
             }
             return searchParent(root.rightChild, key);
         }
+    }
+
+    public BinaryTreeNode searchParent(int key) {
+        return searchParent(treeRoot, key);
     }
 
     protected BinaryTreeNode search(BinaryTreeNode root, int key) {
@@ -313,4 +322,5 @@ public class BinarySearchTree extends Tree {
         // Not available for binary search tree
         return false;
     }
+
 }
