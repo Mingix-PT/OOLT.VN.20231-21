@@ -15,7 +15,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <BorderPane prefHeight="700.0" prefWidth="1024.0">
+      <BorderPane prefHeight="800.0" prefWidth="1200.0">
          <top>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: black;" BorderPane.alignment="CENTER">
                <children>
@@ -45,9 +45,6 @@
          <bottom>
             <HBox prefHeight="100.0" prefWidth="200.0" style="-fx-background-color: black;" BorderPane.alignment="CENTER" />
          </bottom>
-         <center>
-            <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
-         </center>
          <left>
             <VBox prefHeight="500.0" prefWidth="112.0" style="-fx-background-color: black;" BorderPane.alignment="CENTER">
                <children>
@@ -106,6 +103,16 @@
          <right>
             <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: magenta;" BorderPane.alignment="CENTER" />
          </right>
+         <center>
+            <Pane fx:id="treePane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <padding>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </padding>
+               <children>
+                  <Region prefHeight="114.0" prefWidth="890.0" />
+               </children>
+            </Pane>
+         </center>
       </BorderPane>
    </children>
 </AnchorPane>

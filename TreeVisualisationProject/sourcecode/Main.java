@@ -14,7 +14,7 @@ public class Main extends Application {
         final String BST_FXML_FILE_PATH = "/ui/view/BST.fxml";
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource(BST_FXML_FILE_PATH));
-        BSTController bstController = new BSTController(bst);
+        BSTController bstController = new BSTController();
         fxmlLoader.setController(bstController);
         Parent parent = fxmlLoader.load();
 

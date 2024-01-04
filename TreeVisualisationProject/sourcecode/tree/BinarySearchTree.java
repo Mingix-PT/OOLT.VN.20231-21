@@ -3,39 +3,6 @@ package tree;
 import java.util.*;
 
 public class BinarySearchTree extends Tree {
-    protected class BinaryTreeNode {
-        protected int key;
-        protected BinaryTreeNode leftChild;
-        protected BinaryTreeNode rightChild;
-
-        public BinaryTreeNode(int key) {
-            this.key = key;
-            this.leftChild = null;
-            this.rightChild = null;
-        }
-
-        public int getKey() {
-            return key;
-        }
-
-        public boolean isLeaf() {
-            return (leftChild == null && rightChild == null);
-        }
-
-        public BinaryTreeNode getLeftChild() {
-            return leftChild;
-        }
-
-        public BinaryTreeNode getRightChild() {
-            return rightChild;
-        }
-
-        public void setNode(BinaryTreeNode node) {
-            this.key = node.key;
-            this.leftChild = node.leftChild;
-            this.rightChild = node.rightChild;
-        }
-    }
 
     protected List<Integer> inorderTraverseList = new ArrayList<>();
 
@@ -74,6 +41,10 @@ public class BinarySearchTree extends Tree {
     }
 
     protected BinaryTreeNode treeRoot;
+
+    public BinaryTreeNode getTreeRoot () {
+        return treeRoot;
+    }
 
     public int depth(int key) {
         BinaryTreeNode nodeFound = search(treeRoot, key);
