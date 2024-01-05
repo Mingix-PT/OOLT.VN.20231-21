@@ -66,6 +66,21 @@
                         </Label>
                      </children>
                   </VBox>
+                  <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="63.0" text="Button">
+                     <HBox.margin>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="63.0" text="Button">
+                     <HBox.margin>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="63.0" text="Button">
+                     <HBox.margin>
+                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                     </HBox.margin>
+                  </Button>
                   <Slider fx:id="sliderProgress1" blockIncrement="1.0" majorTickUnit="1.0" max="0.0" minorTickCount="0" onDragDone="#getSpeed" prefHeight="38.0" prefWidth="442.0" snapToTicks="true" value="1.0">
                      <HBox.margin>
                         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
