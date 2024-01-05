@@ -67,7 +67,32 @@ public class BSTController {
 
     @FXML
     void deleteNode(ActionEvent event) {
-
+        try {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Delete");
+            dialog.setHeaderText("Delete");
+            String input = dialog.showAndWait().get();
+            int key = Integer.parseInt(input);
+            if (deleteUI(bst.getTreeRoot(), key)) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Deleted", ButtonType.OK);
+                alert.showAndWait();
+                dialog.setContentText("Deleted");
+                clearPane();
+                drawTree(bst.getTreeRoot(), treePane.getWidth() / 2,treePane.getHeight()*0.1, bst.height()*40);
+            }
+            else {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed", ButtonType.OK);
+                alert.showAndWait();
+                dialog.setContentText("Failed");
+            }
+        }
+        catch (NumberFormatException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid input", ButtonType.OK);
+            alert.showAndWait();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @FXML
@@ -248,49 +273,44 @@ public class BSTController {
         return insertUI(root.rightChild, key);
     }
 
+    public boolean deleteUI(BinaryTreeNode root, int key) throws InterruptedException {
+        if (!searchUI(root, key)) {
+            return false;
+        }
+        HBox hBox = findNode(key);
+        if (hBox == null)
+            return false;
+//        treePane.getChildren().remove(hBox);
+        bst.delete(key);
+//        bst.print();
+        return true;
+    }
+
     void highlightNode(int key) {
-        ObservableList<Node> nodes = treePane.getChildren();
-        for (Node node : nodes) {
-            if (!(node instanceof AnchorPane anchorPane))
+        HBox hBox = findNode(key);
+        if (hBox == null)
+            return;
+        hBox.setStyle("-fx-border-color: #000000; -fx-border-radius: 30; " +
+                "-fx-background-color: #ff0000; -fx-background-radius: 30");
+        ObservableList<Node> hBoxChildren = hBox.getChildren();
+        for (Node hBoxChild : hBoxChildren) {
+            if (!(hBoxChild instanceof Label label))
                 continue;
-            ObservableList<Node> children = anchorPane.getChildren();
-            for (Node child : children) {
-                if (!(child instanceof HBox hBox))
-                    continue;
-                ObservableList<Node> hBoxChildren = hBox.getChildren();
-                for (Node hBoxChild : hBoxChildren) {
-                    if (!(hBoxChild instanceof Label label))
-                        continue;
-                    if (!label.getText().equals(String.valueOf(key)))
-                        continue;
-                    hBox.setStyle("-fx-border-color: #ff0000; -fx-border-radius: 30; " +
-                            "-fx-background-color: #ff0000; -fx-background-radius: 30");
-                    label.setStyle("-fx-text-fill: #ffffff");
-                }
-            }
+            label.setStyle("-fx-text-fill: #ffffff");
         }
     }
 
     void highlightNodeFound(int key) {
-        ObservableList<Node> nodes = treePane.getChildren();
-        for (Node node : nodes) {
-            if (!(node instanceof AnchorPane anchorPane))
+        HBox hBox = findNode(key);
+        if (hBox == null)
+            return;
+        hBox.setStyle("-fx-border-color: #000000; -fx-border-radius: 30; " +
+                "-fx-background-color: #00ff00; -fx-background-radius: 30");
+        ObservableList<Node> hBoxChildren = hBox.getChildren();
+        for (Node hBoxChild : hBoxChildren) {
+            if (!(hBoxChild instanceof Label label))
                 continue;
-            ObservableList<Node> children = anchorPane.getChildren();
-            for (Node child : children) {
-                if (!(child instanceof HBox hBox))
-                    continue;
-                ObservableList<Node> hBoxChildren = hBox.getChildren();
-                for (Node hBoxChild : hBoxChildren) {
-                    if (!(hBoxChild instanceof Label label))
-                        continue;
-                    if (!label.getText().equals(String.valueOf(key)))
-                        continue;
-                    hBox.setStyle("-fx-border-color: #000000; -fx-border-radius: 30; " +
-                            "-fx-background-color: #00ff00; -fx-background-radius: 30");
-                    label.setStyle("-fx-text-fill: #000000");
-                }
-            }
+            label.setStyle("-fx-text-fill: #000000");
         }
     }
 
@@ -313,5 +333,24 @@ public class BSTController {
                 }
             }
         }
+    }
+
+    HBox findNode(int key) {
+        ObservableList<Node> nodes = treePane.getChildren();
+        for (Node node : nodes) {
+            if (!(node instanceof AnchorPane anchorPane))
+                continue;
+            ObservableList<Node> children = anchorPane.getChildren();
+            for (Node child : children) {
+                if (!(child instanceof HBox hBox))
+                    continue;
+                ObservableList<Node> hBoxChildren = hBox.getChildren();
+                for (Node hBoxChild : hBoxChildren) {
+                    if (hBoxChild instanceof Label label && label.getText().equals(String.valueOf(key)))
+                        return hBox;
+                }
+            }
+        }
+        return null;
     }
 }

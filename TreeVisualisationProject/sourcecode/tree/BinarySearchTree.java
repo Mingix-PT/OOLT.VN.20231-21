@@ -180,32 +180,40 @@ public class BinarySearchTree extends Tree {
         BinaryTreeNode parent = searchParent(treeRoot, key);
         if (nodeFound.leftChild == null || nodeFound.rightChild == null) {
             setNodeToChild(nodeFound);
-        } else {
+        }
+        else {
             BinaryTreeNode right = nodeFound.rightChild;
             BinaryTreeNode leftMostOfRight = leftMostNode(right);
-            BinaryTreeNode parentLeftMostOfRight = searchParent(treeRoot, leftMostOfRight.key);
-            parentLeftMostOfRight.leftChild = leftMostOfRight.rightChild;
-            if (parent != null) { // Not the root
-                updateNode(nodeFound, leftMostOfRight);
-                leftMostOfRight.leftChild = nodeFound.leftChild;
-            } else { // The root
-                leftMostOfRight.leftChild = nodeFound.leftChild;
-                leftMostOfRight.rightChild = nodeFound.rightChild;
-                treeRoot = leftMostOfRight;
+            if (leftMostOfRight == right) {
+                nodeFound.rightChild = right.rightChild;
+                nodeFound.key = right.key;
+            } else {
+                BinaryTreeNode parentLeftMostOfRight = searchParent(treeRoot, leftMostOfRight.key);
+                parentLeftMostOfRight.leftChild = leftMostOfRight.rightChild;
+                if (parent != null) { // Not the root
+                    updateNode(nodeFound, leftMostOfRight);
+//                leftMostOfRight.leftChild = nodeFound.leftChild;
+//                leftMostOfRight.rightChild = nodeFound.rightChild;
+                } else { // The root
+                    leftMostOfRight.leftChild = nodeFound.leftChild;
+                    leftMostOfRight.rightChild = nodeFound.rightChild;
+                    treeRoot = leftMostOfRight;
+                }
             }
         }
         return true;
     }
 
     protected void updateNode(BinaryTreeNode currentNode, BinaryTreeNode newNode) {
-        BinaryTreeNode parent = searchParent(treeRoot, currentNode.key);
-        if (parent != null) {
-            if (parent.leftChild == currentNode) {
-                parent.leftChild = newNode;
-            } else {
-                parent.rightChild = newNode;
-            }
-        }
+//        BinaryTreeNode parent = searchParent(treeRoot, currentNode.key);
+//        if (parent != null) {
+//            if (parent.leftChild == currentNode) {
+//                parent.leftChild = newNode;
+//            } else {
+//                parent.rightChild = newNode;
+//            }
+//        }
+        currentNode.key = newNode.key;
     }
 
     @Override
