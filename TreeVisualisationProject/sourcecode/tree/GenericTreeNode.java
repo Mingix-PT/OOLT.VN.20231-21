@@ -11,7 +11,6 @@ public class GenericTreeNode {
         this.key = key;
     }
 
-    @SuppressWarnings("unused")
     public int getKey() {
         return key;
     }
