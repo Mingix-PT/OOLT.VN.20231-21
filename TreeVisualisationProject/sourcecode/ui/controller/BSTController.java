@@ -5,7 +5,6 @@ import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -58,6 +57,17 @@ public class BSTController {
 
     @FXML
     private Button bfsButton;
+    
+    @FXML
+    private Slider sliderSpeed;
+
+    @FXML
+    private int speed = 1;
+
+    @FXML
+    private Label speedLabel;
+    
+    private int timeDelaySet = 1020;
 
     @FXML
     void backToMainMenu(ActionEvent event) {
@@ -127,7 +137,7 @@ public class BSTController {
             dialog.setHeaderText("Insert");
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
-            if (insertUI(bst.getTreeRoot(), key, 1000)) {
+            if (insertUI(bst.getTreeRoot(), key, timeDelaySet)) {
 //                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Inserted", ButtonType.OK);
 //                alert.showAndWait();
 //                dialog.setContentText("Inserted");
@@ -146,18 +156,12 @@ public class BSTController {
             throw new RuntimeException(e);
         }
     }
-
-    @FXML
-    void getSpeed() {
-
-    }
-
     @FXML
     void dfsTraverse(ActionEvent event) {
         resetHighlight();
         traverseVBox.setVisible(false);
         try {
-            dfsTraverseUI(bst.getTreeRoot(), 1000);
+            dfsTraverseUI(bst.getTreeRoot(), timeDelaySet);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -218,6 +222,11 @@ public class BSTController {
     @FXML
     public void initialize() {
         final String NODE_FXML_FILE_PATH = "/ui/view/TreeNode.fxml";
+        sliderSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
+            speed = newValue.intValue();
+            timeDelaySet = 1020 / speed;
+            speedLabel.setText(speed + "x");
+        });
         try {
             updateButton.setVisible(false);
             FXMLLoader fxmlLoader = new FXMLLoader();
@@ -289,13 +298,13 @@ public class BSTController {
             if (root == null) {
                 return 0;
             } else {
-                timeDelay += 1000;
+                timeDelay += timeDelaySet;
                 if (root.key == key) {
                     delay(timeDelay, () -> highLightNodeGreen(key));
                     return timeDelay;
                 }
                 delay(timeDelay, () -> highLightNodeRed(root.key));
-                timeDelay += 1000;
+                timeDelay += timeDelaySet;
                 if (root.key > key) {
                     if (root.leftChild == null) {
                         return 0;
@@ -317,7 +326,7 @@ public class BSTController {
     }
 
     public boolean insertUI(BinaryTreeNode root, int key, long timeDelay) throws InterruptedException {
-        timeDelay += 1000;
+        timeDelay += timeDelaySet;
         if (bst.getTreeRoot() == null) {
             bst.setTreeRoot(key);
             drawWholeTree();
@@ -327,14 +336,14 @@ public class BSTController {
         if (root.key == key) {
             return false;
         }
-        timeDelay += 1000;
+        timeDelay += timeDelaySet;
         delay(timeDelay, () -> highLightNodeRed(root.key));
         if (root.key > key) {
             if (root.leftChild == null) {
                 root.leftChild = new BinaryTreeNode(key);
-                timeDelay += 1000;
+                timeDelay += timeDelaySet;
                 delay(timeDelay, () -> drawLeftChild(root.key, key));
-                timeDelay += 1000;
+                timeDelay += timeDelaySet;
                 delay(timeDelay, () -> highLightNodeGreen(key));
                 return true;
             }
@@ -342,9 +351,9 @@ public class BSTController {
         }
         if (root.rightChild == null) {
             root.rightChild = new BinaryTreeNode(key);
-            timeDelay += 1000;
+            timeDelay += timeDelaySet;
             delay(timeDelay, () -> drawRightChild(root.key, key));
-            timeDelay += 1000;
+            timeDelay += timeDelaySet;
             delay(timeDelay, () -> highLightNodeGreen(key));
             return true;
         }
@@ -357,14 +366,14 @@ public class BSTController {
         if (timeDelay == 0) {
             return false;
         }
-        timeDelay += 1000;
+        timeDelay += timeDelaySet;
         HBox hBox = findNode(key);
         if (hBox == null)
             return false;
         HBox hBoxDelete = findNode(key);
         BinaryTreeNode nodeFound = bst.searchNode(key);
         if (nodeFound.isLeaf()) {
-            delay(timeDelay + 1000, () -> {
+            delay(timeDelay + timeDelaySet, () -> {
                 bst.delete(key);
                 clearPane();
                 drawWholeTree();
@@ -372,11 +381,11 @@ public class BSTController {
             return true;
         }
         if (nodeFound.leftChild == null || nodeFound.rightChild == null) {
-            delay(timeDelay + 1000, () -> {
+            delay(timeDelay + timeDelaySet, () -> {
                 hBoxDelete.setVisible(false);
                 deleteLine(hBoxDelete);
             });
-            delay(timeDelay + 2000, () -> {
+            delay(timeDelay + 2 * timeDelaySet, () -> {
                 bst.delete(key);
                 clearPane();
                 drawWholeTree();
@@ -386,12 +395,12 @@ public class BSTController {
         BinaryTreeNode leftMostOfRight = bst.leftMostNode(nodeFound.rightChild);
         HBox hBoxLeftMostOfRight = findNode(leftMostOfRight.key);
         AtomicLong timeDelay2 = new AtomicLong();
-        timeDelay += 1000;
+        timeDelay += timeDelaySet;
         long finalTimeDelay = timeDelay;
         delay(timeDelay, () -> {
             try {
                 timeDelay2.addAndGet(searchUI(nodeFound.rightChild, leftMostOfRight.key, 0));
-                delay(timeDelay2.get() + 1000, () -> {
+                delay(timeDelay2.get() + timeDelaySet, () -> {
                     ObservableList<Node> children = hBoxDelete.getChildren();
                     for (Node child : children) {
                         if (!(child instanceof Label label))
@@ -401,7 +410,7 @@ public class BSTController {
                     deleteLine(hBoxLeftMostOfRight);
                     hBoxLeftMostOfRight.setVisible(false);
                 });
-                delay(timeDelay2.get() + 2000, () -> {
+                delay(timeDelay2.get() + 2 * timeDelaySet, () -> {
                     clearPane();
                     bst.delete(key);
                     drawWholeTree();
@@ -420,13 +429,13 @@ public class BSTController {
         }
         else {
             delay(timeDelay, () -> highLightNodeGreen(root.key));
-            timeDelay += 1000;
+            timeDelay += timeDelaySet;
             if (root.leftChild != null) {
                 dfsTraverseUI(root.leftChild, timeDelay);
             }
             if (root.rightChild != null) {
                 long finalTimeDelay = timeDelay;
-                delay(timeDelayLeft + 1000 * bst.countNodes(root.leftChild), () -> {
+                delay(timeDelayLeft + timeDelaySet * bst.countNodes(root.leftChild), () -> {
                     try {
                         dfsTraverseUI(root.rightChild, finalTimeDelay);
                     } catch (InterruptedException e) {
@@ -443,11 +452,11 @@ public class BSTController {
             return;
         }
         queue.add(bst.getTreeRoot());
-        long timeDelay = 1000;
+        long timeDelay = timeDelaySet;
         while (!queue.isEmpty()) {
             BinaryTreeNode node = queue.poll();
             delay(timeDelay, () -> highLightNodeGreen(node.key));
-            timeDelay += 1000;
+            timeDelay += timeDelaySet;
             if (node.leftChild != null) {
                 queue.add(node.leftChild);
             }
@@ -483,7 +492,7 @@ public class BSTController {
                 continue;
             label.setStyle("-fx-text-fill: #000000");
         }
-//        wait(1000);
+//        wait(timeDelaySet);
     }
 
     void resetHighlight() {
@@ -545,11 +554,6 @@ public class BSTController {
             }
         }
         return null;
-    }
-
-    Point2D findCoordinate(HBox node) {
-        Point2D point2D = new Point2D(node.getLayoutX(), node.getLayoutY());
-        return treePane.localToParent(point2D);
     }
 
     public static void wait(int ms)
@@ -648,39 +652,10 @@ public class BSTController {
     }
 
     void deleteLine(HBox hBox) {
-//        ObservableList<Node> children = treePane.getChildren();
-//        double nodeHeight = 30;
-//        Point2D point2D = findCoordinate(hBox);
-//        double x = point2D.getX();
-//        double y = point2D.getY();
-//        System.out.println("HBox with Point2D: " + x + " " + y);
-//        Bounds bounds = hBox.localToScreen(hBox.getBoundsInLocal());
-//        System.out.println("HBox with Bounds: " + bounds.getMinX() + " " + bounds.getMinY() + " " + bounds.getMaxX() + " " + bounds.getMaxY());
-//        Bounds bounds1 = hBox.localToScene(hBox.getBoundsInLocal());
-//        System.out.println("HBox with Bounds1: " + bounds1.getMinX() + " " + bounds1.getMinY() + " " + bounds1.getMaxX() + " " + bounds1.getMaxY());
-//        for (Node child : children) {
-//            if ((child instanceof Line line)) {
-//                Point2D point2D1 = line.localToScene(line.getStartX(), line.getStartY());
-//                Point2D point2D2 = line.localToScene(line.getEndX(), line.getEndY());
-//                System.out.println("Line with Point2D: " + point2D1.getX() + " " + point2D1.getY() + " " + point2D2.getX() + " " + point2D2.getY());
-//                System.out.println(line.getStartX() + " " + line.getStartY() + " " + line.getEndX() + " " + line.getEndY());
-//                if ((line.getStartX() == x + nodeHeight /2 && line.getStartY() == y + nodeHeight /2)
-//                || (line.getEndX() == x + nodeHeight/2 && line.getEndY() == y + nodeHeight/2))
-//                {
-//                    line.setVisible(false);
-//                }
-//            }
-//        }
         Pane pane = (Pane) hBox.getParent();
         List<Line> lines = mapHBoxLine.get(pane);
         for (Line line : lines) {
             line.setVisible(false);
         }
-    }
-
-    void HBoxContainsLine(HBox hBox, Line line) {
-        Point2D point2D = findCoordinate(hBox);
-        double x = point2D.getX();
-        double y = point2D.getY();
     }
 }

@@ -50,13 +50,13 @@
                   <VBox prefHeight="95.0" prefWidth="126.0">
                      <children>
                         <Region prefHeight="200.0" prefWidth="155.0" />
-                        <Slider fx:id="sliderProgress" blockIncrement="1.0" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" onDragDone="#getSpeed" prefHeight="38.0" prefWidth="165.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
+                        <Slider fx:id="sliderSpeed" blockIncrement="1.0" majorTickUnit="1.0" max="5.0" min="1.0" minorTickCount="0" prefHeight="38.0" prefWidth="165.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="1.0" />
                         <Region prefHeight="200.0" prefWidth="200.0" />
                      </children>
                   </VBox>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <Label prefHeight="35.0" prefWidth="167.0" text="1x" textFill="WHITE" wrapText="true">
+                        <Label fx:id="speedLabel" prefHeight="35.0" prefWidth="167.0" text="1x" textFill="WHITE" wrapText="true">
                            <font>
                               <Font size="24.0" />
                            </font>
@@ -81,11 +81,35 @@
                         <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
                      </HBox.margin>
                   </Button>
-                  <Slider fx:id="sliderProgress1" blockIncrement="1.0" majorTickUnit="1.0" max="0.0" minorTickCount="0" onDragDone="#getSpeed" prefHeight="38.0" prefWidth="442.0" snapToTicks="true" value="1.0">
+                  <Slider fx:id="sliderProgress1" blockIncrement="1.0" majorTickUnit="1.0" max="0.0" minorTickCount="0" prefHeight="38.0" prefWidth="442.0" snapToTicks="true" value="1.0">
                      <HBox.margin>
                         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
                      </HBox.margin>
                   </Slider>
+                  <Button mnemonicParsing="false" prefHeight="59.0" prefWidth="55.0" style="-fx-background-color: black;">
+                     <HBox.margin>
+                        <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
+                     </HBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="32.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../resources/undoButton.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+                  <Button layoutX="857.0" layoutY="40.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="82.0" style="-fx-background-color: black;">
+                     <HBox.margin>
+                        <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
+                     </HBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="32.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../resources/redoButton.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
                   <VBox prefHeight="200.0" prefWidth="100.0" />
                   <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                </children></HBox>
