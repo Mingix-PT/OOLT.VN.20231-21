@@ -72,7 +72,33 @@ public class BSTController {
 
     @FXML
     void insertNode(ActionEvent event) {
-
+        try {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Insert");
+            dialog.setHeaderText("Insert");
+            String input = dialog.showAndWait().get();
+            int key = Integer.parseInt(input);
+            if (insertUI(bst.getTreeRoot(), key)) {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Inserted", ButtonType.OK);
+                alert.showAndWait();
+                dialog.setContentText("Inserted");
+                clearPane();
+                drawTree(bst.getTreeRoot(), treePane.getWidth() / 2,treePane.getHeight()*0.1, bst.height()*40);
+                searchUI(bst.getTreeRoot(), key);
+            }
+            else {
+                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed", ButtonType.OK);
+                alert.showAndWait();
+                dialog.setContentText("Failed");
+            }
+        }
+        catch (NumberFormatException e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Invalid input", ButtonType.OK);
+            alert.showAndWait();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @FXML
@@ -198,6 +224,28 @@ public class BSTController {
             highlightNode(root.rightChild.key);
             return searchUI(root.rightChild, key);
         }
+    }
+
+    public boolean insertUI(BinaryTreeNode root, int key) {
+        if (bst.getTreeRoot() == null) {
+            bst.setTreeRoot(key);
+            return true;
+        }
+        if (root.key == key) {
+            return false;
+        }
+        if (root.key > key) {
+            if (root.leftChild == null) {
+                root.leftChild = new BinaryTreeNode(key);
+                return true;
+            }
+            return insertUI(root.leftChild, key);
+        }
+        if (root.rightChild == null) {
+            root.rightChild = new BinaryTreeNode(key);
+            return true;
+        }
+        return insertUI(root.rightChild, key);
     }
 
     void highlightNode(int key) {

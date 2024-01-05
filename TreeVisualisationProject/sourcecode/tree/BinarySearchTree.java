@@ -323,4 +323,7 @@ public class BinarySearchTree extends Tree {
         return false;
     }
 
+    public void setTreeRoot(int key) {
+        treeRoot = new BinaryTreeNode(key);
+    }
 }
