@@ -66,20 +66,41 @@
                         </Label>
                      </children>
                   </VBox>
-                  <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="63.0" text="Button">
+                  <Button mnemonicParsing="false" prefHeight="31.0" prefWidth="0.0" style="-fx-background-color: black;" text="Button">
                      <HBox.margin>
-                        <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
+                        <Insets bottom="30.0" top="30.0" />
                      </HBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../resources/backButton.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
                   </Button>
-                  <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="63.0" text="Button">
+                  <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="63.0" style="-fx-background-color: black;" text="Button">
                      <HBox.margin>
-                        <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
+                        <Insets bottom="30.0" top="30.0" />
                      </HBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="32.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../resources/pauseButton.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
                   </Button>
-                  <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="63.0" text="Button">
+                  <Button mnemonicParsing="false" prefHeight="69.0" prefWidth="78.0" style="-fx-background-color: black;" text="Button">
                      <HBox.margin>
-                        <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
+                        <Insets bottom="30.0" top="30.0" />
                      </HBox.margin>
+                     <graphic>
+                        <ImageView fitHeight="33.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../resources/nextButton.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
                   </Button>
                   <Slider fx:id="sliderProgress1" blockIncrement="1.0" majorTickUnit="1.0" max="0.0" minorTickCount="0" prefHeight="38.0" prefWidth="442.0" snapToTicks="true" value="1.0">
                      <HBox.margin>
