@@ -192,8 +192,6 @@ public class BinarySearchTree extends Tree {
                 parentLeftMostOfRight.leftChild = leftMostOfRight.rightChild;
                 if (parent != null) { // Not the root
                     updateNode(nodeFound, leftMostOfRight);
-//                leftMostOfRight.leftChild = nodeFound.leftChild;
-//                leftMostOfRight.rightChild = nodeFound.rightChild;
                 } else { // The root
                     leftMostOfRight.leftChild = nodeFound.leftChild;
                     leftMostOfRight.rightChild = nodeFound.rightChild;

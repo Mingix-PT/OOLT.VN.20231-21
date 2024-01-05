@@ -1,9 +1,11 @@
 package ui.controller;
 
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
@@ -18,6 +20,8 @@ import tree.BinaryTreeNode;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class BSTController {
@@ -103,13 +107,10 @@ public class BSTController {
             dialog.setHeaderText("Insert");
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
-            if (insertUI(bst.getTreeRoot(), key)) {
+            if (insertUI(bst.getTreeRoot(), key, 1000)) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Inserted", ButtonType.OK);
                 alert.showAndWait();
                 dialog.setContentText("Inserted");
-                clearPane();
-                drawTree(bst.getTreeRoot(), treePane.getWidth() / 2,treePane.getHeight()*0.1, bst.height()*40);
-                searchUI(bst.getTreeRoot(), key);
             }
             else {
                 Alert alert = new Alert(Alert.AlertType.ERROR, "Failed", ButtonType.OK);
@@ -140,7 +141,7 @@ public class BSTController {
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
             resetHighlight();
-            if (searchUI(bst.getTreeRoot(), key)) {
+            if (searchUI(bst.getTreeRoot(), key, 1000)) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION, "Found", ButtonType.OK);
                 alert.showAndWait();
                 dialog.setContentText("Found");
@@ -226,55 +227,70 @@ public class BSTController {
         treePane.getChildren().clear();
     }
 
-    public boolean searchUI(BinaryTreeNode root,int key) throws InterruptedException {
+    public boolean searchUI(BinaryTreeNode root,int key, long timeDelay) throws InterruptedException {
         if (root == null) {
             return false;
         }
         else {
+            timeDelay += 1000;
             if (root.key == key) {
-                highlightNodeFound(key);
+                delay(timeDelay, () -> highthighLightNodeGreen(key));
                 return true;
             }
-            highlightNode(root.key);
+            delay(timeDelay, () -> highLightNodeRed(root.key));
+            timeDelay += 1000;
             if (root.key > key) {
                 if (root.leftChild == null) {
                     return false;
                 }
-                highlightNode(root.leftChild.key);
-                return searchUI(root.leftChild, key);
+                delay(timeDelay, () -> highLightNodeRed(root.leftChild.key));
+                return searchUI(root.leftChild, key, timeDelay);
             }
             if (root.rightChild == null) {
                 return false;
             }
-            highlightNode(root.rightChild.key);
-            return searchUI(root.rightChild, key);
+            delay(timeDelay, () -> highLightNodeRed(root.rightChild.key));
+            return searchUI(root.rightChild, key, timeDelay);
         }
     }
 
-    public boolean insertUI(BinaryTreeNode root, int key) {
+    public boolean insertUI(BinaryTreeNode root, int key, long timeDelay) throws InterruptedException {
+        timeDelay += 1000;
         if (bst.getTreeRoot() == null) {
             bst.setTreeRoot(key);
+            drawTree(bst.getTreeRoot(), treePane.getWidth() / 2,treePane.getHeight()*0.1, bst.height()*40);
+            delay(timeDelay, () -> highthighLightNodeGreen(key));
             return true;
         }
         if (root.key == key) {
             return false;
         }
+        timeDelay += 1000;
+        delay(timeDelay, () -> highLightNodeRed(root.key));
         if (root.key > key) {
             if (root.leftChild == null) {
                 root.leftChild = new BinaryTreeNode(key);
+                timeDelay += 1000;
+                delay(timeDelay, () -> drawLeftChild(root.key, key));
+                timeDelay += 1000;
+                delay(timeDelay, () -> highthighLightNodeGreen(key));
                 return true;
             }
-            return insertUI(root.leftChild, key);
+            return insertUI(root.leftChild, key, timeDelay);
         }
         if (root.rightChild == null) {
             root.rightChild = new BinaryTreeNode(key);
+            timeDelay += 1000;
+            delay(timeDelay, () -> drawRightChild(root.key, key));
+            timeDelay += 1000;
+            delay(timeDelay, () -> highthighLightNodeGreen(key));
             return true;
         }
-        return insertUI(root.rightChild, key);
+        return insertUI(root.rightChild, key, timeDelay);
     }
 
     public boolean deleteUI(BinaryTreeNode root, int key) throws InterruptedException {
-        if (!searchUI(root, key)) {
+        if (!searchUI(root, key, 1000)) {
             return false;
         }
         HBox hBox = findNode(key);
@@ -286,7 +302,7 @@ public class BSTController {
         return true;
     }
 
-    void highlightNode(int key) {
+    void highLightNodeRed(int key) {
         HBox hBox = findNode(key);
         if (hBox == null)
             return;
@@ -300,7 +316,7 @@ public class BSTController {
         }
     }
 
-    void highlightNodeFound(int key) {
+    void highthighLightNodeGreen(int key) {
         HBox hBox = findNode(key);
         if (hBox == null)
             return;
@@ -312,6 +328,7 @@ public class BSTController {
                 continue;
             label.setStyle("-fx-text-fill: #000000");
         }
+//        wait(1000);
     }
 
     void resetHighlight() {
@@ -352,5 +369,127 @@ public class BSTController {
             }
         }
         return null;
+    }
+
+    List<Double> findCoordinate(int key) {
+        List<Double> coordinate = new ArrayList<>();
+        ObservableList<Node> nodes = treePane.getChildren();
+        for (Node node : nodes) {
+            if (!(node instanceof AnchorPane anchorPane))
+                continue;
+            ObservableList<Node> children = anchorPane.getChildren();
+            for (Node child : children) {
+                if (!(child instanceof HBox hBox))
+                    continue;
+                ObservableList<Node> hBoxChildren = hBox.getChildren();
+                for (Node hBoxChild : hBoxChildren) {
+                    if (hBoxChild instanceof Label label && label.getText().equals(String.valueOf(key))) {
+                        Bounds boundsInScene = hBox.localToScene(hBox.getBoundsInLocal());
+                        coordinate.add(boundsInScene.getCenterX());
+                        coordinate.add(boundsInScene.getCenterY());
+                        return coordinate;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public static void wait(int ms)
+    {
+        try
+        {
+            Thread.sleep(ms);
+        }
+        catch(InterruptedException ex)
+        {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    public static void delay(long millis, Runnable continuation) {
+        Task<Void> sleeper = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                try { Thread.sleep(millis); }
+                catch (InterruptedException e) { }
+                return null;
+            }
+        };
+        sleeper.setOnSucceeded(event -> continuation.run());
+        new Thread(sleeper).start();
+    }
+
+    void drawLeftChild(int parent, int key) {
+        try {
+            List<Double> coordinate = findCoordinate(parent);
+            double x = coordinate.get(0);
+            double y = coordinate.get(1);
+            System.out.println(x + " " + y);
+            double nodeHeight = 30; // Replace with the actual height of the nodes
+            double yAdjustment = 30; // Adjust vertical spacing between nodes
+            // Load the TreeNode.fxml
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/view/TreeNode.fxml"));
+            TreeNodeController treeNodeController = new TreeNodeController();
+            loader.setController(treeNodeController);
+            Pane nodePane = loader.load();
+            // Get the controller and set the node key
+            TreeNodeController controller = loader.getController();
+            controller.setKey(key);
+
+            nodePane.setLayoutX(x);
+            nodePane.setLayoutY(y);
+
+            // Add the node to the pane
+            treePane.getChildren().add(nodePane);
+
+            // Calculate position and draw child nodes
+            final double childY = y + 80; // Vertical distance between nodes
+            // Draw the line to the left child and the left child itself
+            double childX = x - nodeHeight;
+            Line line = new Line(x + nodeHeight/2 , y - yAdjustment + 2 * nodeHeight, childX + nodeHeight/2, childY  + nodeHeight/2);
+            treePane.getChildren().add(line);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void drawRightChild(int parent, int key) {
+        HBox parentHBox = findNode(parent);
+        if (parentHBox == null)
+            return;
+        double x = parentHBox.getLayoutX();
+        double y = parentHBox.getLayoutY();
+        double nodeHeight = 30; // Replace with the actual height of the nodes
+        double yAdjustment = 30; // Adjust vertical spacing between nodes
+        // Load the TreeNode.fxml
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/view/TreeNode.fxml"));
+        TreeNodeController treeNodeController = new TreeNodeController();
+        loader.setController(treeNodeController);
+        try {
+            Pane nodePane = loader.load();
+            // Get the controller and set the node key
+            TreeNodeController controller = loader.getController();
+            controller.setKey(key);
+
+            nodePane.setLayoutX(x);
+            nodePane.setLayoutY(y);
+
+            // Add the node to the pane
+            treePane.getChildren().add(nodePane);
+
+            // Calculate position and draw child nodes
+            final double childY = y + 80; // Vertical distance between nodes
+            // Draw the line to the left child and the left child itself
+            double childX = x + nodeHeight;
+            Line line = new Line(x + nodeHeight/2 , y - yAdjustment + 2 * nodeHeight, childX + nodeHeight/2, childY  + nodeHeight/2);
+            treePane.getChildren().add(line);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void drawChild (int parent, int key) {
+
     }
 }
