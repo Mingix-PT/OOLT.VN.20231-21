@@ -34,6 +34,8 @@ public class BSTController {
     private Button backButton;
 
     @FXML
+    private Button updateButton;
+    @FXML
     private Button createTreeButton;
 
     @FXML
@@ -87,6 +89,7 @@ public class BSTController {
 
     @FXML
     void deleteNode(ActionEvent event) {
+        resetHighlight();
         try {
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Delete");
@@ -101,9 +104,9 @@ public class BSTController {
 //                drawWholeTree();
             }
             else {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed", ButtonType.OK);
-                alert.showAndWait();
-                dialog.setContentText("Failed");
+//                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed", ButtonType.OK);
+//                alert.showAndWait();
+//                dialog.setContentText("Failed");
             }
         }
         catch (NumberFormatException e) {
@@ -117,6 +120,7 @@ public class BSTController {
 
     @FXML
     void insertNode(ActionEvent event) {
+        resetHighlight();
         try {
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Insert");
@@ -124,14 +128,14 @@ public class BSTController {
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
             if (insertUI(bst.getTreeRoot(), key, 1000)) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Inserted", ButtonType.OK);
-                alert.showAndWait();
-                dialog.setContentText("Inserted");
+//                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Inserted", ButtonType.OK);
+//                alert.showAndWait();
+//                dialog.setContentText("Inserted");
             }
             else {
-                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed", ButtonType.OK);
-                alert.showAndWait();
-                dialog.setContentText("Failed");
+//                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed", ButtonType.OK);
+//                alert.showAndWait();
+//                dialog.setContentText("Failed");
             }
         }
         catch (NumberFormatException e) {
@@ -150,6 +154,8 @@ public class BSTController {
 
     @FXML
     void dfsTraverse(ActionEvent event) {
+        resetHighlight();
+        traverseVBox.setVisible(false);
         try {
             dfsTraverseUI(bst.getTreeRoot(), 1000);
         } catch (InterruptedException e) {
@@ -159,6 +165,8 @@ public class BSTController {
 
     @FXML
     void bfsTraverse(ActionEvent event) {
+        resetHighlight();
+        traverseVBox.setVisible(false);
         try {
             bfsTraverseUI();
         } catch (Exception e) {
@@ -179,6 +187,7 @@ public class BSTController {
 
     @FXML
     void searchNode(ActionEvent event) {
+        resetHighlight();
         try{
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Search");
@@ -187,14 +196,14 @@ public class BSTController {
             int key = Integer.parseInt(input);
             resetHighlight();
             if (searchUI(bst.getTreeRoot(), key, 0) != 0) {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Found", ButtonType.OK);
-                alert.showAndWait();
-                dialog.setContentText("Found");
+//                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Found", ButtonType.OK);
+//                alert.showAndWait();
+//                dialog.setContentText("Found");
             }
             else {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Not found", ButtonType.OK);
-                alert.showAndWait();
-                dialog.setContentText("");
+//                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Not found", ButtonType.OK);
+//                alert.showAndWait();
+//                dialog.setContentText("");
             }
         }
         catch (NumberFormatException e) {
@@ -210,6 +219,7 @@ public class BSTController {
     public void initialize() {
         final String NODE_FXML_FILE_PATH = "/ui/view/TreeNode.fxml";
         try {
+            updateButton.setVisible(false);
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(getClass().getResource(NODE_FXML_FILE_PATH));
             TreeNodeController treeNodeController = new TreeNodeController();
@@ -404,26 +414,30 @@ public class BSTController {
     }
 
     public void dfsTraverseUI(BinaryTreeNode root, long timeDelay) throws InterruptedException {
-        resetHighlight();
+        long timeDelayLeft = 0;
         if (root == null) {
-            return ;
+            return;
         }
         else {
             delay(timeDelay, () -> highLightNodeGreen(root.key));
-            if (root.isLeaf()) {
-                return;
-            }
+            timeDelay += 1000;
             if (root.leftChild != null) {
-                dfsTraverseUI(root.leftChild, timeDelay + 1000);
+                dfsTraverseUI(root.leftChild, timeDelay);
             }
             if (root.rightChild != null) {
-                dfsTraverseUI(root.rightChild, timeDelay + 1000);
+                long finalTimeDelay = timeDelay;
+                delay(timeDelayLeft + 1000 * bst.countNodes(root.leftChild), () -> {
+                    try {
+                        dfsTraverseUI(root.rightChild, finalTimeDelay);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                });
             }
         }
     }
 
     public void bfsTraverseUI () {
-        resetHighlight();
         Queue<BinaryTreeNode> queue = new ArrayDeque<>();
         if (bst.getTreeRoot() == null) {
             return;

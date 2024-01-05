@@ -126,7 +126,7 @@
                         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
                      </VBox.margin>
                   </Button>
-                  <Button mnemonicParsing="false" text="Update">
+                  <Button fx:id="traverseButton" mnemonicParsing="false" onAction="#chooseTraverse" text="Traverse">
                      <VBox.margin>
                         <Insets bottom="17.0" left="17.0" right="17.0" top="17.0" />
                      </VBox.margin>
@@ -134,7 +134,7 @@
                         <Font size="15.0" />
                      </font>
                   </Button>
-                  <Button fx:id="traverseButton" mnemonicParsing="false" onAction="#chooseTraverse" text="Traverse">
+                  <Button fx:id="updateButton" mnemonicParsing="false" text="Update">
                      <VBox.margin>
                         <Insets bottom="17.0" left="17.0" right="17.0" top="17.0" />
                      </VBox.margin>

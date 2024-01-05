@@ -336,4 +336,14 @@ public class BinarySearchTree extends Tree {
     public void setTreeRoot(int key) {
         treeRoot = new BinaryTreeNode(key);
     }
+
+    public long countNodes(BinaryTreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        if (root.isLeaf()) {
+            return 1;
+        }
+        return 1 + countNodes(root.leftChild) + countNodes(root.rightChild);
+    }
 }
