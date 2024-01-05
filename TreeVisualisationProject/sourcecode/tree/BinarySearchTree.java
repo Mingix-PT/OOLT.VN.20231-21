@@ -14,7 +14,7 @@ public class BinarySearchTree extends Tree {
         this.treeRoot = null;
     }
 
-    protected BinaryTreeNode leftMostNode(BinaryTreeNode root) {
+    public BinaryTreeNode leftMostNode(BinaryTreeNode root) {
         if (root.leftChild == null) {
             return root;
         }
@@ -140,6 +140,10 @@ public class BinarySearchTree extends Tree {
             }
             return search(root.rightChild, key);
         }
+    }
+
+    public BinaryTreeNode searchNode(int key) {
+        return search(treeRoot, key);
     }
 
     @Override

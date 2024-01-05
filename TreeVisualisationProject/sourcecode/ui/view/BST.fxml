@@ -68,17 +68,17 @@
                   </VBox>
                   <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="63.0" text="Button">
                      <HBox.margin>
-                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                        <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
                      </HBox.margin>
                   </Button>
                   <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="63.0" text="Button">
                      <HBox.margin>
-                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                        <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
                      </HBox.margin>
                   </Button>
                   <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="63.0" text="Button">
                      <HBox.margin>
-                        <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+                        <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
                      </HBox.margin>
                   </Button>
                   <Slider fx:id="sliderProgress1" blockIncrement="1.0" majorTickUnit="1.0" max="0.0" minorTickCount="0" onDragDone="#getSpeed" prefHeight="38.0" prefWidth="442.0" snapToTicks="true" value="1.0">
@@ -134,7 +134,7 @@
                         <Font size="15.0" />
                      </font>
                   </Button>
-                  <Button mnemonicParsing="false" text="Traverse">
+                  <Button fx:id="traverseButton" mnemonicParsing="false" onAction="#chooseTraverse" text="Traverse">
                      <VBox.margin>
                         <Insets bottom="17.0" left="17.0" right="17.0" top="17.0" />
                      </VBox.margin>
@@ -155,6 +155,20 @@
                </padding>
                <children>
                   <Region prefHeight="114.0" prefWidth="890.0" />
+                  <VBox fx:id="traverseVBox" alignment="CENTER" layoutX="25.0" layoutY="483.0" prefHeight="102.0" prefWidth="75.0" style="-fx-background-color: gray; visibility: false;">
+                     <children>
+                        <Button fx:id="dfsButton" mnemonicParsing="false" onAction="#dfsTraverse" text="DFS">
+                           <VBox.margin>
+                              <Insets bottom="17.0" left="17.0" right="17.0" top="17.0" />
+                           </VBox.margin>
+                        </Button>
+                        <Button fx:id="bfsButton" mnemonicParsing="false" onAction="#bfsTraverse" text="BFS">
+                           <VBox.margin>
+                              <Insets bottom="17.0" left="17.0" right="17.0" />
+                           </VBox.margin>
+                        </Button>
+                     </children>
+                  </VBox>
                </children>
             </Pane>
          </center>
