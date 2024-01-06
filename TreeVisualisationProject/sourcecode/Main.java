@@ -5,6 +5,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import tree.*;
 import ui.controller.BSTController;
+import ui.controller.CBBSTController;
 
 public class Main extends Application {
     private BinarySearchTree bst;
@@ -14,8 +15,10 @@ public class Main extends Application {
         final String BST_FXML_FILE_PATH = "/ui/view/BST.fxml";
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource(BST_FXML_FILE_PATH));
-        BSTController bstController = new BSTController();
-        fxmlLoader.setController(bstController);
+//        BSTController bstController = new BSTController();
+//        fxmlLoader.setController(bstController);
+        CBBSTController cbBSTController = new CBBSTController();
+        fxmlLoader.setController(cbBSTController);
         Parent parent = fxmlLoader.load();
 
         Scene scene = new Scene(parent);

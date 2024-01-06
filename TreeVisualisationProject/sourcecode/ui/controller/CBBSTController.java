@@ -18,13 +18,14 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 import tree.BinarySearchTree;
 import tree.BinaryTreeNode;
+import tree.CompleteBalanceBinarySearchTree;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class BSTController {
-    protected BinarySearchTree tree = new BinarySearchTree();
+public class CBBSTController {
+    protected CompleteBalanceBinarySearchTree tree = new CompleteBalanceBinarySearchTree();
     protected Map<Integer, List<Line>> mapHBoxLine = new HashMap<>();
 
     @FXML
@@ -58,7 +59,7 @@ public class BSTController {
 
     @FXML
     protected Button bfsButton;
-    
+
     @FXML
     protected Slider sliderSpeed;
 
@@ -67,7 +68,7 @@ public class BSTController {
 
     @FXML
     protected Label speedLabel;
-    
+
     protected int timeDelaySet = 1020;
 
     @FXML
@@ -84,10 +85,11 @@ public class BSTController {
             dialog.setHeaderText("Enter the height of the tree");
             String input = dialog.showAndWait().get();
             int height = Integer.parseInt(input);
-            tree = new BinarySearchTree();
+            tree = new CompleteBalanceBinarySearchTree();
             while (tree.height() < height) {
                 tree.insert((int) (Math.random() * 100));
             }
+            tree = tree.completeBalanceTheTree();
             tree.print();
             clearPane();
             drawWholeTree();
@@ -107,13 +109,19 @@ public class BSTController {
             dialog.setHeaderText("Delete");
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
-            if (deleteUI(key)) {
+            long timeDelay = deleteUI(key);
+            if (timeDelay > 0) {
+                delay(timeDelay + 2L * timeDelaySet, () -> {
+                    tree = tree.completeBalanceTheTree();
+                    clearPane();
+                    drawWholeTree();
+                });
+            }
 //                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Deleted", ButtonType.OK);
 //                alert.showAndWait();
 //                dialog.setContentText("Deleted");
 //                clearPane();
 //                drawWholeTree();
-            }
             else {
 //                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed", ButtonType.OK);
 //                alert.showAndWait();
@@ -138,7 +146,13 @@ public class BSTController {
             dialog.setHeaderText("Insert");
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
-            if (insertUI(tree.getTreeRoot(), key, timeDelaySet)) {
+            long timeDelay = insertUI(tree.getTreeRoot(), key, timeDelaySet);
+            if (timeDelay > 0) {
+                delay(timeDelay + timeDelaySet, () -> {
+                    tree = tree.completeBalanceTheTree();
+                    clearPane();
+                    drawWholeTree();
+                });
 //                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Inserted", ButtonType.OK);
 //                alert.showAndWait();
 //                dialog.setContentText("Inserted");
@@ -199,7 +213,6 @@ public class BSTController {
             dialog.setHeaderText("Search");
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
-            resetHighlight();
             if (searchUI(tree.getTreeRoot(), key, 0) != 0) {
 //                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Found", ButtonType.OK);
 //                alert.showAndWait();
@@ -326,16 +339,16 @@ public class BSTController {
         }
     }
 
-    public boolean insertUI(BinaryTreeNode root, int key, long timeDelay) throws InterruptedException {
+    public long insertUI(BinaryTreeNode root, int key, long timeDelay) throws InterruptedException {
         timeDelay += timeDelaySet;
         if (tree.getTreeRoot() == null) {
             tree.setTreeRoot(key);
             drawWholeTree();
             highLightNodeGreen(key);
-            return true;
+            return timeDelay;
         }
         if (root.key == key) {
-            return false;
+            return 0;
         }
         timeDelay += timeDelaySet;
         delay(timeDelay, () -> highLightNodeRed(root.key));
@@ -346,7 +359,7 @@ public class BSTController {
                 delay(timeDelay, () -> drawLeftChild(root.key, key));
                 timeDelay += timeDelaySet;
                 delay(timeDelay, () -> highLightNodeGreen(key));
-                return true;
+                return timeDelay;
             }
             return insertUI(root.leftChild, key, timeDelay);
         }
@@ -356,21 +369,21 @@ public class BSTController {
             delay(timeDelay, () -> drawRightChild(root.key, key));
             timeDelay += timeDelaySet;
             delay(timeDelay, () -> highLightNodeGreen(key));
-            return true;
+            return timeDelay;
         }
         return insertUI(root.rightChild, key, timeDelay);
     }
 
-    public boolean deleteUI(int key) throws InterruptedException {
+    public long deleteUI(int key) throws InterruptedException {
         highLightNodeRed(tree.getTreeRoot().key);
         long timeDelay = searchUI(tree.getTreeRoot(), key, 0);
         if (timeDelay == 0) {
-            return false;
+            return 0;
         }
         timeDelay += timeDelaySet;
         HBox hBox = findNode(key);
         if (hBox == null)
-            return false;
+            return 0;
         HBox hBoxDelete = findNode(key);
         BinaryTreeNode nodeFound = tree.searchNode(key);
         if (nodeFound.isLeaf()) {
@@ -380,7 +393,7 @@ public class BSTController {
                 clearPane();
                 drawWholeTree();
             });
-            return true;
+            return timeDelay + timeDelaySet;
         }
         if (nodeFound.leftChild == null || nodeFound.rightChild == null) {
             delay(timeDelay + timeDelaySet, () -> {
@@ -392,13 +405,12 @@ public class BSTController {
                 clearPane();
                 drawWholeTree();
             });
-            return true;
+            return timeDelay + 2L * timeDelaySet;
         }
         BinaryTreeNode leftMostOfRight = tree.leftMostNode(nodeFound.rightChild);
         HBox hBoxLeftMostOfRight = findNode(leftMostOfRight.key);
         AtomicLong timeDelay2 = new AtomicLong();
         timeDelay += timeDelaySet;
-        long finalTimeDelay = timeDelay;
         delay(timeDelay, () -> {
             try {
                 timeDelay2.addAndGet(searchUI(nodeFound.rightChild, leftMostOfRight.key, 0));
@@ -412,7 +424,7 @@ public class BSTController {
                     deleteLine(leftMostOfRight.key);
                     hBoxLeftMostOfRight.setVisible(false);
                 });
-                delay(timeDelay2.get() + 2 * timeDelaySet, () -> {
+                delay(timeDelay2.get() + 2L * timeDelaySet, () -> {
                     clearPane();
                     tree.delete(key);
                     drawWholeTree();
@@ -421,7 +433,7 @@ public class BSTController {
                 throw new RuntimeException(e);
             }
         });
-        return true;
+        return timeDelay2.get() + 2L * timeDelaySet;
     }
 
     public void dfsTraverseUI(BinaryTreeNode root, long timeDelay) throws InterruptedException {
@@ -571,7 +583,7 @@ public class BSTController {
         new Thread(sleeper).start();
     }
 
-     protected void drawLeftChild(int parent, int key) {
+    protected void drawLeftChild(int parent, int key) {
         try {
             double nodeHeight = 30; // Replace with the actual height of the nodes
             double yAdjustment = 30; // Adjust vertical spacing between nodes
@@ -641,7 +653,7 @@ public class BSTController {
         drawTree(tree.getTreeRoot(), treePane.getWidth() / 2,treePane.getHeight()*0.1, tree.height()*40);
     }
 
-     protected void deleteLine(int key) {
+    protected void deleteLine(int key) {
         List<Line> lines = mapHBoxLine.get(key);
         for (Line line : lines) {
             line.setVisible(false);
