@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import tree.*;
 import ui.controller.BSTController;
 import ui.controller.CBBSTController;
+import ui.controller.MenuController;
 
 public class Main extends Application {
     private CompleteBalanceBinarySearchTree tree;
@@ -14,10 +15,11 @@ public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         final String BST_FXML_FILE_PATH = "/ui/view/BST.fxml";
+        final String MENU_FXML_FILE_PATH = "/ui/view/Menu.fxml";
         FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource(BST_FXML_FILE_PATH));
-        BSTController bstController = new BSTController();
-        fxmlLoader.setController(bstController);
+        fxmlLoader.setLocation(getClass().getResource(MENU_FXML_FILE_PATH));
+        MenuController menuController = new MenuController();
+        fxmlLoader.setController(menuController);
 //        CBBSTController cbBSTController = new CBBSTController();
 //        fxmlLoader.setController(cbBSTController);
         Parent parent = fxmlLoader.load();

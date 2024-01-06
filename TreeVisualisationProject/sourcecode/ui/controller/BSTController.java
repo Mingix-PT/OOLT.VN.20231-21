@@ -16,6 +16,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
+import javafx.stage.Stage;
+import javafx.scene.*;
 import tree.BinarySearchTree;
 import tree.BinaryTreeNode;
 
@@ -24,62 +26,79 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class BSTController {
-    protected BinarySearchTree tree = new BinarySearchTree();
-    protected Map<Integer, List<Line>> mapHBoxLine = new HashMap<>();
+    private BinarySearchTree tree = new BinarySearchTree();
+    private Map<Integer, List<Line>> mapHBoxLine = new HashMap<>();
 
     @FXML
-    protected Pane treePane;
+    private Pane treePane;
     @FXML
-    protected Button backButton;
+    private Button backButton;
 
     @FXML
-    protected Button updateButton;
+    private Button updateButton;
 
     @FXML
-    protected Button createTreeButton;
+    private Button createTreeButton;
 
     @FXML
-    protected Button deleteButton;
+    private Button deleteButton;
 
     @FXML
-    protected Button insertButton;
+    private Button insertButton;
 
     @FXML
-    protected Button searchButton;
+    private Button searchButton;
 
     @FXML
-    protected Button traverseButton;
+    private Button traverseButton;
 
     @FXML
-    protected VBox traverseVBox;
+    private VBox traverseVBox;
 
     @FXML
-    protected Button dfsButton;
+    private Button dfsButton;
 
     @FXML
-    protected Button bfsButton;
+    private Button bfsButton;
     
     @FXML
-    protected Slider sliderSpeed;
+    private Slider sliderSpeed;
 
     @FXML
-    protected int speed = 1;
+    private int speed = 1;
 
     @FXML
-    protected Label speedLabel;
+    private Label speedLabel;
+
+    @FXML
+    private Label treeTypeLabel;
     
-    protected int timeDelaySet = 1020;
+    private int timeDelaySet = 1020;
 
     @FXML
     private HBox hBoxTraverse;
 
     @FXML
-    protected void backToMainMenu(ActionEvent event) {
-
+    private void backToMainMenu(ActionEvent event) {
+        final String MENU_FXML_FILE_PATH = "/ui/view/Menu.fxml";
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource(MENU_FXML_FILE_PATH));
+            MenuController menuController = new MenuController();
+            fxmlLoader.setController(menuController);
+            Parent parent = fxmlLoader.load();
+            Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(parent));
+            stage.setTitle("Main Menu");
+            stage.show();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
-    protected void createRandomTree(ActionEvent event) {
+    private void createRandomTree(ActionEvent event) {
         resetTraverse(false);
         try
         {
@@ -103,7 +122,7 @@ public class BSTController {
     }
 
     @FXML
-    protected void deleteNode(ActionEvent event) {
+    private void deleteNode(ActionEvent event) {
         resetHighlight();
         resetTraverse(false);
         try {
@@ -135,7 +154,7 @@ public class BSTController {
     }
 
     @FXML
-    protected void insertNode(ActionEvent event) {
+    private void insertNode(ActionEvent event) {
         resetTraverse(false);
         resetHighlight();
         try {
@@ -165,7 +184,7 @@ public class BSTController {
         }
     }
     @FXML
-    protected void dfsTraverse(ActionEvent event) {
+    private void dfsTraverse(ActionEvent event) {
         resetHighlight();
         traverseVBox.setVisible(false);
         resetTraverse(true);
@@ -177,7 +196,7 @@ public class BSTController {
     }
 
     @FXML
-    protected void bfsTraverse(ActionEvent event) {
+    private void bfsTraverse(ActionEvent event) {
         resetHighlight();
         traverseVBox.setVisible(false);
         resetTraverse(true);
@@ -189,7 +208,7 @@ public class BSTController {
     }
 
     @FXML
-    protected void chooseTraverse(ActionEvent event) {
+    private void chooseTraverse(ActionEvent event) {
         System.out.println("Choose traverse");
         if (traverseVBox.isVisible()) {
             traverseVBox.setVisible(false);
@@ -200,7 +219,7 @@ public class BSTController {
     }
 
     @FXML
-    protected void searchNode(ActionEvent event) {
+    private void searchNode(ActionEvent event) {
         resetTraverse(false);
         resetHighlight();
         try{
@@ -239,6 +258,7 @@ public class BSTController {
             speedLabel.setText(speed + "x");
         });
         try {
+            treeTypeLabel.setText("Binary Search Tree");
             updateButton.setVisible(false);
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(getClass().getResource(NODE_FXML_FILE_PATH));
@@ -251,7 +271,7 @@ public class BSTController {
         }
     }
 
-    protected void drawTree(BinaryTreeNode node, double x, double y, double horizontalSpacing) {
+    private void drawTree(BinaryTreeNode node, double x, double y, double horizontalSpacing) {
         if (node == null) return;
 
         try {
@@ -299,7 +319,7 @@ public class BSTController {
         }
     }
 
-    protected void clearPane() {
+    private void clearPane() {
         treePane.getChildren().clear();
         treePane.getChildren().add(traverseVBox);
         treePane.getChildren().add(hBoxTraverse);
@@ -485,7 +505,7 @@ public class BSTController {
         }
     }
 
-    protected void highLightNodeRed(int key) {
+    private void highLightNodeRed(int key) {
         HBox hBox = findNode(key);
         if (hBox == null)
             return;
@@ -499,7 +519,7 @@ public class BSTController {
         }
     }
 
-    protected void highLightNodeGreen(int key) {
+    private void highLightNodeGreen(int key) {
         HBox hBox = findNode(key);
         if (hBox == null)
             return;
@@ -514,7 +534,7 @@ public class BSTController {
 //        wait(timeDelaySet);
     }
 
-    protected void resetHighlight() {
+    private void resetHighlight() {
         ObservableList<Node> nodes = treePane.getChildren();
         for (Node node : nodes) {
             if (!(node instanceof AnchorPane anchorPane))
@@ -535,7 +555,7 @@ public class BSTController {
         }
     }
 
-    protected HBox findNode(int key) {
+    private HBox findNode(int key) {
         ObservableList<Node> nodes = treePane.getChildren();
         for (Node node : nodes) {
             if (!(node instanceof AnchorPane anchorPane))
@@ -554,7 +574,7 @@ public class BSTController {
         return null;
     }
 
-    protected Point2D findCoordinate(int key) {
+    private Point2D findCoordinate(int key) {
         ObservableList<Node> nodes = treePane.getChildren();
         for (Node node : nodes) {
             if (!(node instanceof AnchorPane anchorPane))
@@ -588,7 +608,7 @@ public class BSTController {
         new Thread(sleeper).start();
     }
 
-     protected void drawLeftChild(int parent, int key) {
+     private void drawLeftChild(int parent, int key) {
         try {
             double nodeHeight = 30; // Replace with the actual height of the nodes
             double yAdjustment = 30; // Adjust vertical spacing between nodes
@@ -621,7 +641,7 @@ public class BSTController {
         }
     }
 
-    protected void drawRightChild(int parent, int key) {
+    private void drawRightChild(int parent, int key) {
         try {
             Point2D coordinate = findCoordinate(parent);
             double nodeHeight = 30; // Replace with the actual height of the nodes
@@ -654,17 +674,17 @@ public class BSTController {
         }
     }
 
-    protected void drawWholeTree() {
+    private void drawWholeTree() {
         drawTree(tree.getTreeRoot(), treePane.getWidth() / 2,5, treePane.getWidth() / 4);
     }
 
-     protected void deleteLine(int key) {
+     private void deleteLine(int key) {
         List<Line> lines = mapHBoxLine.get(key);
         for (Line line : lines) {
             line.setVisible(false);
         }
     }
-    protected void traversePrint (int key) {
+    private void traversePrint (int key) {
         Label label = new Label(key + "    ");
         label.setStyle("-fx-text-fill: #ff0000; -fx-font-size: 20; -fx-font-weight: bold"
                 + "; -fx-font-family: \"Times New Roman\"; -fx-margin: 20");

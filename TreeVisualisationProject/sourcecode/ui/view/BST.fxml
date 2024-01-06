@@ -28,8 +28,11 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <HBox.margin>
+                        <Insets right="100.0" />
+                     </HBox.margin>
                   </Button>
-                  <Label alignment="CENTER" text="Tree Visualisation Application" textFill="#92f29b">
+                  <Label fx:id="treeTypeLabel" alignment="CENTER" text="Tree Visualisation" textFill="#92f29b">
                      <font>
                         <Font size="39.0" />
                      </font>
