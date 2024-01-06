@@ -6,6 +6,8 @@ public abstract class Tree {
 
     public abstract int height();
 
+    public abstract boolean search(int key);
+
     public abstract int depth(int key);
 
     public abstract boolean insert(int parentKey, int key);

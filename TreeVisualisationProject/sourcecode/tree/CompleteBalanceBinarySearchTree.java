@@ -1,7 +1,6 @@
 package tree;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class CompleteBalanceBinarySearchTree extends BinarySearchTree {
 
@@ -54,5 +53,40 @@ public class CompleteBalanceBinarySearchTree extends BinarySearchTree {
             return minMid + (excess - 1);
         }
         return minMid + levelSize / 2 - 1;
+    }
+
+    public boolean isCompleteBalance() {
+        if (treeRoot == null) {
+            return true;
+        }
+
+        Queue<BinaryTreeNode> queue = new LinkedList<>();
+        queue.add(treeRoot);
+
+        boolean endOfCompleteTree = false;
+
+        while (!queue.isEmpty()) {
+            BinaryTreeNode currentNode = queue.poll();
+
+            if (currentNode.leftChild != null) {
+                if (endOfCompleteTree) {
+                    return false;
+                }
+                queue.add(currentNode.leftChild);
+            } else {
+                endOfCompleteTree = true;
+            }
+
+            if (currentNode.rightChild != null) {
+                if (endOfCompleteTree) {
+                    return false;
+                }
+                queue.add(currentNode.rightChild);
+            } else {
+                endOfCompleteTree = true;
+            }
+        }
+
+        return true;
     }
 }

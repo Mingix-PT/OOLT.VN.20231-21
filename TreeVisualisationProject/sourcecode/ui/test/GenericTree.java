@@ -1,4 +1,4 @@
-package ui;
+package ui.test;
 
 import java.util.*;
 

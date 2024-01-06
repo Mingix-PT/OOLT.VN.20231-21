@@ -1,4 +1,4 @@
-package ui;
+package ui.test;
 
 import java.util.Optional;
 
@@ -12,7 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
-import ui.GenericTree.GenericTreeNode;
+import ui.test.GenericTree.GenericTreeNode;
 
 public class TreeVisualizationApp extends Application {
     private GenericTree tree;
