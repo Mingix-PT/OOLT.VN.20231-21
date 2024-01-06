@@ -350,4 +350,40 @@ public class BinarySearchTree extends Tree {
     public void setNullTree() {
         treeRoot = null;
     }
+
+    // Method to compare two BSTs
+    public boolean areIdentical(BinarySearchTree bst) {
+        return areIdentical(this.treeRoot, bst.treeRoot);
+    }
+
+    private boolean areIdentical(BinaryTreeNode node1, BinaryTreeNode node2) {
+        // 1. both empty -> true
+        if (node1 == null && node2 == null) {
+            return true;
+        }
+
+        // 2. both non-empty -> compare them
+        if (node1 != null && node2 != null) {
+            return (node1.key == node2.key
+                    && areIdentical(node1.leftChild, node2.leftChild)
+                    && areIdentical(node1.rightChild, node2.rightChild));
+        }
+
+        // 3. one empty, one not -> false
+        return false;
+    }
+
+    public void copy(BinarySearchTree bst) {
+        this.treeRoot = copy(bst.treeRoot);
+    }
+
+    private BinaryTreeNode copy(BinaryTreeNode node) {
+        if (node == null) {
+            return null;
+        }
+        BinaryTreeNode newNode = new BinaryTreeNode(node.key);
+        newNode.leftChild = copy(node.leftChild);
+        newNode.rightChild = copy(node.rightChild);
+        return newNode;
+    }
 }

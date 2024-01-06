@@ -27,6 +27,9 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class BSTController {
     private BinarySearchTree tree = new BinarySearchTree();
+    private BinarySearchTree oldTree = new BinarySearchTree(-999);
+    private String lastAction = "";
+    private int lastKey = -999;
     private Map<Integer, List<Line>> mapHBoxLine = new HashMap<>();
 
     @FXML
@@ -60,6 +63,9 @@ public class BSTController {
 
     @FXML
     private Button bfsButton;
+
+    @FXML
+    private Button undoButton;
     
     @FXML
     private Slider sliderSpeed;
@@ -131,6 +137,9 @@ public class BSTController {
             dialog.setHeaderText("Delete");
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
+            oldTree.copy(tree);
+            lastAction = "delete";
+            lastKey = key;
             if (deleteUI(key)) {
 //                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Deleted", ButtonType.OK);
 //                alert.showAndWait();
@@ -163,16 +172,10 @@ public class BSTController {
             dialog.setHeaderText("Insert");
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
+            oldTree.copy(tree);
+            lastAction = "insert";
+            lastKey = key;
             if (insertUI(tree.getTreeRoot(), key, timeDelaySet)) {
-                tree.insert(key);
-//                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Inserted", ButtonType.OK);
-//                alert.showAndWait();
-//                dialog.setContentText("Inserted");
-            }
-            else {
-//                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed", ButtonType.OK);
-//                alert.showAndWait();
-//                dialog.setContentText("Failed");
             }
         }
         catch (NumberFormatException e) {
@@ -190,6 +193,7 @@ public class BSTController {
         resetTraverse(true);
         try {
             dfsTraverseUI(tree.getTreeRoot(), timeDelaySet);
+            lastAction = "dfs";
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -202,6 +206,7 @@ public class BSTController {
         resetTraverse(true);
         try {
             bfsTraverseUI();
+            lastAction = "bfs";
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -229,6 +234,8 @@ public class BSTController {
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
             resetHighlight();
+            lastAction = "search";
+            lastKey = key;
             if (searchUI(tree.getTreeRoot(), key, 0) != 0) {
 //                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Found", ButtonType.OK);
 //                alert.showAndWait();
@@ -693,5 +700,37 @@ public class BSTController {
     private void resetTraverse(boolean visibility) {
         hBoxTraverse.getChildren().clear();
         hBoxTraverse.setVisible(visibility);
+    }
+
+    @FXML
+    private void undo() {
+        if (oldTree.areIdentical(new BinarySearchTree(-999))) {
+            return;
+        }
+        if (!oldTree.areIdentical(tree)) {
+            tree.copy(oldTree);
+            clearPane();
+            drawWholeTree();
+            lastAction = null;
+        }
+    }
+    @FXML
+    private void redo(ActionEvent event) throws InterruptedException {
+        if (lastAction == null) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "No action to redo", ButtonType.OK);
+            alert.showAndWait();
+        }
+        else {
+            undo();
+            clearPane();
+            drawWholeTree();
+            switch (lastAction) {
+                case "insert" -> insertUI(tree.getTreeRoot(), lastKey, timeDelaySet);
+                case "delete" -> deleteUI(lastKey);
+                case "search" -> searchUI(tree.getTreeRoot(), lastKey, timeDelaySet);
+                case "dfs" -> dfsTraverseUI(tree.getTreeRoot(), timeDelaySet);
+                case "bfs" -> bfsTraverseUI();
+            }
+        }
     }
 }

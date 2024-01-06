@@ -37,6 +37,12 @@ public class TestBST {
 //        tree.delete(5);
 //        tree.print();
         System.out.println(tree.depth(7));
+        BinarySearchTree newTree = new BinarySearchTree();
+        System.out.println(newTree.areIdentical(tree));
+        newTree.copy(tree);
+        newTree.print();
+        tree.insert(100);
+        System.out.println(newTree.areIdentical(tree));
 //        tree.bfsTraverse();
     }
 }

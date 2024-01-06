@@ -29,6 +29,10 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class CBBSTController {
     private CompleteBalanceBinarySearchTree tree = new CompleteBalanceBinarySearchTree();
+    private CompleteBalanceBinarySearchTree oldTree = new CompleteBalanceBinarySearchTree(-999);
+
+    private String lastAction = "";
+    private int lastArgument = -999;
     private Map<Integer, List<Line>> mapHBoxLine = new HashMap<>();
 
     @FXML
@@ -135,6 +139,7 @@ public class CBBSTController {
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
             long timeDelay = deleteUI(key);
+            oldTree.copy(tree);
             if (timeDelay > 0) {
                 delay(timeDelay + timeDelaySet, () -> {
                     tree.print();
@@ -166,6 +171,7 @@ public class CBBSTController {
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
             long timeDelay = insertUI(tree.getTreeRoot(), key, timeDelaySet);
+            oldTree.copy(tree);
             if (timeDelay > 0) {
                 delay(timeDelay + timeDelaySet, () -> {
                     tree.insert(key);
@@ -696,5 +702,16 @@ public class CBBSTController {
         hBoxTraverse.getChildren().clear();
         hBoxTraverse.setVisible(visibility);
     }
+
+    @FXML
+    private void undo() {
+        if (!oldTree.areIdentical(tree)) {
+            tree.copy(oldTree);
+            clearPane();
+            drawWholeTree();
+        }
+    }
+
+
 
 }

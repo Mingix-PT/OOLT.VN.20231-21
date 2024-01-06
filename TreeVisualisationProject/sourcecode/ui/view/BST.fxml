@@ -110,29 +110,21 @@
                         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
                      </HBox.margin>
                   </Slider>
-                  <Button mnemonicParsing="false" prefHeight="59.0" prefWidth="55.0" style="-fx-background-color: black;">
+                  <Button fx:id="undoButton" mnemonicParsing="false" onAction="#undo" prefHeight="40.0" prefWidth="122.0" text="Undo">
                      <HBox.margin>
                         <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
                      </HBox.margin>
-                     <graphic>
-                        <ImageView fitHeight="32.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/undoButton.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
                   </Button>
-                  <Button layoutX="857.0" layoutY="40.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="82.0" style="-fx-background-color: black;">
+                  <Button fx:id="redoButton" layoutX="857.0" layoutY="40.0" mnemonicParsing="false" onAction="#redo" prefHeight="39.0" prefWidth="130.0" text="Redo">
                      <HBox.margin>
                         <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
                      </HBox.margin>
-                     <graphic>
-                        <ImageView fitHeight="32.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/redoButton.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
                   </Button>
                   <VBox prefHeight="200.0" prefWidth="100.0" />
                   <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
