@@ -8,17 +8,17 @@ import ui.controller.BSTController;
 import ui.controller.CBBSTController;
 
 public class Main extends Application {
-    private BinarySearchTree bst;
+    private CompleteBalanceBinarySearchTree tree;
 
     @Override
     public void start(Stage stage) throws Exception {
         final String BST_FXML_FILE_PATH = "/ui/view/BST.fxml";
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource(BST_FXML_FILE_PATH));
-//        BSTController bstController = new BSTController();
-//        fxmlLoader.setController(bstController);
-        CBBSTController cbBSTController = new CBBSTController();
-        fxmlLoader.setController(cbBSTController);
+        BSTController bstController = new BSTController();
+        fxmlLoader.setController(bstController);
+//        CBBSTController cbBSTController = new CBBSTController();
+//        fxmlLoader.setController(cbBSTController);
         Parent parent = fxmlLoader.load();
 
         Scene scene = new Scene(parent);

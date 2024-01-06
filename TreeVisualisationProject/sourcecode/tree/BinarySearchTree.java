@@ -250,7 +250,7 @@ public class BinarySearchTree extends Tree {
         System.out.println();
     }
 
-    protected List<BinaryTreeNode> bfsTraverse(BinaryTreeNode node) {
+    public List<BinaryTreeNode> bfsTraverse(BinaryTreeNode node) {
         List<BinaryTreeNode> bfsResult = new ArrayList<>();
         Queue<BinaryTreeNode> queueNode = new ArrayDeque<>();
         queueNode.offer(node);
@@ -345,5 +345,9 @@ public class BinarySearchTree extends Tree {
             return 1;
         }
         return 1 + countNodes(root.leftChild) + countNodes(root.rightChild);
+    }
+
+    public void setNullTree() {
+        treeRoot = null;
     }
 }

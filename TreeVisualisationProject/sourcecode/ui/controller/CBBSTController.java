@@ -69,6 +69,9 @@ public class CBBSTController {
     @FXML
     protected Label speedLabel;
 
+    @FXML
+    protected HBox hBoxTraverse;
+
     protected int timeDelaySet = 1020;
 
     @FXML
@@ -78,6 +81,7 @@ public class CBBSTController {
 
     @FXML
     protected void createRandomTree(ActionEvent event) {
+        resetTraverse(false);
         try
         {
             TextInputDialog dialog = new TextInputDialog();
@@ -103,6 +107,7 @@ public class CBBSTController {
     @FXML
     protected void deleteNode(ActionEvent event) {
         resetHighlight();
+        resetTraverse(false);
         try {
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Delete");
@@ -111,21 +116,14 @@ public class CBBSTController {
             int key = Integer.parseInt(input);
             long timeDelay = deleteUI(key);
             if (timeDelay > 0) {
-                delay(timeDelay + 2L * timeDelaySet, () -> {
-                    tree = tree.completeBalanceTheTree();
-                    clearPane();
-                    drawWholeTree();
+                delay(timeDelay + timeDelaySet, () -> {
+                    tree.print();
+                    if (!tree.isCompleteBalance()) {
+                        tree = tree.completeBalanceTheTree();
+                        clearPane();
+                        drawWholeTree();
+                    }
                 });
-            }
-//                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Deleted", ButtonType.OK);
-//                alert.showAndWait();
-//                dialog.setContentText("Deleted");
-//                clearPane();
-//                drawWholeTree();
-            else {
-//                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed", ButtonType.OK);
-//                alert.showAndWait();
-//                dialog.setContentText("Failed");
             }
         }
         catch (NumberFormatException e) {
@@ -140,6 +138,7 @@ public class CBBSTController {
     @FXML
     protected void insertNode(ActionEvent event) {
         resetHighlight();
+        resetTraverse(false);
         try {
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Insert");
@@ -149,18 +148,14 @@ public class CBBSTController {
             long timeDelay = insertUI(tree.getTreeRoot(), key, timeDelaySet);
             if (timeDelay > 0) {
                 delay(timeDelay + timeDelaySet, () -> {
-                    tree = tree.completeBalanceTheTree();
-                    clearPane();
-                    drawWholeTree();
+                    tree.insert(key);
+                    tree.print();
+                    if (!tree.isCompleteBalance()) {
+                        tree = tree.completeBalanceTheTree();
+                        clearPane();
+                        drawWholeTree();
+                    }
                 });
-//                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Inserted", ButtonType.OK);
-//                alert.showAndWait();
-//                dialog.setContentText("Inserted");
-            }
-            else {
-//                Alert alert = new Alert(Alert.AlertType.ERROR, "Failed", ButtonType.OK);
-//                alert.showAndWait();
-//                dialog.setContentText("Failed");
             }
         }
         catch (NumberFormatException e) {
@@ -174,7 +169,7 @@ public class CBBSTController {
     @FXML
     protected void dfsTraverse(ActionEvent event) {
         resetHighlight();
-        traverseVBox.setVisible(false);
+        resetTraverse(true);
         try {
             dfsTraverseUI(tree.getTreeRoot(), timeDelaySet);
         } catch (InterruptedException e) {
@@ -207,6 +202,7 @@ public class CBBSTController {
     @FXML
     protected void searchNode(ActionEvent event) {
         resetHighlight();
+        resetTraverse(false);
         try{
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Search");
@@ -305,6 +301,7 @@ public class CBBSTController {
     protected void clearPane() {
         treePane.getChildren().clear();
         treePane.getChildren().add(traverseVBox);
+        treePane.getChildren().add(hBoxTraverse);
     }
 
     public long searchUI(BinaryTreeNode root,int key, long timeDelay) throws InterruptedException {
@@ -375,6 +372,8 @@ public class CBBSTController {
     }
 
     public long deleteUI(int key) throws InterruptedException {
+        resetHighlight();
+        resetTraverse(false);
         highLightNodeRed(tree.getTreeRoot().key);
         long timeDelay = searchUI(tree.getTreeRoot(), key, 0);
         if (timeDelay == 0) {
@@ -389,7 +388,6 @@ public class CBBSTController {
         if (nodeFound.isLeaf()) {
             delay(timeDelay + timeDelaySet, () -> {
                 tree.delete(key);
-                deleteLine(key);
                 clearPane();
                 drawWholeTree();
             });
@@ -433,10 +431,11 @@ public class CBBSTController {
                 throw new RuntimeException(e);
             }
         });
-        return timeDelay2.get() + 2L * timeDelaySet;
+        return timeDelay + timeDelay2.get() + 2L * timeDelaySet;
     }
 
     public void dfsTraverseUI(BinaryTreeNode root, long timeDelay) throws InterruptedException {
+        resetTraverse(true);
         long timeDelayLeft = 0;
         if (root == null) {
             return;
@@ -461,6 +460,7 @@ public class CBBSTController {
     }
 
     public void bfsTraverseUI () {
+        resetTraverse(true);
         Queue<BinaryTreeNode> queue = new ArrayDeque<>();
         if (tree.getTreeRoot() == null) {
             return;
@@ -469,7 +469,10 @@ public class CBBSTController {
         long timeDelay = timeDelaySet;
         while (!queue.isEmpty()) {
             BinaryTreeNode node = queue.poll();
-            delay(timeDelay, () -> highLightNodeGreen(node.key));
+            delay(timeDelay, () -> {
+                highLightNodeGreen(node.key);
+                traversePrint(node.key);
+            });
             timeDelay += timeDelaySet;
             if (node.leftChild != null) {
                 queue.add(node.leftChild);
@@ -482,8 +485,10 @@ public class CBBSTController {
 
     protected void highLightNodeRed(int key) {
         HBox hBox = findNode(key);
-        if (hBox == null)
+        if (hBox == null) {
+            System.out.println("HBox is null");
             return;
+        }
         hBox.setStyle("-fx-border-color: #000000; -fx-border-radius: 30; " +
                 "-fx-background-color: #ff0000; -fx-background-radius: 30");
         ObservableList<Node> hBoxChildren = hBox.getChildren();
@@ -506,7 +511,6 @@ public class CBBSTController {
                 continue;
             label.setStyle("-fx-text-fill: #000000");
         }
-//        wait(timeDelaySet);
     }
 
     protected void resetHighlight() {
@@ -650,7 +654,7 @@ public class CBBSTController {
     }
 
     protected void drawWholeTree() {
-        drawTree(tree.getTreeRoot(), treePane.getWidth() / 2,treePane.getHeight()*0.1, tree.height()*40);
+        drawTree(tree.getTreeRoot(), treePane.getWidth() / 2,5, treePane.getWidth() / 4);
     }
 
     protected void deleteLine(int key) {
@@ -659,4 +663,17 @@ public class CBBSTController {
             line.setVisible(false);
         }
     }
+
+    protected void traversePrint (int key) {
+        Label label = new Label(key + "    ");
+        label.setStyle("-fx-text-fill: #ff0000; -fx-font-size: 30; -fx-font-weight: bold"
+                + "; -fx-font-family: \"Times New Roman\"; -fx-margin: 20");
+        hBoxTraverse.getChildren().add(label);
+    }
+
+    private void resetTraverse(boolean visibility) {
+        hBoxTraverse.getChildren().clear();
+        hBoxTraverse.setVisible(visibility);
+    }
+
 }

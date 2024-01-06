@@ -71,12 +71,16 @@ public class BSTController {
     protected int timeDelaySet = 1020;
 
     @FXML
+    private HBox hBoxTraverse;
+
+    @FXML
     protected void backToMainMenu(ActionEvent event) {
 
     }
 
     @FXML
     protected void createRandomTree(ActionEvent event) {
+        resetTraverse(false);
         try
         {
             TextInputDialog dialog = new TextInputDialog();
@@ -101,6 +105,7 @@ public class BSTController {
     @FXML
     protected void deleteNode(ActionEvent event) {
         resetHighlight();
+        resetTraverse(false);
         try {
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Delete");
@@ -131,6 +136,7 @@ public class BSTController {
 
     @FXML
     protected void insertNode(ActionEvent event) {
+        resetTraverse(false);
         resetHighlight();
         try {
             TextInputDialog dialog = new TextInputDialog();
@@ -139,6 +145,7 @@ public class BSTController {
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
             if (insertUI(tree.getTreeRoot(), key, timeDelaySet)) {
+                tree.insert(key);
 //                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Inserted", ButtonType.OK);
 //                alert.showAndWait();
 //                dialog.setContentText("Inserted");
@@ -161,6 +168,7 @@ public class BSTController {
     protected void dfsTraverse(ActionEvent event) {
         resetHighlight();
         traverseVBox.setVisible(false);
+        resetTraverse(true);
         try {
             dfsTraverseUI(tree.getTreeRoot(), timeDelaySet);
         } catch (InterruptedException e) {
@@ -172,6 +180,7 @@ public class BSTController {
     protected void bfsTraverse(ActionEvent event) {
         resetHighlight();
         traverseVBox.setVisible(false);
+        resetTraverse(true);
         try {
             bfsTraverseUI();
         } catch (Exception e) {
@@ -192,6 +201,7 @@ public class BSTController {
 
     @FXML
     protected void searchNode(ActionEvent event) {
+        resetTraverse(false);
         resetHighlight();
         try{
             TextInputDialog dialog = new TextInputDialog();
@@ -292,6 +302,7 @@ public class BSTController {
     protected void clearPane() {
         treePane.getChildren().clear();
         treePane.getChildren().add(traverseVBox);
+        treePane.getChildren().add(hBoxTraverse);
     }
 
     public long searchUI(BinaryTreeNode root,int key, long timeDelay) throws InterruptedException {
@@ -376,7 +387,7 @@ public class BSTController {
         if (nodeFound.isLeaf()) {
             delay(timeDelay + timeDelaySet, () -> {
                 tree.delete(key);
-                deleteLine(key);
+//                deleteLine(key);
                 clearPane();
                 drawWholeTree();
             });
@@ -385,7 +396,7 @@ public class BSTController {
         if (nodeFound.leftChild == null || nodeFound.rightChild == null) {
             delay(timeDelay + timeDelaySet, () -> {
                 hBoxDelete.setVisible(false);
-                deleteLine(key);
+//                deleteLine(key);
             });
             delay(timeDelay + 2L * timeDelaySet, () -> {
                 tree.delete(key);
@@ -409,7 +420,7 @@ public class BSTController {
                             continue;
                         label.setText(String.valueOf(leftMostOfRight.key));
                     }
-                    deleteLine(leftMostOfRight.key);
+//                    deleteLine(leftMostOfRight.key);
                     hBoxLeftMostOfRight.setVisible(false);
                 });
                 delay(timeDelay2.get() + 2 * timeDelaySet, () -> {
@@ -430,7 +441,10 @@ public class BSTController {
             return;
         }
         else {
-            delay(timeDelay, () -> highLightNodeGreen(root.key));
+            delay(timeDelay, () -> {
+                highLightNodeGreen(root.key);
+                traversePrint(root.key);
+            });
             timeDelay += timeDelaySet;
             if (root.leftChild != null) {
                 dfsTraverseUI(root.leftChild, timeDelay);
@@ -457,7 +471,10 @@ public class BSTController {
         long timeDelay = timeDelaySet;
         while (!queue.isEmpty()) {
             BinaryTreeNode node = queue.poll();
-            delay(timeDelay, () -> highLightNodeGreen(node.key));
+            delay(timeDelay, () -> {
+                highLightNodeGreen(node.key);
+                traversePrint(node.key);
+            });
             timeDelay += timeDelaySet;
             if (node.leftChild != null) {
                 queue.add(node.leftChild);
@@ -638,7 +655,7 @@ public class BSTController {
     }
 
     protected void drawWholeTree() {
-        drawTree(tree.getTreeRoot(), treePane.getWidth() / 2,treePane.getHeight()*0.1, tree.height()*40);
+        drawTree(tree.getTreeRoot(), treePane.getWidth() / 2,5, treePane.getWidth() / 4);
     }
 
      protected void deleteLine(int key) {
@@ -646,5 +663,15 @@ public class BSTController {
         for (Line line : lines) {
             line.setVisible(false);
         }
+    }
+    protected void traversePrint (int key) {
+        Label label = new Label(key + "    ");
+        label.setStyle("-fx-text-fill: #ff0000; -fx-font-size: 20; -fx-font-weight: bold"
+                + "; -fx-font-family: \"Times New Roman\"; -fx-margin: 20");
+        hBoxTraverse.getChildren().add(label);
+    }
+    private void resetTraverse(boolean visibility) {
+        hBoxTraverse.getChildren().clear();
+        hBoxTraverse.setVisible(visibility);
     }
 }
