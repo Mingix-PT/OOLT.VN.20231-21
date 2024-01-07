@@ -18,16 +18,16 @@ import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.scene.*;
-import tree.BinarySearchTree;
+import tree.AVLTree;
 import tree.BinaryTreeNode;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class BSTController {
-    private BinarySearchTree tree = new BinarySearchTree();
-    private BinarySearchTree oldTree = new BinarySearchTree(-999);
+public class AVLController {
+    private AVLTree tree = new AVLTree();
+    private AVLTree oldTree = new AVLTree(-999);
     private String lastAction = "nothing";
     private String lastActionRedo = "";
     private int lastKey = -999;
@@ -67,7 +67,7 @@ public class BSTController {
 
     @FXML
     private Button undoButton;
-    
+
     @FXML
     private Slider sliderSpeed;
 
@@ -79,7 +79,7 @@ public class BSTController {
 
     @FXML
     private Label treeTypeLabel;
-    
+
     private int timeDelaySet = 1020;
 
     @FXML
@@ -115,7 +115,7 @@ public class BSTController {
             dialog.setHeaderText("Enter the height of the tree");
             String input = dialog.showAndWait().get();
             int height = Integer.parseInt(input);
-            tree = new BinarySearchTree();
+            tree = new AVLTree();
             while (tree.height() < height) {
                 tree.insert((int) (Math.random() * 100));
             }
@@ -256,7 +256,7 @@ public class BSTController {
             speedLabel.setText(speed + "x");
         });
         try {
-            treeTypeLabel.setText("Binary Search Tree");
+            treeTypeLabel.setText("AVL Tree");
             updateButton.setVisible(false);
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(getClass().getResource(NODE_FXML_FILE_PATH));
@@ -606,7 +606,7 @@ public class BSTController {
         new Thread(sleeper).start();
     }
 
-     private void drawLeftChild(int parent, int key) {
+    private void drawLeftChild(int parent, int key) {
         try {
             double nodeHeight = 30; // Replace with the actual height of the nodes
             double yAdjustment = 30; // Adjust vertical spacing between nodes
@@ -676,7 +676,7 @@ public class BSTController {
         drawTree(tree.getTreeRoot(), treePane.getWidth() / 2,5, treePane.getWidth() / 4);
     }
 
-     private void deleteLine(int key) {
+    private void deleteLine(int key) {
         List<Line> lines = mapHBoxLine.get(key);
         for (Line line : lines) {
             line.setVisible(false);
@@ -697,7 +697,7 @@ public class BSTController {
     private void undo() {
         if (oldTree.getTreeRoot().key == -999) {
             clearPane();
-            tree = new BinarySearchTree();
+            tree = new AVLTree();
         }
         else if (!oldTree.areIdentical(tree)) {
             tree.copy(oldTree);

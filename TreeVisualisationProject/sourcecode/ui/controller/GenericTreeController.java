@@ -28,7 +28,7 @@ public class GenericTreeController {
     private int speed;
     private long timeDelaySet = 1020;
     private GenericTree tree = new GenericTree();
-    private GenericTree oldTree = new GenericTree();
+    private GenericTree oldTree = new GenericTree(-999);
     private String lastAction = "nothing";
     private String lastActionRedo = "nothing";
     private int lastKey = -999;
@@ -110,11 +110,15 @@ public class GenericTreeController {
 
     @FXML
     void createRandomTree(ActionEvent event) {
+        if (tree!=null) {
+            oldTree.copy(tree);
+        }
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Create Random Tree");
         dialog.setHeaderText("Enter the height of the tree:");
         dialog.showAndWait();
         int height = Integer.parseInt(dialog.getEditor().getText());
+        setLastAction("create", height);
         tree = new GenericTree();
         tree.createRandomTree(height);
         tree.printTree();
@@ -136,8 +140,8 @@ public class GenericTreeController {
         dialog1.setHeaderText("Enter the new key of the node:");
         dialog1.showAndWait();
         int newKey = Integer.parseInt(dialog1.getEditor().getText());
-        long timeDelay = updateUI(oldKey, newKey);
         setLastAction("update", newKey, oldKey);
+        long timeDelay = updateUI(oldKey, newKey);
     }
 
     private long updateUI(int oldKey, int newKey) {
@@ -240,8 +244,8 @@ public class GenericTreeController {
         dialog.setHeaderText("Enter the key of the node:");
         dialog.showAndWait();
         int key = Integer.parseInt(dialog.getEditor().getText());
-        long timeDelay = insertUI(parentKey, key);
         setLastAction("insert", key, parentKey);
+        long timeDelay = insertUI(parentKey, key);
     }
 
     private long insertUI(int parent, int key) {
@@ -249,24 +253,29 @@ public class GenericTreeController {
             tree.insert(key);
             return 0;
         }
-        if (tree.search(key)) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "Key " + key + " already exists in the tree", ButtonType.OK);
-            alert.showAndWait();
-            return 0;
-        }
-        long timeDelay = searchUI(tree.getTreeRoot(), parent, timeDelaySet);
-        if (timeDelay != 0) {
-            delay(timeDelay + timeDelaySet, () -> {
-                GenericTreeNode parentNode = tree.search(tree.getTreeRoot(), parent);
-                parentNode.children.add(new GenericTreeNode(key));
-                clearPane();
-                drawWholeTree();
-                highLightNodeGreen(key);
-                delay(timeDelaySet, () -> {
-                    clearPane();
-                    drawWholeTree();
+        Queue<GenericTreeNode> queue = new ArrayDeque<>();
+        queue.add(tree.getTreeRoot());
+        long timeDelay = timeDelaySet;
+        while (!queue.isEmpty()) {
+            GenericTreeNode topNode = queue.poll();
+            if (topNode.key != parent) {
+                delay(timeDelay, () -> {
+                    highLightNodeRed(topNode.key);
                 });
-            });
+                timeDelay += timeDelaySet;
+                queue.addAll(topNode.getChildren());
+            }
+            else {
+                delay(timeDelay, () -> {
+                    highLightNodeGreen(topNode.key);
+                    tree.insert(parent, key);
+                    delay(timeDelaySet, () -> {
+                        clearPane();
+                        drawWholeTree();
+                    });
+                });
+                return timeDelay;
+            }
         }
         return 0;
     }
@@ -304,8 +313,8 @@ public class GenericTreeController {
         dialog.setHeaderText("Search");
         dialog.showAndWait();
         int key = Integer.parseInt(dialog.getEditor().getText());
-        long timeDelay = searchUI(tree.getTreeRoot(), key, timeDelaySet);
         setLastAction("search", key);
+        long timeDelay = searchUI(tree.getTreeRoot(), key, timeDelaySet);
     }
 
 
@@ -315,11 +324,11 @@ public class GenericTreeController {
         resetTraverse(false);
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Delete Node");
-        dialog.setHeaderText("Enter the key of the node:");
+        dialog.setHeaderText("Delete");
         dialog.showAndWait();
         int key = Integer.parseInt(dialog.getEditor().getText());
-        long timeDelay = deleteUI(key);
         setLastAction("delete", key);
+        long timeDelay = deleteUI(key);
     }
 
 
@@ -327,20 +336,29 @@ public class GenericTreeController {
         if (tree.getTreeRoot() == null) {
             return 0;
         }
-        long timeDelay = searchUI(tree.getTreeRoot(), key, timeDelaySet);
-        if (timeDelay != 0) {
-            delay(timeDelay + timeDelaySet, () -> {
-                tree.delete(key);
-                clearPane();
-                drawWholeTree();
+        Queue<GenericTreeNode> queue = new ArrayDeque<>();
+        queue.add(tree.getTreeRoot());
+        long timeDelay = timeDelaySet;
+        while (!queue.isEmpty()) {
+            GenericTreeNode topNode = queue.poll();
+            if (topNode.key == key) {
+                delay(timeDelay, () -> {
+                    highLightNodeGreen(topNode.key);
+                    tree.delete(key);
+                    delay(timeDelaySet, () -> {
+                        clearPane();
+                        drawWholeTree();
+                    });
+                });
+                return timeDelay;
+            }
+            delay(timeDelay, () -> {
+                highLightNodeRed(topNode.key);
             });
+            timeDelay += timeDelaySet;
+            queue.addAll(topNode.getChildren());
         }
         return 0;
-    }
-
-    @FXML
-    void undo(ActionEvent event) {
-
     }
 
     public void clearPane() {
@@ -430,7 +448,7 @@ public class GenericTreeController {
 
     private void traversePrint (int key) {
         Label label = new Label(key + "    ");
-        label.setStyle("-fx-text-fill: #ff0000; -fx-font-size: 20; -fx-font-weight: bold"
+        label.setStyle("-fx-text-fill: #ff0000; -fx-font-size: 15; -fx-font-weight: bold"
                 + "; -fx-font-family: \"Times New Roman\"; -fx-margin: 20");
         hBoxTraverse.getChildren().add(label);
     }
@@ -442,11 +460,14 @@ public class GenericTreeController {
 
     @FXML
     private void undo() {
-        if (oldTree.getTreeRoot().key == -999) {
+        System.out.println("Undo");
+        if (oldTree.getTreeRoot() == null) {
+            System.out.println("Tree is empty");
             clearPane();
             tree = new GenericTree();
         }
-        if (!oldTree.areIdentical(tree)) {
+        else if (!oldTree.areIdentical(tree)) {
+            System.out.println("Tree is not identical");
             tree.copy(oldTree);
             clearPane();
             drawWholeTree();
@@ -470,7 +491,7 @@ public class GenericTreeController {
             clearPane();
             drawWholeTree();
             switch (lastActionRedo) {
-                case "insert" -> insertUI(lastKey, lastKey);
+                case "insert" -> insertUI(lastParentKey, lastKey);
                 case "delete" -> deleteUI(lastKey);
                 case "search" -> searchUI(tree.getTreeRoot(), lastKey, timeDelaySet);
                 case "dfs" -> {
@@ -480,6 +501,13 @@ public class GenericTreeController {
                 case "bfs" -> {
                     resetTraverse(true);
                     bfsTraverseUI();
+                }
+                case "update" -> updateUI(lastKey, lastParentKey);
+                case "create" -> {
+                    tree = new GenericTree();
+                    tree.createRandomTree(lastKey);
+                    clearPane();
+                    drawWholeTree();
                 }
             }
         }

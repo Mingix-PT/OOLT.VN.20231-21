@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -34,7 +35,15 @@ public class MenuController {
 
     @FXML
     void confirmQuit(ActionEvent event) {
-
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Quit");
+        alert.setHeaderText("Are you sure you want to quit?");
+        alert.setContentText("Press OK to quit, or press Cancel to return.");
+        alert.showAndWait();
+        if (alert.getResult().getText().equals("OK")) {
+            Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
+            stage.close();
+        }
     }
 
     @FXML
@@ -57,7 +66,7 @@ public class MenuController {
     }
 
     @FXML
-    void openButton(ActionEvent event) {
+    void openHelp(ActionEvent event) {
 
     }
 

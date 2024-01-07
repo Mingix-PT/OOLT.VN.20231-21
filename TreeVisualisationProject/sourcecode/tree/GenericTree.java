@@ -290,7 +290,7 @@ public class GenericTree extends Tree {
     }
 
     public void copy(GenericTree otherTree) {
-        treeRoot = copy(treeRoot);
+        treeRoot = copy(otherTree.treeRoot);
     }
 
     private GenericTreeNode copy(GenericTreeNode root) {

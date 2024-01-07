@@ -97,7 +97,7 @@
                   <HBox layoutX="10.0" layoutY="310.0" prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
-                        <Button fx:id="helpButton" mnemonicParsing="false" onAction="#openButton" prefHeight="50.0" prefWidth="200.0" text="Help">
+                        <Button fx:id="helpButton" mnemonicParsing="false" onAction="#openHelp" prefHeight="50.0" prefWidth="200.0" text="Help">
                            <HBox.margin>
                               <Insets bottom="20.0" top="20.0" />
                            </HBox.margin>
