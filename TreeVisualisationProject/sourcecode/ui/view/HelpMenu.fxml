@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.TextFlow?>
+
+<AnchorPane prefHeight="120.0" prefWidth="222.0" style="-fx-background-color: black;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <BorderPane prefHeight="800.0" prefWidth="1200.0">
+         <top>
+            <Pane prefHeight="108.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Label layoutX="102.0" prefHeight="164.0" prefWidth="1045.0" text="TREE VISUALISATION APPLICATION" textFill="#92f29b">
+                     <font>
+                        <Font size="61.0" />
+                     </font>
+                     <padding>
+                        <Insets bottom="35.0" left="35.0" right="35.0" top="35.0" />
+                     </padding>
+                  </Label>
+                  <Button fx:id="backButton" layoutX="42.0" layoutY="42.0" mnemonicParsing="false" onAction="#backToMainMenu" style="-fx-background-color: black;">
+                     <graphic>
+                        <ImageView fitHeight="37.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../resources/backButton.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                  </Button>
+               </children>
+            </Pane>
+         </top>
+         <center>
+            <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <children>
+                  <TextFlow fx:id="textFlow" layoutX="193.0" layoutY="61.0" prefHeight="581.0" prefWidth="853.0" style="visibility: true;" />
+               </children>
+            </Pane>
+         </center>
+         <right>
+            <ImageView fitHeight="360.0" fitWidth="356.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+               <image>
+                  <Image url="@../resources/tree.png" />
+               </image>
+            </ImageView>
+         </right>
+      </BorderPane>
+   </children>
+</AnchorPane>

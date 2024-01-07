@@ -56,7 +56,7 @@ public class MenuController {
         Parent parent = fxmlLoader.load();
         Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
         stage.setScene(new Scene(parent));
-        stage.setTitle("Binary Search Tree");
+        stage.setTitle("AVL Tree");
         stage.show();
     }
 
@@ -75,8 +75,17 @@ public class MenuController {
     }
 
     @FXML
-    void openHelp(ActionEvent event) {
-
+    void openHelp(ActionEvent event) throws IOException {
+        final String BST_FXML_FILE_PATH = "/ui/view/HelpMenu.fxml";
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getResource(BST_FXML_FILE_PATH));
+        HelpController helpController = new HelpController();
+        fxmlLoader.setController(helpController);
+        Parent parent = fxmlLoader.load();
+        Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(new Scene(parent));
+        stage.setTitle("Help Menu");
+        stage.show();
     }
 
     @FXML
@@ -89,7 +98,7 @@ public class MenuController {
         Parent parent = fxmlLoader.load();
         Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
         stage.setScene(new Scene(parent));
-        stage.setTitle("Binary Search Tree");
+        stage.setTitle("Complete Balance Binary Search Tree");
         stage.show();
     }
 
@@ -103,7 +112,7 @@ public class MenuController {
         Parent parent = fxmlLoader.load();
         Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
         stage.setScene(new Scene(parent));
-        stage.setTitle("Binary Search Tree");
+        stage.setTitle("Generic Tree");
         stage.show();
     }
 

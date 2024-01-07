@@ -421,6 +421,7 @@ public class GenericTreeController {
         sliderProgress1.valueProperty().addListener((observable, oldValue, newValue) -> {
             timeDelaySet = 1020 - newValue.intValue();
         });
+        treeTypeLabel.setText("Generic Tree");
     }
     public static void delay(long millis, Runnable continuation) {
         Task<Void> sleeper = new Task<Void>() {
