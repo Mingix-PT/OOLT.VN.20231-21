@@ -742,10 +742,12 @@ public class BSTController {
     }
 
     private void setLastAction(String action) {
+        oldTree.copy(tree);
         lastAction = action;
         lastActionRedo = action;
     }
     private void setLastAction(String action, int key) {
+        oldTree.copy(tree);
         lastAction = action;
         lastActionRedo = action;
         lastKey = key;

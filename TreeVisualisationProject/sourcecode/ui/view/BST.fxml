@@ -32,7 +32,7 @@
                         <Insets right="100.0" />
                      </HBox.margin>
                   </Button>
-                  <Label fx:id="treeTypeLabel" alignment="CENTER" text="Tree Visualisation" textFill="#92f29b">
+                  <Label fx:id="treeTypeLabel" alignment="CENTER" prefHeight="56.0" prefWidth="946.0" text="Tree Visualisation" textFill="#92f29b">
                      <font>
                         <Font size="39.0" />
                      </font>

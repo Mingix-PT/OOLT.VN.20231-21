@@ -31,7 +31,9 @@ public class CBBSTController {
     private CompleteBalanceBinarySearchTree tree = new CompleteBalanceBinarySearchTree();
     private CompleteBalanceBinarySearchTree oldTree = new CompleteBalanceBinarySearchTree(-999);
 
-    private String lastAction = "";
+    private String lastAction = "nothing";
+    private String lastActionRedo = "nothing";
+    private int lastKey = -999;
     private int lastArgument = -999;
     private Map<Integer, List<Line>> mapHBoxLine = new HashMap<>();
 
@@ -140,6 +142,7 @@ public class CBBSTController {
             int key = Integer.parseInt(input);
             long timeDelay = deleteUI(key);
             oldTree.copy(tree);
+            setLastAction("delete", key);
             if (timeDelay > 0) {
                 delay(timeDelay + timeDelaySet, () -> {
                     tree.print();
@@ -172,6 +175,7 @@ public class CBBSTController {
             int key = Integer.parseInt(input);
             long timeDelay = insertUI(tree.getTreeRoot(), key, timeDelaySet);
             oldTree.copy(tree);
+            setLastAction("insert", key);
             if (timeDelay > 0) {
                 delay(timeDelay + timeDelaySet, () -> {
                     tree.insert(key);
@@ -198,6 +202,7 @@ public class CBBSTController {
         resetTraverse(true);
         try {
             dfsTraverseUI(tree.getTreeRoot(), timeDelaySet);
+            setLastAction("dfs");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -209,6 +214,7 @@ public class CBBSTController {
         traverseVBox.setVisible(false);
         try {
             bfsTraverseUI();
+            setLastAction("bfs");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -235,6 +241,7 @@ public class CBBSTController {
             dialog.setHeaderText("Search");
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
+            setLastAction("search", key);
             if (searchUI(tree.getTreeRoot(), key, 0) != 0) {
 //                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Found", ButtonType.OK);
 //                alert.showAndWait();
@@ -705,13 +712,59 @@ public class CBBSTController {
 
     @FXML
     private void undo() {
+        if (oldTree.getTreeRoot().key == -999) {
+            clearPane();
+            tree = new CompleteBalanceBinarySearchTree();
+        }
         if (!oldTree.areIdentical(tree)) {
             tree.copy(oldTree);
             clearPane();
             drawWholeTree();
+            lastActionRedo = lastAction;
+            lastAction = "nothing";
+        }
+        else if (lastAction.equals("search") || lastAction.equals("dfs") || lastAction.equals("bfs")) {
+            clearPane();
+            drawWholeTree();
+        }
+    }
+    @FXML
+    private void redo(ActionEvent event) throws InterruptedException {
+        if (lastAction.equals("nothing") ) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "No action to redo", ButtonType.OK);
+            alert.showAndWait();
+        }
+        else {
+            undo();
+            clearPane();
+            drawWholeTree();
+            switch (lastActionRedo) {
+                case "insert" -> insertUI(tree.getTreeRoot(), lastKey, timeDelaySet);
+                case "delete" -> deleteUI(lastKey);
+                case "search" -> searchUI(tree.getTreeRoot(), lastKey, timeDelaySet);
+                case "dfs" -> {
+                    resetTraverse(true);
+                    dfsTraverse(event);
+                }
+                case "bfs" -> {
+                    resetTraverse(true);
+                    bfsTraverseUI();
+                }
+            }
         }
     }
 
+    private void setLastAction(String action) {
+        oldTree.copy(tree);
+        lastAction = action;
+        lastActionRedo = action;
+    }
+    private void setLastAction(String action, int key) {
+        oldTree.copy(tree);
+        lastAction = action;
+        lastActionRedo = action;
+        lastKey = key;
+    }
 
 
 }
