@@ -401,24 +401,88 @@ public class AVLController {
         return insertUI(root.rightChild, key, timeDelay);
     }
 
+//    public boolean deleteUI(int key) throws InterruptedException {
+//        if (tree.getTreeRoot() == null) {
+//            return false;
+//        }
+//        long timeDelay = searchUI(tree.getTreeRoot(), key, timeDelaySet);
+//        if (timeDelay == 0) {
+//            return false;
+//        }
+//        HBox hBox = findNode(key);
+//        timeDelay += timeDelaySet;
+//        delay(timeDelay, () -> {
+//            hBox.setVisible(false);
+//            deleteLine(key);
+//            delay(timeDelaySet, () -> {
+//                tree.delete(key);
+//                clearPane();
+//                drawWholeTree();
+//            });
+//        });
+//        return true;
+//    }
+
+
     public boolean deleteUI(int key) throws InterruptedException {
-        if (tree.getTreeRoot() == null) {
-            return false;
-        }
-        long timeDelay = searchUI(tree.getTreeRoot(), key, timeDelaySet);
+        highLightNodeRed(tree.getTreeRoot().key);
+        long timeDelay = searchUI(tree.getTreeRoot(), key, 0);
         if (timeDelay == 0) {
             return false;
         }
-        HBox hBox = findNode(key);
         timeDelay += timeDelaySet;
-        delay(timeDelay, () -> {
-            hBox.setVisible(false);
-            deleteLine(key);
-            delay(timeDelaySet, () -> {
+        HBox hBox = findNode(key);
+        if (hBox == null)
+            return false;
+        HBox hBoxDelete = findNode(key);
+        BinaryTreeNode nodeFound = tree.searchNode(key);
+        if (nodeFound.isLeaf()) {
+            delay(timeDelay + timeDelaySet, () -> {
+                tree.delete(key);
+//                deleteLine(key);
+                clearPane();
+                drawWholeTree();
+            });
+            return true;
+        }
+        if (nodeFound.leftChild == null || nodeFound.rightChild == null) {
+            delay(timeDelay + timeDelaySet, () -> {
+                hBoxDelete.setVisible(false);
+//                deleteLine(key);
+            });
+            delay(timeDelay + 2L * timeDelaySet, () -> {
                 tree.delete(key);
                 clearPane();
                 drawWholeTree();
             });
+            return true;
+        }
+        BinaryTreeNode leftMostOfRight = tree.leftMostNode(nodeFound.rightChild);
+        HBox hBoxLeftMostOfRight = findNode(leftMostOfRight.key);
+        AtomicLong timeDelay2 = new AtomicLong();
+        timeDelay += timeDelaySet;
+        long finalTimeDelay = timeDelay;
+        delay(timeDelay, () -> {
+            try {
+                timeDelay2.addAndGet(searchUI(nodeFound.rightChild, leftMostOfRight.key, 0));
+                delay(timeDelay2.get() + timeDelaySet, () -> {
+                    ObservableList<Node> children = hBoxDelete.getChildren();
+                    for (Node child : children) {
+                        if (!(child instanceof Label label))
+                            continue;
+                        label.setText(String.valueOf(leftMostOfRight.key));
+                    }
+//                    deleteLine(leftMostOfRight.key);
+                    hBoxLeftMostOfRight.setVisible(false);
+                });
+                delay(timeDelay2.get() + 2 * timeDelaySet, () -> {
+                    clearPane();
+                    tree.delete(key);
+                    drawWholeTree();
+                });
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         });
         return true;
     }
