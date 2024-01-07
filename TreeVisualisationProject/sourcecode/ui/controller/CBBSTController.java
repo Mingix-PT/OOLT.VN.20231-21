@@ -767,4 +767,9 @@ public class CBBSTController {
     }
 
 
+    @FXML
+    private void updateNode() {
+
+    }
+
 }

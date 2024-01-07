@@ -47,8 +47,17 @@ public class MenuController {
     }
 
     @FXML
-    void openAVL(ActionEvent event) {
-
+    void openAVL(ActionEvent event) throws IOException {
+        final String BST_FXML_FILE_PATH = "/ui/view/BST.fxml";
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(getClass().getResource(BST_FXML_FILE_PATH));
+        AVLController avlController = new AVLController();
+        fxmlLoader.setController(avlController);
+        Parent parent = fxmlLoader.load();
+        Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(new Scene(parent));
+        stage.setTitle("Binary Search Tree");
+        stage.show();
     }
 
     @FXML

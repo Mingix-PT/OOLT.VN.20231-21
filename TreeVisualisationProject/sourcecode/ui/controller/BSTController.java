@@ -742,4 +742,9 @@ public class BSTController {
         lastActionRedo = action;
         lastKey = key;
     }
+
+    @FXML
+    private void updateNode() {
+
+    }
 }
