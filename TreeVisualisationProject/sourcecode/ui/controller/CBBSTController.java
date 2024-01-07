@@ -700,7 +700,7 @@ public class CBBSTController {
 
     private void traversePrint (int key) {
         Label label = new Label(key + "    ");
-        label.setStyle("-fx-text-fill: #ff0000; -fx-font-size: 30; -fx-font-weight: bold"
+        label.setStyle("-fx-text-fill: #ff0000; -fx-font-size: 20; -fx-font-weight: bold"
                 + "; -fx-font-family: \"Times New Roman\"; -fx-margin: 20");
         hBoxTraverse.getChildren().add(label);
     }

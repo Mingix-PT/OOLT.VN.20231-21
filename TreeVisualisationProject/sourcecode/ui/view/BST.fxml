@@ -174,7 +174,7 @@
                         <Font size="15.0" />
                      </font>
                   </Button>
-                  <Button fx:id="updateButton" mnemonicParsing="false" text="Update">
+                  <Button fx:id="updateButton" mnemonicParsing="false" onAction="#updateNode" text="Update">
                      <VBox.margin>
                         <Insets bottom="17.0" left="17.0" right="17.0" top="17.0" />
                      </VBox.margin>
