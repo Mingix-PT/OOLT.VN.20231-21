@@ -28,7 +28,8 @@ import java.util.concurrent.atomic.AtomicLong;
 public class BSTController {
     private BinarySearchTree tree = new BinarySearchTree();
     private BinarySearchTree oldTree = new BinarySearchTree(-999);
-    private String lastAction = "";
+    private String lastAction = "nothing";
+    private String lastActionRedo = "";
     private int lastKey = -999;
     private Map<Integer, List<Line>> mapHBoxLine = new HashMap<>();
 
@@ -138,8 +139,7 @@ public class BSTController {
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
             oldTree.copy(tree);
-            lastAction = "delete";
-            lastKey = key;
+            setLastAction("delete", key);
             if (deleteUI(key)) {
 //                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Deleted", ButtonType.OK);
 //                alert.showAndWait();
@@ -173,8 +173,7 @@ public class BSTController {
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
             oldTree.copy(tree);
-            lastAction = "insert";
-            lastKey = key;
+            setLastAction("insert", key);
             if (insertUI(tree.getTreeRoot(), key, timeDelaySet)) {
             }
         }
@@ -193,7 +192,8 @@ public class BSTController {
         resetTraverse(true);
         try {
             dfsTraverseUI(tree.getTreeRoot(), timeDelaySet);
-            lastAction = "dfs";
+            setLastAction("dfs");
+            oldTree.copy(tree);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -206,7 +206,8 @@ public class BSTController {
         resetTraverse(true);
         try {
             bfsTraverseUI();
-            lastAction = "bfs";
+            oldTree.copy(tree);
+            setLastAction("bfs");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -234,8 +235,8 @@ public class BSTController {
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
             resetHighlight();
-            lastAction = "search";
-            lastKey = key;
+            setLastAction("search", key);
+            oldTree.copy(tree);
             if (searchUI(tree.getTreeRoot(), key, 0) != 0) {
 //                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Found", ButtonType.OK);
 //                alert.showAndWait();
@@ -704,19 +705,25 @@ public class BSTController {
 
     @FXML
     private void undo() {
-        if (oldTree.areIdentical(new BinarySearchTree(-999))) {
-            return;
+        if (oldTree.getTreeRoot().key == -999) {
+            clearPane();
+            tree = new BinarySearchTree();
         }
         if (!oldTree.areIdentical(tree)) {
             tree.copy(oldTree);
             clearPane();
             drawWholeTree();
-            lastAction = null;
+            lastActionRedo = lastAction;
+            lastAction = "nothing";
+        }
+        else if (lastAction.equals("search") || lastAction.equals("dfs") || lastAction.equals("bfs")) {
+            clearPane();
+            drawWholeTree();
         }
     }
     @FXML
     private void redo(ActionEvent event) throws InterruptedException {
-        if (lastAction == null) {
+        if (lastAction.equals("nothing") ) {
             Alert alert = new Alert(Alert.AlertType.ERROR, "No action to redo", ButtonType.OK);
             alert.showAndWait();
         }
@@ -724,13 +731,23 @@ public class BSTController {
             undo();
             clearPane();
             drawWholeTree();
-            switch (lastAction) {
+            switch (lastActionRedo) {
                 case "insert" -> insertUI(tree.getTreeRoot(), lastKey, timeDelaySet);
                 case "delete" -> deleteUI(lastKey);
                 case "search" -> searchUI(tree.getTreeRoot(), lastKey, timeDelaySet);
-                case "dfs" -> dfsTraverseUI(tree.getTreeRoot(), timeDelaySet);
+                case "dfs" -> dfsTraverse(event);
                 case "bfs" -> bfsTraverseUI();
             }
         }
+    }
+
+    private void setLastAction(String action) {
+        lastAction = action;
+        lastActionRedo = action;
+    }
+    private void setLastAction(String action, int key) {
+        lastAction = action;
+        lastActionRedo = action;
+        lastKey = key;
     }
 }
