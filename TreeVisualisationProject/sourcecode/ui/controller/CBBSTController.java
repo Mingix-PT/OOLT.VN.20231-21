@@ -7,6 +7,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -16,6 +18,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
+import javafx.stage.Stage;
 import tree.BinarySearchTree;
 import tree.BinaryTreeNode;
 import tree.CompleteBalanceBinarySearchTree;
@@ -25,62 +28,85 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class CBBSTController {
-    protected CompleteBalanceBinarySearchTree tree = new CompleteBalanceBinarySearchTree();
-    protected Map<Integer, List<Line>> mapHBoxLine = new HashMap<>();
+    private CompleteBalanceBinarySearchTree tree = new CompleteBalanceBinarySearchTree();
+    private CompleteBalanceBinarySearchTree oldTree = new CompleteBalanceBinarySearchTree(-999);
+
+    private String lastAction = "nothing";
+    private String lastActionRedo = "nothing";
+    private int lastKey = -999;
+    private int lastArgument = -999;
+    private Map<Integer, List<Line>> mapHBoxLine = new HashMap<>();
 
     @FXML
-    protected Pane treePane;
-    @FXML
-    protected Button backButton;
+    private Pane treePane;
 
     @FXML
-    protected Button updateButton;
+    private Label treeTypeLabel;
+    @FXML
+    private Button backButton;
 
     @FXML
-    protected Button createTreeButton;
+    private Button updateButton;
 
     @FXML
-    protected Button deleteButton;
+    private Button createTreeButton;
 
     @FXML
-    protected Button insertButton;
+    private Button deleteButton;
 
     @FXML
-    protected Button searchButton;
+    private Button insertButton;
 
     @FXML
-    protected Button traverseButton;
+    private Button searchButton;
 
     @FXML
-    protected VBox traverseVBox;
+    private Button traverseButton;
 
     @FXML
-    protected Button dfsButton;
+    private VBox traverseVBox;
 
     @FXML
-    protected Button bfsButton;
+    private Button dfsButton;
 
     @FXML
-    protected Slider sliderSpeed;
+    private Button bfsButton;
 
     @FXML
-    protected int speed = 1;
+    private Slider sliderSpeed;
 
     @FXML
-    protected Label speedLabel;
+    private int speed = 1;
 
     @FXML
-    protected HBox hBoxTraverse;
-
-    protected int timeDelaySet = 1020;
+    private Label speedLabel;
 
     @FXML
-    protected void backToMainMenu(ActionEvent event) {
+    private HBox hBoxTraverse;
 
+    private int timeDelaySet = 1020;
+
+    @FXML
+    private void backToMainMenu(ActionEvent event) {
+        final String MENU_FXML_FILE_PATH = "/ui/view/Menu.fxml";
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader();
+            fxmlLoader.setLocation(getClass().getResource(MENU_FXML_FILE_PATH));
+            MenuController menuController = new MenuController();
+            fxmlLoader.setController(menuController);
+            Parent parent = fxmlLoader.load();
+            Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(parent));
+            stage.setTitle("Main Menu");
+            stage.show();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
-    protected void createRandomTree(ActionEvent event) {
+    private void createRandomTree(ActionEvent event) {
         resetTraverse(false);
         try
         {
@@ -105,7 +131,7 @@ public class CBBSTController {
     }
 
     @FXML
-    protected void deleteNode(ActionEvent event) {
+    private void deleteNode(ActionEvent event) {
         resetHighlight();
         resetTraverse(false);
         try {
@@ -115,6 +141,8 @@ public class CBBSTController {
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
             long timeDelay = deleteUI(key);
+            oldTree.copy(tree);
+            setLastAction("delete", key);
             if (timeDelay > 0) {
                 delay(timeDelay + timeDelaySet, () -> {
                     tree.print();
@@ -136,7 +164,7 @@ public class CBBSTController {
     }
 
     @FXML
-    protected void insertNode(ActionEvent event) {
+    private void insertNode(ActionEvent event) {
         resetHighlight();
         resetTraverse(false);
         try {
@@ -146,6 +174,8 @@ public class CBBSTController {
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
             long timeDelay = insertUI(tree.getTreeRoot(), key, timeDelaySet);
+            oldTree.copy(tree);
+            setLastAction("insert", key);
             if (timeDelay > 0) {
                 delay(timeDelay + timeDelaySet, () -> {
                     tree.insert(key);
@@ -167,29 +197,31 @@ public class CBBSTController {
         }
     }
     @FXML
-    protected void dfsTraverse(ActionEvent event) {
+    private void dfsTraverse(ActionEvent event) {
         resetHighlight();
         resetTraverse(true);
         try {
             dfsTraverseUI(tree.getTreeRoot(), timeDelaySet);
+            setLastAction("dfs");
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     @FXML
-    protected void bfsTraverse(ActionEvent event) {
+    private void bfsTraverse(ActionEvent event) {
         resetHighlight();
         traverseVBox.setVisible(false);
         try {
             bfsTraverseUI();
+            setLastAction("bfs");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @FXML
-    protected void chooseTraverse(ActionEvent event) {
+    private void chooseTraverse(ActionEvent event) {
         System.out.println("Choose traverse");
         if (traverseVBox.isVisible()) {
             traverseVBox.setVisible(false);
@@ -200,7 +232,7 @@ public class CBBSTController {
     }
 
     @FXML
-    protected void searchNode(ActionEvent event) {
+    private void searchNode(ActionEvent event) {
         resetHighlight();
         resetTraverse(false);
         try{
@@ -209,6 +241,7 @@ public class CBBSTController {
             dialog.setHeaderText("Search");
             String input = dialog.showAndWait().get();
             int key = Integer.parseInt(input);
+            setLastAction("search", key);
             if (searchUI(tree.getTreeRoot(), key, 0) != 0) {
 //                Alert alert = new Alert(Alert.AlertType.INFORMATION, "Found", ButtonType.OK);
 //                alert.showAndWait();
@@ -237,6 +270,7 @@ public class CBBSTController {
             timeDelaySet = 1020 / speed;
             speedLabel.setText(speed + "x");
         });
+        treeTypeLabel.setText("Complete Balance Binary Search Tree");
         try {
             updateButton.setVisible(false);
             FXMLLoader fxmlLoader = new FXMLLoader();
@@ -250,7 +284,7 @@ public class CBBSTController {
         }
     }
 
-    protected void drawTree(BinaryTreeNode node, double x, double y, double horizontalSpacing) {
+    private void drawTree(BinaryTreeNode node, double x, double y, double horizontalSpacing) {
         if (node == null) return;
 
         try {
@@ -298,7 +332,7 @@ public class CBBSTController {
         }
     }
 
-    protected void clearPane() {
+    private void clearPane() {
         treePane.getChildren().clear();
         treePane.getChildren().add(traverseVBox);
         treePane.getChildren().add(hBoxTraverse);
@@ -483,7 +517,7 @@ public class CBBSTController {
         }
     }
 
-    protected void highLightNodeRed(int key) {
+    private void highLightNodeRed(int key) {
         HBox hBox = findNode(key);
         if (hBox == null) {
             System.out.println("HBox is null");
@@ -499,7 +533,7 @@ public class CBBSTController {
         }
     }
 
-    protected void highLightNodeGreen(int key) {
+    private void highLightNodeGreen(int key) {
         HBox hBox = findNode(key);
         if (hBox == null)
             return;
@@ -513,7 +547,7 @@ public class CBBSTController {
         }
     }
 
-    protected void resetHighlight() {
+    private void resetHighlight() {
         ObservableList<Node> nodes = treePane.getChildren();
         for (Node node : nodes) {
             if (!(node instanceof AnchorPane anchorPane))
@@ -534,7 +568,7 @@ public class CBBSTController {
         }
     }
 
-    protected HBox findNode(int key) {
+    private HBox findNode(int key) {
         ObservableList<Node> nodes = treePane.getChildren();
         for (Node node : nodes) {
             if (!(node instanceof AnchorPane anchorPane))
@@ -553,7 +587,7 @@ public class CBBSTController {
         return null;
     }
 
-    protected Point2D findCoordinate(int key) {
+    private Point2D findCoordinate(int key) {
         ObservableList<Node> nodes = treePane.getChildren();
         for (Node node : nodes) {
             if (!(node instanceof AnchorPane anchorPane))
@@ -587,7 +621,7 @@ public class CBBSTController {
         new Thread(sleeper).start();
     }
 
-    protected void drawLeftChild(int parent, int key) {
+    private void drawLeftChild(int parent, int key) {
         try {
             double nodeHeight = 30; // Replace with the actual height of the nodes
             double yAdjustment = 30; // Adjust vertical spacing between nodes
@@ -620,7 +654,7 @@ public class CBBSTController {
         }
     }
 
-    protected void drawRightChild(int parent, int key) {
+    private void drawRightChild(int parent, int key) {
         try {
             Point2D coordinate = findCoordinate(parent);
             double nodeHeight = 30; // Replace with the actual height of the nodes
@@ -653,20 +687,20 @@ public class CBBSTController {
         }
     }
 
-    protected void drawWholeTree() {
+    private void drawWholeTree() {
         drawTree(tree.getTreeRoot(), treePane.getWidth() / 2,5, treePane.getWidth() / 4);
     }
 
-    protected void deleteLine(int key) {
+    private void deleteLine(int key) {
         List<Line> lines = mapHBoxLine.get(key);
         for (Line line : lines) {
             line.setVisible(false);
         }
     }
 
-    protected void traversePrint (int key) {
+    private void traversePrint (int key) {
         Label label = new Label(key + "    ");
-        label.setStyle("-fx-text-fill: #ff0000; -fx-font-size: 30; -fx-font-weight: bold"
+        label.setStyle("-fx-text-fill: #ff0000; -fx-font-size: 15; -fx-font-weight: bold"
                 + "; -fx-font-family: \"Times New Roman\"; -fx-margin: 20");
         hBoxTraverse.getChildren().add(label);
     }
@@ -674,6 +708,68 @@ public class CBBSTController {
     private void resetTraverse(boolean visibility) {
         hBoxTraverse.getChildren().clear();
         hBoxTraverse.setVisible(visibility);
+    }
+
+    @FXML
+    private void undo() {
+        if (oldTree.getTreeRoot().key == -999) {
+            clearPane();
+            tree = new CompleteBalanceBinarySearchTree();
+        }
+        else if (!oldTree.areIdentical(tree)) {
+            tree.copy(oldTree);
+            clearPane();
+            drawWholeTree();
+            lastActionRedo = lastAction;
+            lastAction = "nothing";
+        }
+        else if (lastAction.equals("search") || lastAction.equals("dfs") || lastAction.equals("bfs")) {
+            clearPane();
+            drawWholeTree();
+        }
+    }
+    @FXML
+    private void redo(ActionEvent event) throws InterruptedException {
+        if (lastAction.equals("nothing") ) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, "No action to redo", ButtonType.OK);
+            alert.showAndWait();
+        }
+        else {
+            undo();
+            clearPane();
+            drawWholeTree();
+            switch (lastActionRedo) {
+                case "insert" -> insertUI(tree.getTreeRoot(), lastKey, timeDelaySet);
+                case "delete" -> deleteUI(lastKey);
+                case "search" -> searchUI(tree.getTreeRoot(), lastKey, timeDelaySet);
+                case "dfs" -> {
+                    resetTraverse(true);
+                    dfsTraverse(event);
+                }
+                case "bfs" -> {
+                    resetTraverse(true);
+                    bfsTraverseUI();
+                }
+            }
+        }
+    }
+
+    private void setLastAction(String action) {
+        oldTree.copy(tree);
+        lastAction = action;
+        lastActionRedo = action;
+    }
+    private void setLastAction(String action, int key) {
+        oldTree.copy(tree);
+        lastAction = action;
+        lastActionRedo = action;
+        lastKey = key;
+    }
+
+
+    @FXML
+    private void updateNode() {
+
     }
 
 }

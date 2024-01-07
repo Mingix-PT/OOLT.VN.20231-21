@@ -28,10 +28,13 @@
                            </image>
                         </ImageView>
                      </graphic>
+                     <HBox.margin>
+                        <Insets right="50.0" />
+                     </HBox.margin>
                   </Button>
-                  <Label alignment="CENTER" text="Tree Visualisation Application" textFill="#92f29b">
+                  <Label fx:id="treeTypeLabel" alignment="CENTER" prefHeight="56.0" prefWidth="1453.0" text="Tree Visualisation" textFill="#92f29b">
                      <font>
-                        <Font size="39.0" />
+                        <Font size="35.0" />
                      </font>
                      <padding>
                         <Insets left="150.0" right="200.0" />
@@ -107,29 +110,21 @@
                         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
                      </HBox.margin>
                   </Slider>
-                  <Button mnemonicParsing="false" prefHeight="59.0" prefWidth="55.0" style="-fx-background-color: black;">
+                  <Button fx:id="undoButton" mnemonicParsing="false" onAction="#undo" prefHeight="40.0" prefWidth="122.0" text="Undo">
                      <HBox.margin>
                         <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
                      </HBox.margin>
-                     <graphic>
-                        <ImageView fitHeight="32.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/undoButton.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
                   </Button>
-                  <Button layoutX="857.0" layoutY="40.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="82.0" style="-fx-background-color: black;">
+                  <Button fx:id="redoButton" layoutX="857.0" layoutY="40.0" mnemonicParsing="false" onAction="#redo" prefHeight="39.0" prefWidth="130.0" text="Redo">
                      <HBox.margin>
                         <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
                      </HBox.margin>
-                     <graphic>
-                        <ImageView fitHeight="32.0" fitWidth="35.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../resources/redoButton.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
+                     <font>
+                        <Font size="14.0" />
+                     </font>
                   </Button>
                   <VBox prefHeight="200.0" prefWidth="100.0" />
                   <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
@@ -179,7 +174,7 @@
                         <Font size="15.0" />
                      </font>
                   </Button>
-                  <Button fx:id="updateButton" mnemonicParsing="false" text="Update">
+                  <Button fx:id="updateButton" mnemonicParsing="false" onAction="#updateNode" text="Update">
                      <VBox.margin>
                         <Insets bottom="17.0" left="17.0" right="17.0" top="17.0" />
                      </VBox.margin>
@@ -191,7 +186,7 @@
             </VBox>
          </left>
          <center>
-            <Pane fx:id="treePane" prefHeight="599.0" prefWidth="901.0" BorderPane.alignment="CENTER">
+            <Pane fx:id="treePane" BorderPane.alignment="CENTER">
                <padding>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                </padding>
@@ -216,7 +211,7 @@
             </Pane>
          </center>
          <right>
-            <Pane prefHeight="599.0" prefWidth="122.0" style="-fx-background-color: magenta;" BorderPane.alignment="CENTER" />
+            <Pane prefHeight="600.0" prefWidth="106.0" style="-fx-background-color: black;" BorderPane.alignment="CENTER" />
          </right>
       </BorderPane>
    </children>

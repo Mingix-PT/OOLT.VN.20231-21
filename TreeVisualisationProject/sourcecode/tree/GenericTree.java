@@ -9,9 +9,17 @@ public class GenericTree extends Tree {
         treeRoot = new GenericTreeNode(key);
     }
 
+    public GenericTree() {
+        treeRoot = null;
+    }
+
     @Override
     public Tree createTree() {
         return null;
+    }
+
+    public GenericTreeNode getTreeRoot() {
+        return treeRoot;
     }
 
     @Override
@@ -47,7 +55,7 @@ public class GenericTree extends Tree {
     public boolean search(int key) {
         return search(treeRoot, key) != null;
     }
-    private GenericTreeNode search(GenericTreeNode root, int key) {
+    public GenericTreeNode search(GenericTreeNode root, int key) {
         // Search using BFS traverse
         Queue<GenericTreeNode> queueTree = new ArrayDeque<>();
         queueTree.add(treeRoot);
@@ -61,7 +69,7 @@ public class GenericTree extends Tree {
         return null;
     }
 
-    private GenericTreeNode searchParent(int key) {
+    public GenericTreeNode searchParent(int key) {
         // Search using BFS traverse
         if (treeRoot.key == key) {
             return null;
@@ -132,6 +140,21 @@ public class GenericTree extends Tree {
         return true;
     }
 
+    public int countNodes() {
+        return countNodes(treeRoot);
+    }
+
+    public int countNodes(GenericTreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        int count = 1;
+        for (GenericTreeNode eachChild : root.children) {
+            count += countNodes(eachChild);
+        }
+        return count;
+    }
+
     @Override
     public void dfsTraverse() {
         dfsTraverse(treeRoot);
@@ -176,6 +199,30 @@ public class GenericTree extends Tree {
         return bfsResult;
     }
 
+    public void createRandomTree(int height) {
+        treeRoot = new GenericTreeNode(new Random().nextInt(100));
+        createRandomTree(treeRoot, height);
+    }
+
+    private void createRandomTree(GenericTreeNode root, int height) {
+        if (height == 0) {
+            return;
+        }
+        Random random = new Random();
+        int numberOfChildren = random.nextInt(2) + 1;
+        if (numberOfChildren == 0) {
+            numberOfChildren++;
+        }
+        for (int i = 0; i < numberOfChildren; i++) {
+            int randomKey = 1;
+            while (search(randomKey)) {
+                randomKey = random.nextInt(100);
+            }
+            root.children.add(new GenericTreeNode(randomKey));
+            createRandomTree(root.children.get(i), height - 1);
+        }
+    }
+
     @Override
     public boolean insert(int key) {
         // Not available for generic tree
@@ -199,5 +246,61 @@ public class GenericTree extends Tree {
                 printNode(node.children.get(node.children.size() - 1), prefix + "    ");
             }
         }
+    }
+
+    public int width() {
+        return width(treeRoot);
+    }
+
+    public int width(GenericTreeNode root) {
+        if (root == null) {
+            return 0;
+        }
+        if (root.isLeaf()) {
+            return 1;
+        }
+        int maxWidth = 0;
+        for (GenericTreeNode child : root.children) {
+            maxWidth += width(child);
+        }
+        return maxWidth;
+    }
+
+    public boolean areIdentical(GenericTree otherTree) {
+        return areIdentical(treeRoot, otherTree.treeRoot);
+    }
+
+    private boolean areIdentical(GenericTreeNode root1,  GenericTreeNode root2) {
+        if (root1 == null && root2 == null) {
+            return true;
+        }
+        if (root1 != null && root2 != null) {
+            if (root1.key == root2.key) {
+                if (root1.children.size() == root2.children.size()) {
+                    for (int i = 0; i < root1.children.size(); i++) {
+                        if (!areIdentical(root1.children.get(i), root2.children.get(i))) {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void copy(GenericTree otherTree) {
+        treeRoot = copy(otherTree.treeRoot);
+    }
+
+    private GenericTreeNode copy(GenericTreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        GenericTreeNode newRoot = new GenericTreeNode(root.key);
+        for (GenericTreeNode eachChild : root.children) {
+            newRoot.children.add(copy(eachChild));
+        }
+        return newRoot;
     }
 }
