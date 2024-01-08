@@ -1,6 +1,6 @@
 package test.bst;
 
-import tree.BinarySearchTree;
+import tree.type.BinarySearchTree;
 
 public class TestBST {
     public static void main (String[] args) {

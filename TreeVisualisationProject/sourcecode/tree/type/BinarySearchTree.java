@@ -1,9 +1,10 @@
-package tree;
+package tree.type;
+
+import tree.node.BinaryTreeNode;
 
 import java.util.*;
 
 public class BinarySearchTree extends Tree {
-
     protected List<Integer> inorderTraverseList = new ArrayList<>();
 
     public BinarySearchTree(int key) {
@@ -45,7 +46,6 @@ public class BinarySearchTree extends Tree {
         return 1 + Math.max(height(root.leftChild), height(root.rightChild));
     }
 
-    protected BinaryTreeNode treeRoot;
 
     public BinaryTreeNode getTreeRoot () {
         return treeRoot;
@@ -77,8 +77,12 @@ public class BinarySearchTree extends Tree {
     }
 
     @Override
-    public Tree createTree() {
-        return null;
+    public void createTree(int height) {
+        // Create random tree with height h
+        while (height() < height) {
+            int key = (int) (Math.random() * 100);
+            insert(key);
+        }
     }
 
     protected void setNodeToChild(BinaryTreeNode node) {
@@ -352,8 +356,11 @@ public class BinarySearchTree extends Tree {
     }
 
     // Method to compare two BSTs
-    public boolean areIdentical(BinarySearchTree bst) {
-        return areIdentical(this.treeRoot, bst.treeRoot);
+    public boolean areIdentical(Tree tree) {
+        if (!(tree instanceof BinarySearchTree)) {
+            return false;
+        }
+        return areIdentical(this.treeRoot, ((BinarySearchTree) tree).getTreeRoot());
     }
 
     private boolean areIdentical(BinaryTreeNode node1, BinaryTreeNode node2) {

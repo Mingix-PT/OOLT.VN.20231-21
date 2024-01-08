@@ -1,4 +1,4 @@
-package tree;
+package tree.node;
 
 public class BinaryTreeNode {
     public int key;

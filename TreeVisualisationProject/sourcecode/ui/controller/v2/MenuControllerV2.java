@@ -1,4 +1,4 @@
-package ui.controller;
+package ui.controller.v2;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -7,13 +7,15 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.scene.*;
+import tree.type.*;
+import ui.controller.ultility.HelpController;
 
 import java.io.IOException;
 
-public class MenuController {
+public class MenuControllerV2 {
+    private Tree tree;
 
     @FXML
     private Button avlButton;
@@ -48,30 +50,14 @@ public class MenuController {
 
     @FXML
     void openAVL(ActionEvent event) throws IOException {
-        final String BST_FXML_FILE_PATH = "/ui/view/BST.fxml";
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource(BST_FXML_FILE_PATH));
-        AVLController avlController = new AVLController();
-        fxmlLoader.setController(avlController);
-        Parent parent = fxmlLoader.load();
-        Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(parent));
-        stage.setTitle("AVL Tree");
-        stage.show();
+        tree = new AVLTree();
+        loadTreeMenu(event, tree);
     }
 
     @FXML
     void openBST(ActionEvent event) throws IOException {
-        final String BST_FXML_FILE_PATH = "/ui/view/BST.fxml";
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource(BST_FXML_FILE_PATH));
-        BSTController bstController = new BSTController();
-        fxmlLoader.setController(bstController);
-        Parent parent = fxmlLoader.load();
-        Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(parent));
-        stage.setTitle("Binary Search Tree");
-        stage.show();
+        tree = new BinarySearchTree();
+        loadTreeMenu(event, tree);
     }
 
     @FXML
@@ -90,30 +76,42 @@ public class MenuController {
 
     @FXML
     void openCBBST(ActionEvent event) throws IOException {
-        final String BST_FXML_FILE_PATH = "/ui/view/BST.fxml";
-        FXMLLoader fxmlLoader = new FXMLLoader();
-        fxmlLoader.setLocation(getClass().getResource(BST_FXML_FILE_PATH));
-        CBBSTController cbBSTController = new CBBSTController();
-        fxmlLoader.setController(cbBSTController);
-        Parent parent = fxmlLoader.load();
-        Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(parent));
-        stage.setTitle("Complete Balance Binary Search Tree");
-        stage.show();
+        tree = new CompleteBalanceBinarySearchTree();
+        loadTreeMenu(event, tree);
     }
 
     @FXML
     void openGenericTree(ActionEvent event) throws IOException {
+        tree = new GenericTree();
+        loadTreeMenu(event, tree);
+    }
+
+    void loadTreeMenu(ActionEvent event, Tree tree) throws IOException {
         final String BST_FXML_FILE_PATH = "/ui/view/BST.fxml";
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource(BST_FXML_FILE_PATH));
-        GenericTreeController genericTreeController = new GenericTreeController();
-        fxmlLoader.setController(genericTreeController);
+        ControllerV2 controllerV2 = new ControllerV2(tree);
+        fxmlLoader.setController(controllerV2);
         Parent parent = fxmlLoader.load();
         Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
         stage.setScene(new Scene(parent));
-        stage.setTitle("Generic Tree");
+        stage.setTitle(getClass(tree));
         stage.show();
+    }
+
+    public static String getClass(Tree tree) {
+        if (tree instanceof GenericTree) {
+            return "Generic Tree";
+        }
+        else if (tree instanceof AVLTree) {
+            return "AVL Tree";
+        }
+        else if (tree instanceof BinarySearchTree) {
+            return "Binary Search Tree";
+        }
+        else {
+            return "Complete Balance Binary Search Tree";
+        }
     }
 
 }

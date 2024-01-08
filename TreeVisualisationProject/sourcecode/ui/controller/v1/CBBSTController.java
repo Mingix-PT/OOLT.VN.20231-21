@@ -1,4 +1,4 @@
-package ui.controller;
+package ui.controller.v1;
 
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -19,9 +19,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
-import tree.BinarySearchTree;
-import tree.BinaryTreeNode;
-import tree.CompleteBalanceBinarySearchTree;
+import tree.node.BinaryTreeNode;
+import tree.type.CompleteBalanceBinarySearchTree;
+import ui.controller.ultility.MenuController;
+import ui.controller.ultility.TreeNodeController;
 
 import java.io.IOException;
 import java.util.*;

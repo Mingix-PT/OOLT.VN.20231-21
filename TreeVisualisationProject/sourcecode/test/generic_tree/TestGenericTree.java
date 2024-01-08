@@ -1,6 +1,6 @@
 package test.generic_tree;
 
-import tree.GenericTree;
+import tree.type.GenericTree;
 
 public class TestGenericTree {
     public static void main (String[] args) {

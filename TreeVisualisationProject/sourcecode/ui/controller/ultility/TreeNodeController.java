@@ -1,4 +1,4 @@
-package ui.controller;
+package ui.controller.ultility;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

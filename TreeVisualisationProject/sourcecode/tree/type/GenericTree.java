@@ -1,4 +1,7 @@
-package tree;
+package tree.type;
+
+import tree.node.GenericTreeNode;
+import tree.node.TreeNode;
 
 import java.util.*;
 
@@ -14,11 +17,11 @@ public class GenericTree extends Tree {
     }
 
     @Override
-    public Tree createTree() {
-        return null;
+    public void createTree(int height) {
+        createRandomTree(height);
     }
 
-    public GenericTreeNode getTreeRoot() {
+    public TreeNode getTreeRoot() {
         return treeRoot;
     }
 
@@ -266,8 +269,11 @@ public class GenericTree extends Tree {
         return maxWidth;
     }
 
-    public boolean areIdentical(GenericTree otherTree) {
-        return areIdentical(treeRoot, otherTree.treeRoot);
+    public boolean areIdentical(Tree otherTree) {
+        if (!(otherTree instanceof GenericTree)) {
+            return false;
+        }
+        return areIdentical(treeRoot, ((GenericTree) otherTree).getTreeRoot());
     }
 
     private boolean areIdentical(GenericTreeNode root1,  GenericTreeNode root2) {

@@ -1,6 +1,6 @@
 package test.cbbst;
 
-import tree.CompleteBalanceBinarySearchTree;
+import tree.type.CompleteBalanceBinarySearchTree;
 
 public class TestCBBST {
     public static void main (String[] args) {
