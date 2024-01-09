@@ -1,10 +1,12 @@
 package tree.type;
 
 import tree.node.BinaryTreeNode;
+import tree.node.TreeNode;
 
 import java.util.*;
 
 public class BinarySearchTree extends Tree {
+    protected BinaryTreeNode treeRoot;
     protected List<Integer> inorderTraverseList = new ArrayList<>();
 
     public BinarySearchTree(int key) {
@@ -31,22 +33,26 @@ public class BinarySearchTree extends Tree {
 
     @Override
     public int height() {
-        return height(treeRoot);
+        if (treeRoot instanceof BinaryTreeNode) {
+            return height((BinaryTreeNode) treeRoot);
+        }
+        return 0;
     }
 
     @Override
     public boolean search(int key) {
-        return search(treeRoot, key) != null;
+        return search((BinaryTreeNode) treeRoot, key) != null;
     }
 
     protected int height(BinaryTreeNode root) {
         if (root == null || root.isLeaf()) {
             return 0;
         }
+
         return 1 + Math.max(height(root.leftChild), height(root.rightChild));
     }
 
-
+    @Override
     public BinaryTreeNode getTreeRoot () {
         return treeRoot;
     }

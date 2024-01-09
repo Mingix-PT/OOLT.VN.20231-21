@@ -1,12 +1,12 @@
 package tree.node;
 
-public class BinaryTreeNode {
+public class BinaryTreeNode extends TreeNode {
     public int key;
     public BinaryTreeNode leftChild;
     public BinaryTreeNode rightChild;
 
     public BinaryTreeNode(int key) {
-        this.key = key;
+        super(key);
         this.leftChild = null;
         this.rightChild = null;
     }

@@ -3,12 +3,12 @@ package tree.node;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GenericTreeNode {
+public class GenericTreeNode extends TreeNode {
     public int key;
     public List<GenericTreeNode> children = new ArrayList<>();
 
     public GenericTreeNode(int key) {
-        this.key = key;
+        super(key);
     }
 
     public int getKey() {

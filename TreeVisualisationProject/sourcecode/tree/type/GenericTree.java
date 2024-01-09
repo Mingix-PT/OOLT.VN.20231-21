@@ -21,7 +21,8 @@ public class GenericTree extends Tree {
         createRandomTree(height);
     }
 
-    public TreeNode getTreeRoot() {
+    @Override
+    public GenericTreeNode getTreeRoot() {
         return treeRoot;
     }
 
@@ -273,7 +274,7 @@ public class GenericTree extends Tree {
         if (!(otherTree instanceof GenericTree)) {
             return false;
         }
-        return areIdentical(treeRoot, ((GenericTree) otherTree).getTreeRoot());
+        return areIdentical(treeRoot,(GenericTreeNode) otherTree.getTreeRoot());
     }
 
     private boolean areIdentical(GenericTreeNode root1,  GenericTreeNode root2) {

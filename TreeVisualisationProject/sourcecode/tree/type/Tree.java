@@ -3,7 +3,6 @@ package tree.type;
 import tree.node.TreeNode;
 
 public abstract class Tree {
-    protected TreeNode treeRoot;
 
     public abstract void createTree(int height);
 
