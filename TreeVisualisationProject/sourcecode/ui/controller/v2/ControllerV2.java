@@ -1,6 +1,5 @@
 package ui.controller.v2;
 
-import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.collections.ObservableList;
@@ -17,12 +16,12 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import tree.node.BinaryTreeNode;
 import tree.node.GenericTreeNode;
 import tree.type.BinarySearchTree;
 import tree.type.GenericTree;
 import tree.type.Tree;
-import ui.controller.ultility.MenuController;
 import ui.controller.ultility.TreeNodeController;
 
 import java.io.IOException;
@@ -142,19 +141,308 @@ public class ControllerV2 {
 
     @FXML
     void bfsTraverse(ActionEvent event) {
-
+        resetTraverse(true);
+        resetHighlight();
+        bfsUI();
+        traverseVBox.setVisible(true);
+        setLastAction("bfs");
     }
 
+    private void bfsUI () {
+        if (tree instanceof GenericTree) {
+            bfsUIGeneric();
+        }
+        else {
+            bfsUIBST();
+        }
+    }
+
+    private void bfsUIGeneric () {
+        List<GenericTreeNode> bfsList = bfsGenericList();
+        if (bfsList == null) {
+            return;
+        }
+        int max = bfsList.size();
+        resetProgressBar(max);
+        timeline = listTraverseUIGeneric(bfsList);
+    }
+
+    private List<GenericTreeNode> bfsGenericList() {
+        if (tree == null) {
+            return null;
+        }
+        List<GenericTreeNode> bfsList = new ArrayList<>();
+        Queue<GenericTreeNode> queueTree = new ArrayDeque<>();
+        queueTree.add((GenericTreeNode) tree.getTreeRoot());
+        while (!queueTree.isEmpty()) {
+            GenericTreeNode node = queueTree.poll();
+            bfsList.add(node);
+            queueTree.addAll(node.children);
+        }
+        return bfsList;
+    }
+
+    private void bfsUIBST() {
+        List<BinaryTreeNode> bfsList = bfsBSTList();
+        if (bfsList == null) {
+            return;
+        }
+        int max = bfsList.size();
+        resetProgressBar(max);
+        timeline = listTraverseUIBST(bfsList);
+    }
+
+    private List<BinaryTreeNode> bfsBSTList() {
+        if (tree == null) {
+            return null;
+        }
+        List<BinaryTreeNode> bfsList = new ArrayList<>();
+        Queue<BinaryTreeNode> queueTree = new ArrayDeque<>();
+        queueTree.add((BinaryTreeNode) tree.getTreeRoot());
+        while (!queueTree.isEmpty()) {
+            BinaryTreeNode node = queueTree.poll();
+            bfsList.add(node);
+            if (node.leftChild != null) {
+                queueTree.add(node.leftChild);
+            }
+            if (node.rightChild != null) {
+                queueTree.add(node.rightChild);
+            }
+        }
+        return bfsList;
+    }
+
+
+    @FXML
+    void dfsTraverse(ActionEvent event) {
+        resetTraverse(true);
+        resetHighlight();
+        dfsUI();
+        traverseVBox.setVisible(true);
+        setLastAction("dfs");
+    }
+
+    private void dfsUI() {
+        if (tree instanceof GenericTree) {
+            dfsUIGeneric();
+        }
+        else {
+            dfsUIBST();
+        }
+    }
+
+    private void dfsUIGeneric() {
+        List<GenericTreeNode> dfsList = dfsGenericList((GenericTreeNode) tree.getTreeRoot(), new ArrayList<>());
+        if (dfsList == null) {
+            return;
+        }
+        for (GenericTreeNode node : dfsList) {
+            System.out.print(node.key + " ");
+        }
+        int max = dfsList.size();
+        resetProgressBar(max);
+        AtomicInteger counter = new AtomicInteger(0);
+        timeline = listTraverseUIGeneric(dfsList);
+    }
+
+    private List<GenericTreeNode> dfsGenericList(GenericTreeNode node, List<GenericTreeNode> dfsList) {
+        if (node == null) {
+            return dfsList;
+        }
+        dfsList.add(node);
+        for (GenericTreeNode child : node.children) {
+            dfsGenericList(child, dfsList);
+        }
+        return dfsList;
+    }
+
+    private void dfsUIBST() {
+        List<BinaryTreeNode> dfsList = dfsBSTList((BinaryTreeNode) tree.getTreeRoot(), new ArrayList<>());
+        if (dfsList == null) {
+            return;
+        }
+        for (BinaryTreeNode node : dfsList) {
+            System.out.print(node.key + " ");
+        }
+        int max = dfsList.size();
+        resetProgressBar(max);
+        timeline = listTraverseUIBST(dfsList);
+    }
+
+    private List<BinaryTreeNode> dfsBSTList(BinaryTreeNode node, List<BinaryTreeNode> dfsList) {
+        if (node == null) {
+            return dfsList;
+        }
+        dfsList.add(node);
+        dfsBSTList(node.leftChild, dfsList);
+        dfsBSTList(node.rightChild, dfsList);
+        return dfsList;
+    }
+
+    private Timeline listTraverseUIGeneric(List<GenericTreeNode> list) {
+        resetProgressBar(list.size());
+        AtomicInteger counter = new AtomicInteger(0);
+        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
+            if (counter.get() >= list.size()) {
+                counter.set(0);
+            }
+            if (list.isEmpty()) {
+                timeline.stop();
+                return;
+            }
+            int key = list.get(counter.get()).key;
+            counter.getAndIncrement();
+            sliderProgress.setValue(counter.get());
+            highLightNodeGreen(key);
+            if (pause) {
+                timeline.pause();
+            }
+        });
+        Timeline timelineIn = new Timeline();
+        timelineIn.getKeyFrames().add(keyFrame);
+        timelineIn.setCycleCount(list.size());
+        timelineIn.play();
+        return timelineIn;
+    }
+
+    private Timeline listTraverseUIGeneric(List<GenericTreeNode> list, int key) {
+        resetProgressBar(list.size());
+        AtomicInteger counter = new AtomicInteger(0);
+        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
+            if (counter.get() >= list.size()) {
+                counter.set(0);
+            }
+            if (list.isEmpty()) {
+                timeline.stop();
+                return;
+            }
+            int keyList = list.get(counter.get()).key;
+            counter.getAndIncrement();
+            sliderProgress.setValue(counter.get());
+            if (keyList == key) {
+                highLightNodeGreen(key);
+            }
+            else {
+                highLightNodeRed(keyList);
+            }
+            if (pause) {
+                timeline.pause();
+            }
+        });
+        Timeline timelineIn = new Timeline();
+        timelineIn.getKeyFrames().add(keyFrame);
+        timelineIn.setCycleCount(list.size());
+        timelineIn.play();
+        return timelineIn;
+    }
+    private Timeline listTraverseUIBST(List<BinaryTreeNode> list) {
+        resetProgressBar(list.size());
+        AtomicInteger counter = new AtomicInteger(0);
+        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
+            if (counter.get() >= list.size()) {
+                counter.set(0);
+            }
+            if (list.isEmpty()) {
+                timeline.stop();
+                return;
+            }
+            int key = list.get(counter.get()).key;
+            counter.getAndIncrement();
+            sliderProgress.setValue(counter.get());
+            highLightNodeGreen(key);
+            if (pause) {
+                timeline.pause();
+            }
+        });
+        Timeline timelineIn = new Timeline();
+        timelineIn.getKeyFrames().add(keyFrame);
+        timelineIn.setCycleCount(list.size());
+        timelineIn.play();
+        return timelineIn;
+    }
+    private Timeline listTraverseUIBST(List<BinaryTreeNode> list, int key) {
+        resetProgressBar(list.size());
+        AtomicInteger counter = new AtomicInteger(0);
+        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
+            if (counter.get() >= list.size()) {
+                counter.set(0);
+            }
+            if (list.isEmpty()) {
+                timeline.stop();
+                return;
+            }
+            int keyList = list.get(counter.get()).key;
+            counter.getAndIncrement();
+            sliderProgress.setValue(counter.get());
+            if (keyList == key) {
+                highLightNodeGreen(key);
+            }
+            else {
+                highLightNodeRed(keyList);
+            }
+            if (pause) {
+                timeline.pause();
+            }
+        });
+        Timeline timelineIn = new Timeline();
+        timelineIn.getKeyFrames().add(keyFrame);
+        timelineIn.setCycleCount(list.size());
+        timelineIn.play();
+        return timelineIn;
+    }
 
 
     @FXML
     void deleteNode(ActionEvent event) {
-
+        resetHighlight();
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Delete");
+        dialog.setHeaderText("Enter the key to delete");
+        dialog.setContentText("Key: ");
+        dialog.showAndWait();
+        int key = Integer.parseInt(dialog.getEditor().getText());
+        deleteUI(key);
+        setLastAction("delete", key);
     }
 
-    @FXML
-    void dfsTraverse(ActionEvent event) {
 
+    private void deleteUI(int key) {
+        Duration timeDelay = Duration.ZERO;
+        int step = 0;
+        if (tree instanceof GenericTree) {
+            deleteUIGeneric(key);
+            step = searchTimesGeneric(key).size();
+        }
+        else {
+            deleteUIBST(key);
+            step = searchTimesGeneric(key).size();
+        }
+        timeDelay = timeDelay.add(millis(timeDelaySet * (step+1)));
+        System.out.println(timeDelay);
+        KeyFrame keyFrame1 = new KeyFrame(timeDelay, event -> {
+            tree.delete(key);
+            resetScreen();
+        });
+        timeline.getKeyFrames().add(keyFrame1);
+        Timeline timelineIn = new Timeline();
+        timelineIn.getKeyFrames().add(keyFrame1);
+        timelineIn.play();
+    }
+
+    private void deleteUIGeneric(int key) {
+        List<GenericTreeNode> bfsSearchResult = searchTimesGeneric(key);
+        if (bfsSearchResult == null) {
+            return;
+        }
+        timeline = listTraverseUIGeneric(bfsSearchResult, key);
+    }
+
+    private void deleteUIBST(int key) {
+        List<BinaryTreeNode> dfsSearchResult = searchTimesBST((BinaryTreeNode) tree.getTreeRoot(), key, new ArrayList<>());
+        if (dfsSearchResult == null) {
+            return;
+        }
+        timeline = listTraverseUIBST(dfsSearchResult, key);
     }
 
     @FXML
@@ -173,6 +461,7 @@ public class ControllerV2 {
         dialog.showAndWait();
         int key = Integer.parseInt(dialog.getEditor().getText());
         searchUI(key);
+        setLastAction("search", key);
     }
 
     private void searchUI(int key) {
@@ -190,32 +479,7 @@ public class ControllerV2 {
         }
         int max = bfsSearchResult.size();
         resetProgressBar(max);
-        AtomicInteger counter = new AtomicInteger(0);
-        Timeline timelineIn = new Timeline();
-        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
-            if (bfsSearchResult.isEmpty()) {
-                timelineIn.stop();
-                return;
-            }
-            GenericTreeNode node = bfsSearchResult.getFirst();
-            counter.getAndIncrement();
-            sliderProgress.setValue(counter.get());
-            if (node.key == key) {
-                highLightNodeGreen(node.key);
-                return;
-            }
-            else {
-                highLightNodeRed(node.key);
-                bfsSearchResult.removeFirst();
-            }
-            if (pause) {
-                timelineIn.pause();
-            }
-        });
-        timelineIn.getKeyFrames().add(keyFrame);
-        timelineIn.setCycleCount(max);
-        timelineIn.play();
-        this.timeline = timelineIn;
+        timeline = listTraverseUIGeneric(bfsSearchResult, key);
     }
 
     private List<GenericTreeNode> searchTimesGeneric(int key) {
@@ -243,40 +507,18 @@ public class ControllerV2 {
         if (dfsSearchResult == null) {
             return;
         }
+        System.out.print("Search result: ");
+        for (BinaryTreeNode node : dfsSearchResult) {
+            System.out.println(node.key);
+        }
         int max = dfsSearchResult.size();
         System.out.println(max);
         resetProgressBar(max);
-        AtomicInteger counter = new AtomicInteger(0);
-        Timeline timelineIn = new Timeline();
-        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
-            if (dfsSearchResult.isEmpty()) {
-                timelineIn.stop();
-                return;
-            }
-            BinaryTreeNode node = dfsSearchResult.getFirst();
-            counter.getAndIncrement();
-            sliderProgress.setValue(counter.get());
-            if (node.key == key) {
-                highLightNodeGreen(node.key);
-                dfsSearchResult.removeFirst();
-                return;
-            }
-            else {
-                highLightNodeRed(node.key);
-                dfsSearchResult.removeFirst();
-            }
-            if (pause) {
-                timeline.pause();
-            }
-        });
-        timelineIn.getKeyFrames().add(keyFrame);
-        timelineIn.setCycleCount(max);
-        timelineIn.play();
-        this.timeline = timelineIn;
+        timeline = listTraverseUIBST(dfsSearchResult, key);
     }
     private List<BinaryTreeNode> searchTimesBST(BinaryTreeNode node, int key, List<BinaryTreeNode> result) {
         if (node == null) {
-            return null;
+            return result;
         }
         if (node.key == key) {
             result.add(node);
@@ -293,13 +535,62 @@ public class ControllerV2 {
     }
 
     @FXML
-    void undo(ActionEvent event) {
-
+    void updateNode(ActionEvent event) {
+        resetHighlight();
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Update");
+        dialog.setHeaderText("Enter the key to update");
+        dialog.setContentText("Key: ");
+        dialog.showAndWait();
+        int oldKey = Integer.parseInt(dialog.getEditor().getText());
+        dialog = new TextInputDialog();
+        dialog.setTitle("Update");
+        dialog.setHeaderText("Enter the new key");
+        dialog.setContentText("Key: ");
+        dialog.showAndWait();
+        int newKey = Integer.parseInt(dialog.getEditor().getText());
+        updateUI(oldKey, newKey);
     }
 
-    @FXML
-    void updateNode(ActionEvent event) {
-
+    private void updateUI(int oldKey, int newKey) {
+        if (!(tree instanceof GenericTree)) {
+            return;
+        }
+        if (tree.search(newKey)) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Key already exists");
+            alert.setContentText("Key " + newKey + " already exists in the tree");
+            alert.showAndWait();
+            return;
+        }
+        if (tree == null) {
+            return;
+        }
+        timeline = listTraverseUIGeneric(searchTimesGeneric(oldKey), oldKey);
+        Duration timeDelay = Duration.ZERO;
+        for (KeyFrame keyFrame : timeline.getKeyFrames()) {
+            timeDelay = timeDelay.add(keyFrame.getTime());
+        }
+        timeDelay = timeDelay.add(millis(timeDelaySet));
+        KeyFrame keyFrame1 = new KeyFrame(timeDelay, event -> {
+            resetScreen();
+            tree.update(oldKey, newKey);
+            drawWholeTree();
+            highLightNodeGreen(newKey);
+        });
+        timeDelay.add(millis(timeDelaySet));
+        timeDelay.add(keyFrame1.getTime());
+        KeyFrame keyFrame2 = new KeyFrame(timeDelay, event -> {
+            resetScreen();
+            drawWholeTree();
+        });
+        timeline.getKeyFrames().add(keyFrame1);
+        timeline.getKeyFrames().add(keyFrame2);
+        Timeline timelineIn = new Timeline();
+        timelineIn.getKeyFrames().add(keyFrame1);
+        timelineIn.getKeyFrames().add(keyFrame2);
+        timelineIn.play();
     }
 
     private void drawWholeTree() {
@@ -396,12 +687,12 @@ public class ControllerV2 {
     }@FXML
     private void chooseTraverse(ActionEvent event) {
         System.out.println("Choose traverse");
-        if (traverseVBox.isVisible()) {
+        if (!treePane.getChildren().contains(traverseVBox)) {
+            treePane.getChildren().add(traverseVBox);
             traverseVBox.setVisible(false);
+            return;
         }
-        else {
-            traverseVBox.setVisible(true);
-        }
+        traverseVBox.setVisible(!traverseVBox.isVisible());
     }
 
     private void traversePrint (int key) {
@@ -417,7 +708,7 @@ public class ControllerV2 {
     }
 
     @FXML
-    private void undo() {
+    private void undo(ActionEvent event) {
         System.out.println("Undo");
         if (oldTree.getTreeRoot() == null) {
             System.out.println("Tree is empty");
@@ -437,33 +728,37 @@ public class ControllerV2 {
     }
 
     @FXML
-    private void redo(ActionEvent event) throws InterruptedException {
-        if (lastAction.equals("nothing") ) {
-            Alert alert = new Alert(Alert.AlertType.ERROR, "No action to redo", ButtonType.OK);
-            alert.showAndWait();
-        }
-        else {
-            undo();
-            resetScreen();
-            switch (lastActionRedo) {
-//                case "insert" -> insertUI(lastParentKey, lastKey);
-//                case "delete" -> deleteUI(lastKey);
-//                case "search" -> searchUI(tree.getTreeRoot(), lastKey, timeDelaySet);
-                case "dfs" -> {
-                    resetTraverse(true);
-                    dfsTraverse(event);
-                }
-                case "bfs" -> {
-                    resetTraverse(true);
-//                    bfsTraverseUI();
-                }
-//                case "update" -> updateUI(lastKey, lastParentKey);
-                case "create" -> {
-                    tree = new GenericTree();
-                    tree.createTree(lastKey);
-                    resetScreen();
-                }
-            }
+    private void redo(ActionEvent event) {
+        resetScreen();
+        resetHighlight();
+        undo(event);
+        sliderProgress.setValue(0);
+        Timeline timelineIn = timeline;
+        timelineIn.stop();
+        timelineIn.jumpTo(Duration.ZERO); // reset the timeline to the start
+        timelineIn.play();
+        switch (lastActionRedo) {
+            case "create":
+                tree.createTree(lastKey);
+                resetScreen();
+                break;
+            case "delete":
+                deleteUI(lastKey);
+                break;
+            case "search":
+                searchUI(lastKey);
+                break;
+            case "dfs":
+                dfsUI();
+                break;
+            case "bfs":
+                bfsUI();
+                break;
+            case "update":
+                updateUI(lastKey, lastParentKey);
+                break;
+            default:
+                break;
         }
     }
 
@@ -598,10 +893,6 @@ public class ControllerV2 {
         treePane.getChildren().add(hBoxTraverse);
     }
 
-    private void clearAllPane() {
-        treePane.getChildren().clear();
-    }
-    
     private void resetScreen() {
         clearPane();
         drawWholeTree();
