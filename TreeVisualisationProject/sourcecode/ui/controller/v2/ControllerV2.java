@@ -447,12 +447,108 @@ public class ControllerV2 {
 
     @FXML
     void insertNode(ActionEvent event) {
+        resetHighlight();
+        if (tree instanceof GenericTree) {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Insert");
+            dialog.setHeaderText("Enter the parent key: ");
+            dialog.setContentText("Key: ");
+            dialog.showAndWait();
+            int parentKey = Integer.parseInt(dialog.getEditor().getText());
+            dialog = new TextInputDialog();
+            dialog.setTitle("Insert");
+            dialog.setHeaderText("Enter the key to insert");
+            dialog.setContentText("Key: ");
+            dialog.showAndWait();
+            int key = Integer.parseInt(dialog.getEditor().getText());
+            insertUI(parentKey, key);
+            setLastAction("insert", key, parentKey);
+        }
+        else {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Insert");
+            dialog.setHeaderText("Enter the key to insert");
+            dialog.setContentText("Key: ");
+            dialog.showAndWait();
+            int key = Integer.parseInt(dialog.getEditor().getText());
+            insertUI(key);
+            setLastAction("insert", key);
+        }
+    }
 
+    private void insertUI(int parent, int key) {
+        if (tree.search(key)) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Key already exists");
+            alert.setContentText("Key " + key + " already exists in the tree");
+            alert.showAndWait();
+            return;
+        }
+        List<GenericTreeNode> bfsSearchResult = searchTimesGeneric(parent);
+        if (bfsSearchResult == null) {
+            return;
+        }
+        for (GenericTreeNode node : bfsSearchResult) {
+            System.out.print(node.key + " ");
+        }
+        System.out.println(bfsSearchResult.size());
+        timeline = listTraverseUIGeneric(bfsSearchResult, parent);
+        long step = (bfsSearchResult.size()+1)*timeDelaySet;
+        Duration timeDelay = Duration.ZERO;
+        timeDelay = timeDelay.add(Duration.millis((step)));
+        System.out.println(timeDelay);
+        KeyFrame keyFrame1 = new KeyFrame(timeDelay, event -> {
+            resetScreen();
+            tree.insert(parent, key);
+            drawWholeTree();
+            highLightNodeGreen(key);
+        });
+        timeDelay = timeDelay.add(millis(timeDelaySet));
+        System.out.println(timeDelay);
+        KeyFrame keyFrame2 = new KeyFrame(timeDelay, event -> {
+            resetScreen();
+            drawWholeTree();
+        });
+        timeline.getKeyFrames().add(keyFrame1);
+        timeline.getKeyFrames().add(keyFrame2);
+        Timeline timelineIn = new Timeline();
+        timelineIn.getKeyFrames().add(keyFrame1);
+        timelineIn.getKeyFrames().add(keyFrame2);
+        timelineIn.play();
+    }
+
+    private void insertUI(int key) {
+        List<BinaryTreeNode> dfsSearchResult = searchTimesBST((BinaryTreeNode) tree.getTreeRoot(), key, new ArrayList<>());
+        if (dfsSearchResult == null) {
+            return;
+        }
+        timeline = listTraverseUIBST(dfsSearchResult, key);
+        Duration timeDelay = Duration.ZERO;
+        timeDelay.add(millis(timeDelaySet*(dfsSearchResult.size()+1)));
+        System.out.println(timeDelay);
+        KeyFrame keyFrame1 = new KeyFrame(timeDelay, event -> {
+            resetScreen();
+            tree.insert(key);
+            drawWholeTree();
+            highLightNodeGreen(key);
+        });
+        timeDelay.add(millis(timeDelaySet));
+        System.out.println(timeDelay);
+        KeyFrame keyFrame2 = new KeyFrame(timeDelay, event -> {
+            resetScreen();
+            drawWholeTree();
+        });
+        timeline.getKeyFrames().add(keyFrame1);
+        timeline.getKeyFrames().add(keyFrame2);
+        Timeline timelineIn = new Timeline();
+        timelineIn.getKeyFrames().add(keyFrame1);
+        timelineIn.getKeyFrames().add(keyFrame2);
+        timelineIn.play();
     }
 
     @FXML
     void searchNode(ActionEvent event) throws InterruptedException {
-        resetHighlight();
         resetHighlight();
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Search");
@@ -729,9 +825,9 @@ public class ControllerV2 {
 
     @FXML
     private void redo(ActionEvent event) {
-        resetScreen();
-        resetHighlight();
         undo(event);
+        resetHighlight();
+        resetScreen();
         sliderProgress.setValue(0);
         Timeline timelineIn = timeline;
         timelineIn.stop();
@@ -742,20 +838,23 @@ public class ControllerV2 {
                 tree.createTree(lastKey);
                 resetScreen();
                 break;
+            case "insert":
+                if (tree instanceof GenericTree)
+                    tree.insert(lastParentKey, lastKey);
+                else
+                    tree.insert(lastKey);
+                break;
             case "delete":
-                deleteUI(lastKey);
+                tree.delete(lastKey);
                 break;
             case "search":
-                searchUI(lastKey);
                 break;
             case "dfs":
-                dfsUI();
                 break;
             case "bfs":
-                bfsUI();
                 break;
             case "update":
-                updateUI(lastKey, lastParentKey);
+                tree.update(lastKey, lastParentKey);
                 break;
             default:
                 break;
