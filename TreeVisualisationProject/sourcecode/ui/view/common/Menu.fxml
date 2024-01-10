@@ -130,12 +130,12 @@
       </BorderPane>
       <ImageView fitHeight="408.0" fitWidth="425.0" layoutX="40.0" layoutY="231.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../resources/tree.png" />
+            <Image url="@../../resources/tree.png" />
          </image>
       </ImageView>
       <ImageView fitHeight="388.0" fitWidth="404.0" layoutX="764.0" layoutY="228.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../resources/mctree.png" />
+            <Image url="@../../resources/mctree.png" />
          </image>
       </ImageView>
    </children>

@@ -84,6 +84,7 @@ public class BinarySearchTree extends Tree {
 
     @Override
     public void createTree(int height) {
+        treeRoot = null;
         // Create random tree with height h
         while (height() < height) {
             double random = Math.random();

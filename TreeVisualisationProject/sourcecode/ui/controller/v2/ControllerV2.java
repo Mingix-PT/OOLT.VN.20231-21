@@ -109,7 +109,7 @@ public class ControllerV2 {
 
     @FXML
     void backToMainMenu(ActionEvent event) {
-        final String MENU_FXML_FILE_PATH = "/ui/view/Menu.fxml";
+        final String MENU_FXML_FILE_PATH = "/ui/view/common/Menu.fxml";
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(getClass().getResource(MENU_FXML_FILE_PATH));
@@ -128,7 +128,6 @@ public class ControllerV2 {
     
     @FXML
     void createTree(ActionEvent event) {
-        resetScreen();
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Create Tree");
         dialog.setHeaderText("Enter the height of the tree");
@@ -318,7 +317,7 @@ public class ControllerV2 {
         if (node == null) return;
 
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/view/TreeNode.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/view/common/TreeNode.fxml"));
             TreeNodeController treeNodeController = new TreeNodeController();
             loader.setController(treeNodeController);
             Pane nodePane = loader.load();
@@ -358,7 +357,7 @@ public class ControllerV2 {
         try {
             double nodeHeight = 30; // Replace with the actual height of the nodes
             // Load the TreeNode.fxml
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/view/TreeNode.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ui/view/common/TreeNode.fxml"));
             TreeNodeController treeNodeController = new TreeNodeController();
             loader.setController(treeNodeController);
             Pane nodePane = loader.load();
@@ -582,7 +581,6 @@ public class ControllerV2 {
 
     @FXML
     private void initialize() {
-        final String NODE_FXML_FILE_PATH = "/ui/view/TreeNode.fxml";
         sliderSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
             speed = newValue.intValue();
             timeDelaySet = 1020 / speed;

@@ -12,7 +12,7 @@ public class MainV2 extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        final String MENU_FXML_FILE_PATH = "/ui/view/Menu.fxml";
+        final String MENU_FXML_FILE_PATH = "/ui/view/common/Menu.fxml";
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource(MENU_FXML_FILE_PATH));
         MenuControllerV2 menuController = new MenuControllerV2();

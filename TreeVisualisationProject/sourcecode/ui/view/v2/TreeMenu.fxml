@@ -24,7 +24,7 @@
                      <graphic>
                         <ImageView fitHeight="150.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../resources/backButton.png" />
+                              <Image url="@../../resources/backButton.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -76,7 +76,7 @@
                      <graphic>
                         <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../resources/backButton.png" />
+                              <Image url="@../../resources/backButton.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -88,7 +88,7 @@
                      <graphic>
                         <ImageView fx:id="pauseButton" fitHeight="32.0" fitWidth="31.0" onDragDetected="#pause" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../resources/pauseButton.png" />
+                              <Image url="@../../resources/pauseButton.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -100,7 +100,7 @@
                      <graphic>
                         <ImageView fitHeight="33.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../resources/nextButton.png" />
+                              <Image url="@../../resources/nextButton.png" />
                            </image>
                         </ImageView>
                      </graphic>
