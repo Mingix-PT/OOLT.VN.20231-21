@@ -415,12 +415,13 @@ public class ControllerV2 {
         }
         else {
             deleteUIBST(key);
-            step = searchTimesGeneric(key).size();
+            step = searchTimesBST((BinaryTreeNode) tree.getTreeRoot(), key, new ArrayList<BinaryTreeNode>()).size();
         }
         timeDelay = timeDelay.add(millis(timeDelaySet * (step+1)));
         System.out.println(timeDelay);
         KeyFrame keyFrame1 = new KeyFrame(timeDelay, event -> {
-            tree.delete(key);
+            System.out.println("Delete " + key +
+                    tree.delete(key));
             resetScreen();
         });
         timeline.getKeyFrames().add(keyFrame1);
@@ -525,7 +526,7 @@ public class ControllerV2 {
         }
         timeline = listTraverseUIBST(dfsSearchResult, key);
         Duration timeDelay = Duration.ZERO;
-        timeDelay.add(millis(timeDelaySet*(dfsSearchResult.size()+1)));
+        timeDelay = timeDelay.add(millis(timeDelaySet*(dfsSearchResult.size()+1)));
         System.out.println(timeDelay);
         KeyFrame keyFrame1 = new KeyFrame(timeDelay, event -> {
             resetScreen();
@@ -533,7 +534,7 @@ public class ControllerV2 {
             drawWholeTree();
             highLightNodeGreen(key);
         });
-        timeDelay.add(millis(timeDelaySet));
+        timeDelay = timeDelay.add(millis(timeDelaySet));
         System.out.println(timeDelay);
         KeyFrame keyFrame2 = new KeyFrame(timeDelay, event -> {
             resetScreen();
