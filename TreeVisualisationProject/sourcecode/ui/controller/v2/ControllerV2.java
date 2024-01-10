@@ -3,7 +3,6 @@ package ui.controller.v2;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -31,10 +30,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
 import static javafx.util.Duration.millis;
 
@@ -117,8 +113,8 @@ public class ControllerV2 {
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(getClass().getResource(MENU_FXML_FILE_PATH));
-            MenuController menuController = new MenuController();
-            fxmlLoader.setController(menuController);
+            MenuControllerV2 menuControllerV2 = new MenuControllerV2();
+            fxmlLoader.setController(menuControllerV2);
             Parent parent = fxmlLoader.load();
             Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(parent));
@@ -132,6 +128,7 @@ public class ControllerV2 {
     
     @FXML
     void createTree(ActionEvent event) {
+        resetScreen();
         TextInputDialog dialog = new TextInputDialog();
         dialog.setTitle("Create Tree");
         dialog.setHeaderText("Enter the height of the tree");
@@ -168,7 +165,6 @@ public class ControllerV2 {
 
     @FXML
     void searchNode(ActionEvent event) throws InterruptedException {
-        timeline.getKeyFrames().clear();
         resetHighlight();
         resetHighlight();
         TextInputDialog dialog = new TextInputDialog();
@@ -177,30 +173,34 @@ public class ControllerV2 {
         dialog.setContentText("Key: ");
         dialog.showAndWait();
         int key = Integer.parseInt(dialog.getEditor().getText());
-//        System.out.println("Counter: " + (searchUIGeneric(key, 0)));
-//        searchUIGeneric(key, timeDelaySet);
         searchUI(key);
     }
 
-    private int searchUI(int key) {
+    private void searchUI(int key) {
         if (tree instanceof GenericTree) {
-            return searchUIGeneric(key);
+            searchUIGeneric(key);
         }
         else {
-            return searchUIBST(key);
+            searchUIBST(key);
         }
     }
-    private int searchUIGeneric(int key){
+    private void searchUIGeneric(int key){
         List<GenericTreeNode> bfsSearchResult = searchTimesGeneric(key);
         if (bfsSearchResult == null) {
-            return 0;
+            return;
         }
         int max = bfsSearchResult.size();
+        resetProgressBar(max);
         AtomicInteger counter = new AtomicInteger(0);
+        Timeline timelineIn = new Timeline();
         KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
+            if (bfsSearchResult.isEmpty()) {
+                timelineIn.stop();
+                return;
+            }
             GenericTreeNode node = bfsSearchResult.getFirst();
-            setProgressBar(max, counter.get());
             counter.getAndIncrement();
+            sliderProgress.setValue(counter.get());
             if (node.key == key) {
                 highLightNodeGreen(node.key);
                 return;
@@ -210,46 +210,14 @@ public class ControllerV2 {
                 bfsSearchResult.removeFirst();
             }
             if (pause) {
-                timeline.pause();
+                timelineIn.pause();
             }
         });
-        timeline.getKeyFrames().add(keyFrame);
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
-        return bfsSearchResult.size();
+        timelineIn.getKeyFrames().add(keyFrame);
+        timelineIn.setCycleCount(max);
+        timelineIn.play();
+        this.timeline = timelineIn;
     }
-
-//    private int searchUIGeneric(int key, long timeDelay) {
-//        timeline.getKeyFrames().clear();
-//        if (tree == null) {
-//            return 0;
-//        }
-//        Queue<GenericTreeNode> queueTree = new ArrayDeque<>();
-//        queueTree.add((GenericTreeNode) tree.getTreeRoot());
-//        AtomicInteger counter = new AtomicInteger();
-//        KeyFrame keyFrame = new KeyFrame(millis(timeDelay), event -> {
-//            GenericTreeNode node = queueTree.poll();
-//            if (node == null) {
-//                timeline.stop();
-//                return;
-//            }
-//            if (node.key == key) {
-//                highLightNodeGreen(node.key);
-//                timeline.stop();
-//            }
-//            else {
-//                highLightNodeRed(node.key);
-//                queueTree.addAll(node.children);
-//            }
-//            if (pause) {
-//                timeline.pause();
-//            }
-//        });
-//        timeline.getKeyFrames().add(keyFrame);
-//        timeline.setCycleCount(Animation.INDEFINITE);
-//        timeline.play();
-//        return counter.get();
-//    }
 
     private List<GenericTreeNode> searchTimesGeneric(int key) {
         if (tree == null) {
@@ -271,16 +239,27 @@ public class ControllerV2 {
         return bfsSearchResult;
     }
 
-    private int searchUIBST(int key) {
-        timeline.getKeyFrames().clear();
+    private void searchUIBST(int key) {
         List<BinaryTreeNode> dfsSearchResult = searchTimesBST((BinaryTreeNode) tree.getTreeRoot(), key, new ArrayList<>());
         if (dfsSearchResult == null) {
-            return 0;
+            return;
         }
+        int max = dfsSearchResult.size();
+        System.out.println(max);
+        resetProgressBar(max);
+        AtomicInteger counter = new AtomicInteger(0);
+        Timeline timelineIn = new Timeline();
         KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
+            if (dfsSearchResult.isEmpty()) {
+                timelineIn.stop();
+                return;
+            }
             BinaryTreeNode node = dfsSearchResult.getFirst();
+            counter.getAndIncrement();
+            sliderProgress.setValue(counter.get());
             if (node.key == key) {
                 highLightNodeGreen(node.key);
+                dfsSearchResult.removeFirst();
                 return;
             }
             else {
@@ -291,10 +270,10 @@ public class ControllerV2 {
                 timeline.pause();
             }
         });
-        timeline.getKeyFrames().add(keyFrame);
-        timeline.setCycleCount(Animation.INDEFINITE);
-        timeline.play();
-        return dfsSearchResult.size();
+        timelineIn.getKeyFrames().add(keyFrame);
+        timelineIn.setCycleCount(max);
+        timelineIn.play();
+        this.timeline = timelineIn;
     }
     private List<BinaryTreeNode> searchTimesBST(BinaryTreeNode node, int key, List<BinaryTreeNode> result) {
         if (node == null) {
@@ -630,31 +609,10 @@ public class ControllerV2 {
         drawWholeTree();
     }
 
-    private void setProgressBar(int counter, int current) {
+    private void resetProgressBar(int counter) {
         sliderProgress.setMax(counter);
-        sliderProgress.setValue(current);
+        sliderProgress.setValue(0);
     }
-
-//    private void playAnimation(int counter) {
-//        timeline.getKeyFrames();
-//        AtomicInteger currentValue = new AtomicInteger(0);
-//        sliderProgress.setMax(counter);
-//        sliderProgress.setMin(0);
-//        sliderProgress.setBlockIncrement(1);
-//        sliderProgress.setValue(currentValue.get());
-//        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
-//            clearAllPane();
-//            treePane.getChildren().addAll(sceneNodes.get(currentValue.get()));
-//            currentValue.getAndIncrement();
-//            sliderProgress.setValue(currentValue.get());
-//            if (currentValue.get() == counter) {
-//                timeline.stop();
-//            }
-//        });
-//        timeline.getKeyFrames().add(keyFrame);
-//        timeline.setCycleCount(Timeline.INDEFINITE);
-//        timeline.play();
-//    }
 
     @FXML
     private void pause() {
