@@ -33,15 +33,15 @@ public class BinarySearchTree extends Tree {
 
     @Override
     public int height() {
-        if (treeRoot instanceof BinaryTreeNode) {
-            return height((BinaryTreeNode) treeRoot);
+        if (treeRoot != null) {
+            return height(treeRoot);
         }
         return 0;
     }
 
     @Override
     public boolean search(int key) {
-        return search((BinaryTreeNode) treeRoot, key) != null;
+        return search(treeRoot, key) != null;
     }
 
     protected int height(BinaryTreeNode root) {
@@ -86,7 +86,10 @@ public class BinarySearchTree extends Tree {
     public void createTree(int height) {
         // Create random tree with height h
         while (height() < height) {
-            int key = (int) (Math.random() * 100);
+            double random = Math.random();
+            System.out.println(random);
+            int key = (int) (random * 100);
+            System.out.println(key);
             insert(key);
         }
     }
@@ -168,7 +171,8 @@ public class BinarySearchTree extends Tree {
         }
         if (root.key == key) {
             return false;
-        } else if (key < root.key) {
+        }
+        else if (key < root.key) {
             if (root.leftChild == null) {
                 root.leftChild = new BinaryTreeNode(key);
                 return true;
@@ -217,14 +221,6 @@ public class BinarySearchTree extends Tree {
     }
 
     protected void updateNode(BinaryTreeNode currentNode, BinaryTreeNode newNode) {
-//        BinaryTreeNode parent = searchParent(treeRoot, currentNode.key);
-//        if (parent != null) {
-//            if (parent.leftChild == currentNode) {
-//                parent.leftChild = newNode;
-//            } else {
-//                parent.rightChild = newNode;
-//            }
-//        }
         currentNode.key = newNode.key;
     }
 
@@ -386,8 +382,11 @@ public class BinarySearchTree extends Tree {
         return false;
     }
 
-    public void copy(BinarySearchTree bst) {
-        this.treeRoot = copy(bst.treeRoot);
+    public void copy(Tree bst) {
+        if (!(bst instanceof BinarySearchTree)) {
+            return;
+        }
+        this.treeRoot = copy(((BinarySearchTree) bst).getTreeRoot());
     }
 
     private BinaryTreeNode copy(BinaryTreeNode node) {

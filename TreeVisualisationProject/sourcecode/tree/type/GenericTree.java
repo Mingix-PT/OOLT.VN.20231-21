@@ -62,7 +62,7 @@ public class GenericTree extends Tree {
     public GenericTreeNode search(GenericTreeNode root, int key) {
         // Search using BFS traverse
         Queue<GenericTreeNode> queueTree = new ArrayDeque<>();
-        queueTree.add(treeRoot);
+        queueTree.add(root);
         while (!queueTree.isEmpty()) {
             GenericTreeNode topNode = queueTree.poll();
             if (topNode.key == key) {
@@ -205,6 +205,7 @@ public class GenericTree extends Tree {
 
     public void createRandomTree(int height) {
         treeRoot = new GenericTreeNode(new Random().nextInt(100));
+        print();
         createRandomTree(treeRoot, height);
     }
 
@@ -214,14 +215,13 @@ public class GenericTree extends Tree {
         }
         Random random = new Random();
         int numberOfChildren = random.nextInt(2) + 1;
-        if (numberOfChildren == 0) {
-            numberOfChildren++;
-        }
         for (int i = 0; i < numberOfChildren; i++) {
             int randomKey = 1;
+            Random randomKeyGenerator = new Random();
             while (search(randomKey)) {
-                randomKey = random.nextInt(100);
+                randomKey = randomKeyGenerator.nextInt(100);
             }
+            System.out.println("Inserting key " + randomKey + " under parent key " + root.key);
             root.children.add(new GenericTreeNode(randomKey));
             createRandomTree(root.children.get(i), height - 1);
         }
@@ -234,7 +234,7 @@ public class GenericTree extends Tree {
     }
 
     // Print tree - idea by Copilot Chat
-    public void printTree() {
+    public void print() {
         if (treeRoot != null) {
             printNode(treeRoot, "");
         }
@@ -296,8 +296,11 @@ public class GenericTree extends Tree {
         return false;
     }
 
-    public void copy(GenericTree otherTree) {
-        treeRoot = copy(otherTree.treeRoot);
+    public void copy(Tree otherTree) {
+        if (!(otherTree instanceof GenericTree)) {
+            return;
+        }
+        treeRoot = copy((GenericTreeNode) otherTree.getTreeRoot());
     }
 
     private GenericTreeNode copy(GenericTreeNode root) {

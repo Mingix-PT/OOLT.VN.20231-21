@@ -86,7 +86,7 @@
                         <Insets bottom="30.0" top="30.0" />
                      </HBox.margin>
                      <graphic>
-                        <ImageView fitHeight="32.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="pauseButton" fitHeight="32.0" fitWidth="31.0" onDragDetected="#pause" pickOnBounds="true" preserveRatio="true">
                            <image>
                               <Image url="@../resources/pauseButton.png" />
                            </image>
@@ -105,7 +105,7 @@
                         </ImageView>
                      </graphic>
                   </Button>
-                  <Slider fx:id="sliderProgress1" blockIncrement="1.0" majorTickUnit="1.0" max="0.0" minorTickCount="0" prefHeight="38.0" prefWidth="442.0" snapToTicks="true" value="1.0">
+                  <Slider fx:id="sliderProgress" blockIncrement="1.0" majorTickUnit="1.0" max="1.0" min="1.0" minorTickCount="0" prefHeight="38.0" prefWidth="442.0" showTickMarks="true" snapToTicks="true" value="1.0">
                      <HBox.margin>
                         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
                      </HBox.margin>
@@ -134,7 +134,7 @@
             <VBox prefHeight="500.0" prefWidth="112.0" style="-fx-background-color: black;" BorderPane.alignment="CENTER">
                <children>
                   <Region prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
-                  <Button fx:id="createTreeButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#createRandomTree" text="Create Tree">
+                  <Button fx:id="createTreeButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#createTree" text="Create Tree">
                      <font>
                         <Font size="15.0" />
                      </font>

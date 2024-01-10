@@ -122,7 +122,7 @@ public class GenericTreeController {
         setLastAction("create", height);
         tree = new GenericTree();
         tree.createRandomTree(height);
-        tree.printTree();
+        tree.print();
         clearPane();
         drawWholeTree();
     }

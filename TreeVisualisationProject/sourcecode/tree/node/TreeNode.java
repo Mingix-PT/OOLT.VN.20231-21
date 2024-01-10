@@ -3,7 +3,7 @@ package tree.node;
 public abstract class TreeNode {
     public int key;
 
-    public TreeNode(int key) {
+    protected TreeNode(int key) {
         this.key = key;
     }
 
@@ -11,5 +11,5 @@ public abstract class TreeNode {
         return key;
     }
 
-    public abstract boolean isLeaf();
+    protected abstract boolean isLeaf();
 }

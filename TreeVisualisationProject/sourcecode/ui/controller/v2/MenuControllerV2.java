@@ -87,7 +87,7 @@ public class MenuControllerV2 {
     }
 
     void loadTreeMenu(ActionEvent event, Tree tree) throws IOException {
-        final String BST_FXML_FILE_PATH = "/ui/view/BST.fxml";
+        final String BST_FXML_FILE_PATH = "/ui/view/TreeMenu.fxml";
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource(BST_FXML_FILE_PATH));
         ControllerV2 controllerV2 = new ControllerV2(tree);

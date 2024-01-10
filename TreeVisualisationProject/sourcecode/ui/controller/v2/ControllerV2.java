@@ -1,5 +1,9 @@
 package ui.controller.v2;
 
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,10 +27,20 @@ import ui.controller.ultility.MenuController;
 import ui.controller.ultility.TreeNodeController;
 
 import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+
+import static javafx.util.Duration.millis;
 
 public class ControllerV2 {
     private Tree tree;
-    private Tree oldTree;
+    private Tree oldTree = null;
     private double nodeHeight = 30;
     private int speed = 1;
     private int timeDelaySet = 1020;
@@ -34,6 +48,10 @@ public class ControllerV2 {
     private String lastActionRedo = "nothing";
     private int lastKey = -999;
     private int lastParentKey = -999;
+    private List<ObservableList<Node>> sceneNodes = new ArrayList<>();
+    private boolean pause = false;
+
+    Timeline timeline = new Timeline();
 
     public ControllerV2(Tree tree) {
         this.tree = tree;
@@ -67,7 +85,7 @@ public class ControllerV2 {
     private Button searchButton;
 
     @FXML
-    private Slider sliderProgress1;
+    private Slider sliderProgress;
 
     @FXML
     private Slider sliderSpeed;
@@ -111,6 +129,20 @@ public class ControllerV2 {
             e.printStackTrace();
         }
     }
+    
+    @FXML
+    void createTree(ActionEvent event) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Create Tree");
+        dialog.setHeaderText("Enter the height of the tree");
+        dialog.setContentText("Height: ");
+        dialog.showAndWait();
+        int height = Integer.parseInt(dialog.getEditor().getText());
+        tree.createTree(height);
+        tree.print();
+        resetScreen();
+        setLastAction("create", height);
+    }
 
     @FXML
     void bfsTraverse(ActionEvent event) {
@@ -118,10 +150,6 @@ public class ControllerV2 {
     }
 
 
-    @FXML
-    void createRandomTree(ActionEvent event) {
-
-    }
 
     @FXML
     void deleteNode(ActionEvent event) {
@@ -139,8 +167,151 @@ public class ControllerV2 {
     }
 
     @FXML
-    void searchNode(ActionEvent event) {
+    void searchNode(ActionEvent event) throws InterruptedException {
+        timeline.getKeyFrames().clear();
+        resetHighlight();
+        resetHighlight();
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Search");
+        dialog.setHeaderText("Enter the key to search");
+        dialog.setContentText("Key: ");
+        dialog.showAndWait();
+        int key = Integer.parseInt(dialog.getEditor().getText());
+//        System.out.println("Counter: " + (searchUIGeneric(key, 0)));
+//        searchUIGeneric(key, timeDelaySet);
+        searchUI(key);
+    }
 
+    private int searchUI(int key) {
+        if (tree instanceof GenericTree) {
+            return searchUIGeneric(key);
+        }
+        else {
+            return searchUIBST(key);
+        }
+    }
+    private int searchUIGeneric(int key){
+        List<GenericTreeNode> bfsSearchResult = searchTimesGeneric(key);
+        if (bfsSearchResult == null) {
+            return 0;
+        }
+        int max = bfsSearchResult.size();
+        AtomicInteger counter = new AtomicInteger(0);
+        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
+            GenericTreeNode node = bfsSearchResult.getFirst();
+            setProgressBar(max, counter.get());
+            counter.getAndIncrement();
+            if (node.key == key) {
+                highLightNodeGreen(node.key);
+                return;
+            }
+            else {
+                highLightNodeRed(node.key);
+                bfsSearchResult.removeFirst();
+            }
+            if (pause) {
+                timeline.pause();
+            }
+        });
+        timeline.getKeyFrames().add(keyFrame);
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+        return bfsSearchResult.size();
+    }
+
+//    private int searchUIGeneric(int key, long timeDelay) {
+//        timeline.getKeyFrames().clear();
+//        if (tree == null) {
+//            return 0;
+//        }
+//        Queue<GenericTreeNode> queueTree = new ArrayDeque<>();
+//        queueTree.add((GenericTreeNode) tree.getTreeRoot());
+//        AtomicInteger counter = new AtomicInteger();
+//        KeyFrame keyFrame = new KeyFrame(millis(timeDelay), event -> {
+//            GenericTreeNode node = queueTree.poll();
+//            if (node == null) {
+//                timeline.stop();
+//                return;
+//            }
+//            if (node.key == key) {
+//                highLightNodeGreen(node.key);
+//                timeline.stop();
+//            }
+//            else {
+//                highLightNodeRed(node.key);
+//                queueTree.addAll(node.children);
+//            }
+//            if (pause) {
+//                timeline.pause();
+//            }
+//        });
+//        timeline.getKeyFrames().add(keyFrame);
+//        timeline.setCycleCount(Animation.INDEFINITE);
+//        timeline.play();
+//        return counter.get();
+//    }
+
+    private List<GenericTreeNode> searchTimesGeneric(int key) {
+        if (tree == null) {
+            return null;
+        }
+        List<GenericTreeNode> bfsSearchResult = new ArrayList<>();
+        Queue<GenericTreeNode> queueTree = new ArrayDeque<>();
+        queueTree.add((GenericTreeNode) tree.getTreeRoot());
+        while (!queueTree.isEmpty()) {
+            GenericTreeNode node = queueTree.poll();
+            bfsSearchResult.add(node);
+            if (node.key == key) {
+                break;
+            }
+            else {
+                queueTree.addAll(node.children);
+            }
+        }
+        return bfsSearchResult;
+    }
+
+    private int searchUIBST(int key) {
+        timeline.getKeyFrames().clear();
+        List<BinaryTreeNode> dfsSearchResult = searchTimesBST((BinaryTreeNode) tree.getTreeRoot(), key, new ArrayList<>());
+        if (dfsSearchResult == null) {
+            return 0;
+        }
+        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
+            BinaryTreeNode node = dfsSearchResult.getFirst();
+            if (node.key == key) {
+                highLightNodeGreen(node.key);
+                return;
+            }
+            else {
+                highLightNodeRed(node.key);
+                dfsSearchResult.removeFirst();
+            }
+            if (pause) {
+                timeline.pause();
+            }
+        });
+        timeline.getKeyFrames().add(keyFrame);
+        timeline.setCycleCount(Animation.INDEFINITE);
+        timeline.play();
+        return dfsSearchResult.size();
+    }
+    private List<BinaryTreeNode> searchTimesBST(BinaryTreeNode node, int key, List<BinaryTreeNode> result) {
+        if (node == null) {
+            return null;
+        }
+        if (node.key == key) {
+            result.add(node);
+            return result;
+        }
+        else if (node.key > key) {
+            result.add(node);
+            return searchTimesBST(node.leftChild, key, result);
+        }
+        else {
+            result.add(node);
+            return searchTimesBST(node.rightChild, key, result);
+        }
     }
 
     @FXML
@@ -156,10 +327,10 @@ public class ControllerV2 {
     private void drawWholeTree() {
         treePane.getChildren().clear();
         if (tree instanceof GenericTree) {
-            drawGenericTree(((GenericTree) tree).getTreeRoot(), 0, 0, 1000);
+            drawGenericTree(((GenericTree) tree).getTreeRoot(), treePane.getWidth()/2, treePane.getHeight()*0.1, treePane.getWidth()/4);
         }
         else {
-            drawBST(((BinarySearchTree) tree).getTreeRoot(), treePane.getWidth()/2, treePane.getHeight()*0.1, 1000);
+            drawBST(((BinarySearchTree) tree).getTreeRoot(), treePane.getWidth()/2, treePane.getHeight()*0.1, treePane.getWidth()/4);
         }
     }
 
@@ -278,14 +449,12 @@ public class ControllerV2 {
         else if (!oldTree.areIdentical(tree)) {
             System.out.println("Tree is not identical");
             tree.copy(oldTree);
-            clearPane();
-            drawWholeTree();
+            resetScreen();
             lastActionRedo = lastAction;
             lastAction = "nothing";
         }
         else if (lastAction.equals("search") || lastAction.equals("dfs") || lastAction.equals("bfs")) {
-            clearPane();
-            drawWholeTree();
+            resetScreen();
         }
     }
 
@@ -297,43 +466,65 @@ public class ControllerV2 {
         }
         else {
             undo();
-            clearPane();
-            drawWholeTree();
+            resetScreen();
             switch (lastActionRedo) {
-                case "insert" -> insertUI(lastParentKey, lastKey);
-                case "delete" -> deleteUI(lastKey);
-                case "search" -> searchUI(tree.getTreeRoot(), lastKey, timeDelaySet);
+//                case "insert" -> insertUI(lastParentKey, lastKey);
+//                case "delete" -> deleteUI(lastKey);
+//                case "search" -> searchUI(tree.getTreeRoot(), lastKey, timeDelaySet);
                 case "dfs" -> {
                     resetTraverse(true);
                     dfsTraverse(event);
                 }
                 case "bfs" -> {
                     resetTraverse(true);
-                    bfsTraverseUI();
+//                    bfsTraverseUI();
                 }
-                case "update" -> updateUI(lastKey, lastParentKey);
+//                case "update" -> updateUI(lastKey, lastParentKey);
                 case "create" -> {
                     tree = new GenericTree();
-                    tree.createRandomTree(lastKey);
-                    clearPane();
-                    drawWholeTree();
+                    tree.createTree(lastKey);
+                    resetScreen();
                 }
             }
         }
     }
 
     private void setLastAction(String action) {
+        if (oldTree == null) {
+            if (tree instanceof GenericTree) {
+                oldTree = new GenericTree();
+            }
+            else {
+                oldTree = new BinarySearchTree();
+            }
+        }
         oldTree.copy(tree);
         lastAction = action;
         lastActionRedo = action;
     }
     private void setLastAction(String action, int key) {
+        if (oldTree == null) {
+            if (tree instanceof GenericTree) {
+                oldTree = new GenericTree();
+            }
+            else {
+                oldTree = new BinarySearchTree();
+            }
+        }
         oldTree.copy(tree);
         lastAction = action;
         lastActionRedo = action;
         lastKey = key;
     }
     private void setLastAction(String action, int key, int parent) {
+        if (oldTree == null) {
+            if (tree instanceof GenericTree) {
+                oldTree = new GenericTree();
+            }
+            else {
+                oldTree = new BinarySearchTree();
+            }
+        }
         oldTree.copy(tree);
         lastAction = action;
         lastActionRedo = action;
@@ -411,7 +602,8 @@ public class ControllerV2 {
     }
 
     @FXML
-    private void initialize() {final String NODE_FXML_FILE_PATH = "/ui/view/TreeNode.fxml";
+    private void initialize() {
+        final String NODE_FXML_FILE_PATH = "/ui/view/TreeNode.fxml";
         sliderSpeed.valueProperty().addListener((observable, oldValue, newValue) -> {
             speed = newValue.intValue();
             timeDelaySet = 1020 / speed;
@@ -423,4 +615,49 @@ public class ControllerV2 {
         }
     }
 
+    private void clearPane() {
+        treePane.getChildren().clear();
+        treePane.getChildren().add(traverseVBox);
+        treePane.getChildren().add(hBoxTraverse);
+    }
+
+    private void clearAllPane() {
+        treePane.getChildren().clear();
+    }
+    
+    private void resetScreen() {
+        clearPane();
+        drawWholeTree();
+    }
+
+    private void setProgressBar(int counter, int current) {
+        sliderProgress.setMax(counter);
+        sliderProgress.setValue(current);
+    }
+
+//    private void playAnimation(int counter) {
+//        timeline.getKeyFrames();
+//        AtomicInteger currentValue = new AtomicInteger(0);
+//        sliderProgress.setMax(counter);
+//        sliderProgress.setMin(0);
+//        sliderProgress.setBlockIncrement(1);
+//        sliderProgress.setValue(currentValue.get());
+//        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
+//            clearAllPane();
+//            treePane.getChildren().addAll(sceneNodes.get(currentValue.get()));
+//            currentValue.getAndIncrement();
+//            sliderProgress.setValue(currentValue.get());
+//            if (currentValue.get() == counter) {
+//                timeline.stop();
+//            }
+//        });
+//        timeline.getKeyFrames().add(keyFrame);
+//        timeline.setCycleCount(Timeline.INDEFINITE);
+//        timeline.play();
+//    }
+
+    @FXML
+    private void pause() {
+        pause = !pause;
+    }
 }

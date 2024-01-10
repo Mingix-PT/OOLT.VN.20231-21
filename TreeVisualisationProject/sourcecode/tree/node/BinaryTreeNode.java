@@ -1,7 +1,6 @@
 package tree.node;
 
 public class BinaryTreeNode extends TreeNode {
-    public int key;
     public BinaryTreeNode leftChild;
     public BinaryTreeNode rightChild;
 
@@ -9,10 +8,6 @@ public class BinaryTreeNode extends TreeNode {
         super(key);
         this.leftChild = null;
         this.rightChild = null;
-    }
-
-    public int getKey() {
-        return key;
     }
 
     public boolean isLeaf() {
