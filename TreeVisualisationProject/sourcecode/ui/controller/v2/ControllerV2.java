@@ -10,6 +10,8 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -111,6 +113,12 @@ public class ControllerV2 {
 
     @FXML
     private Button pauseButton;
+
+    @FXML
+    private ImageView pauseImage;
+
+    private final Image pauseIcon = new Image("/ui/resources/image/pauseButton.png");
+    private final Image playIcon = new Image("/ui/resources/image/playButton.png");
 
     @FXML
     void backToMainMenu(ActionEvent event) {
@@ -315,15 +323,16 @@ public class ControllerV2 {
 
     private void deleteUI(int key) {
         Duration timeDelay = Duration.ZERO;
-        int step = 0;
+        int step;
         if (tree instanceof GenericTree) {
             deleteUIGeneric(key);
             step = searchTimesGeneric(key).size();
         }
         else {
             deleteUIBST(key);
-            step = searchTimesBST((BinaryTreeNode) tree.getTreeRoot(), key, new ArrayList<BinaryTreeNode>()).size();
+            step = searchTimesBST((BinaryTreeNode) tree.getTreeRoot(), key, new ArrayList<>()).size();
         }
+        System.out.println(step);
         timeDelay = timeDelay.add(millis(timeDelaySet * (step+1)));
         System.out.println(timeDelay);
         KeyFrame keyFrame1 = new KeyFrame(timeDelay, event -> {
@@ -332,16 +341,13 @@ public class ControllerV2 {
             resetScreen();
         });
         timeline.getKeyFrames().add(keyFrame1);
+        System.out.println(timeline.getKeyFrames());
         timeline.play();
     }
 
     private void deleteUIGeneric(int key) {
         List<GenericTreeNode> bfsSearchResult = searchTimesGeneric(key);
-        if (bfsSearchResult == null) {
-            return;
-        }
         timeline = listTraverseUIGeneric(bfsSearchResult, key);
-        timeline.play();
     }
 
     private void deleteUIBST(int key) {
@@ -350,7 +356,6 @@ public class ControllerV2 {
             return;
         }
         timeline = listTraverseUIBST(dfsSearchResult, key);
-        timeline.play();
     }
 
     @FXML
@@ -539,7 +544,7 @@ public class ControllerV2 {
 
     private List<GenericTreeNode> searchTimesGeneric(int key) {
         if (tree == null) {
-            return null;
+            return new ArrayList<>();
         }
         List<GenericTreeNode> bfsSearchResult = new ArrayList<>();
         Queue<GenericTreeNode> queueTree = new ArrayDeque<>();
@@ -604,9 +609,6 @@ public class ControllerV2 {
             counter.getAndIncrement();
             sliderProgress.setValue(counter.get());
             highLightNodeGreen(key);
-            if (!isRunning) {
-                timeline.pause();
-            }
         });
         Timeline timelineIn = new Timeline();
         timelineIn.getKeyFrames().add(keyFrame);
@@ -634,9 +636,6 @@ public class ControllerV2 {
             else {
                 highLightNodeRed(keyList);
             }
-            if (!isRunning) {
-                timeline.pause();
-            }
         });
         Timeline timelineIn = new Timeline();
         timelineIn.getKeyFrames().add(keyFrame);
@@ -658,9 +657,6 @@ public class ControllerV2 {
             counter.getAndIncrement();
             sliderProgress.setValue(counter.get());
             highLightNodeGreen(key);
-            if (!isRunning) {
-                timeline.pause();
-            }
         });
         Timeline timelineIn = new Timeline();
         timelineIn.getKeyFrames().add(keyFrame);
@@ -686,9 +682,6 @@ public class ControllerV2 {
             }
             else {
                 highLightNodeRed(keyList);
-            }
-            if (!isRunning) {
-                timeline.pause();
             }
         });
         Timeline timelineIn = new Timeline();
@@ -993,7 +986,6 @@ public class ControllerV2 {
         if (!(tree instanceof GenericTree)) {
             updateButton.setVisible(false);
         }
-        playButton.setVisible(false);
     }
 
     private void clearPane() {
@@ -1019,20 +1011,13 @@ public class ControllerV2 {
             System.out.println("Pause");
             isRunning = false;
             timeline.pause();
-            playButton.setVisible(true);
-            pauseButton.setVisible(false);
+            pauseImage.setImage(playIcon);
         }
-    }
-
-    @FXML
-    private void play(ActionEvent event) {
-        System.out.println("\nPlay button pressed");
-        if (!isRunning) {
+        else {
             System.out.println("Play");
             isRunning = true;
             timeline.play();
-            playButton.setVisible(false);
-            pauseButton.setVisible(true);
+            pauseImage.setImage(pauseIcon);
         }
     }
 }
