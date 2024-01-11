@@ -44,7 +44,7 @@ public class ControllerV2 {
     private int lastKey = -999;
     private int lastParentKey = -999;
     private List<ObservableList<Node>> sceneNodes = new ArrayList<>();
-    private boolean pause = false;
+    private boolean isRunning = true;
 
     Timeline timeline = new Timeline();
 
@@ -107,6 +107,12 @@ public class ControllerV2 {
     private Button updateButton;
 
     @FXML
+    private Button playButton;
+
+    @FXML
+    private Button pauseButton;
+
+    @FXML
     void backToMainMenu(ActionEvent event) {
         final String MENU_FXML_FILE_PATH = "/ui/view/common/Menu.fxml";
         try {
@@ -127,16 +133,26 @@ public class ControllerV2 {
     
     @FXML
     void createTree(ActionEvent event) {
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Create Tree");
-        dialog.setHeaderText("Enter the height of the tree");
-        dialog.setContentText("Height: ");
-        dialog.showAndWait();
-        int height = Integer.parseInt(dialog.getEditor().getText());
-        tree.createTree(height);
-        tree.print();
-        resetScreen();
-        setLastAction("create", height);
+        try
+        {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Create Tree");
+            dialog.setHeaderText("Enter the height of the tree");
+            dialog.setContentText("Height: ");
+            dialog.showAndWait();
+            int height = Integer.parseInt(dialog.getEditor().getText());
+            tree.createTree(height);
+            tree.print();
+            resetScreen();
+            setLastAction("create", height);
+        }
+        catch (IllegalArgumentException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Invalid height");
+            alert.setContentText("Height must be a positive integer");
+            alert.showAndWait();
+        }
     }
 
     @FXML
@@ -165,6 +181,7 @@ public class ControllerV2 {
         int max = bfsList.size();
         resetProgressBar(max);
         timeline = listTraverseUIGeneric(bfsList);
+        timeline.play();
     }
 
     private List<GenericTreeNode> bfsGenericList() {
@@ -190,6 +207,7 @@ public class ControllerV2 {
         int max = bfsList.size();
         resetProgressBar(max);
         timeline = listTraverseUIBST(bfsList);
+        timeline.play();
     }
 
     private List<BinaryTreeNode> bfsBSTList() {
@@ -243,6 +261,7 @@ public class ControllerV2 {
         resetProgressBar(max);
         AtomicInteger counter = new AtomicInteger(0);
         timeline = listTraverseUIGeneric(dfsList);
+        timeline.play();
     }
 
     private List<GenericTreeNode> dfsGenericList(GenericTreeNode node, List<GenericTreeNode> dfsList) {
@@ -267,6 +286,7 @@ public class ControllerV2 {
         int max = dfsList.size();
         resetProgressBar(max);
         timeline = listTraverseUIBST(dfsList);
+        timeline.play();
     }
 
     private List<BinaryTreeNode> dfsBSTList(BinaryTreeNode node, List<BinaryTreeNode> dfsList) {
@@ -312,9 +332,7 @@ public class ControllerV2 {
             resetScreen();
         });
         timeline.getKeyFrames().add(keyFrame1);
-        Timeline timelineIn = new Timeline();
-        timelineIn.getKeyFrames().add(keyFrame1);
-        timelineIn.play();
+        timeline.play();
     }
 
     private void deleteUIGeneric(int key) {
@@ -323,6 +341,7 @@ public class ControllerV2 {
             return;
         }
         timeline = listTraverseUIGeneric(bfsSearchResult, key);
+        timeline.play();
     }
 
     private void deleteUIBST(int key) {
@@ -331,6 +350,7 @@ public class ControllerV2 {
             return;
         }
         timeline = listTraverseUIBST(dfsSearchResult, key);
+        timeline.play();
     }
 
     @FXML
@@ -400,10 +420,7 @@ public class ControllerV2 {
         });
         timeline.getKeyFrames().add(keyFrame1);
         timeline.getKeyFrames().add(keyFrame2);
-        Timeline timelineIn = new Timeline();
-        timelineIn.getKeyFrames().add(keyFrame1);
-        timelineIn.getKeyFrames().add(keyFrame2);
-        timelineIn.play();
+        timeline.play();
     }
 
     private void insertUI(int key) {
@@ -429,10 +446,7 @@ public class ControllerV2 {
         });
         timeline.getKeyFrames().add(keyFrame1);
         timeline.getKeyFrames().add(keyFrame2);
-        Timeline timelineIn = new Timeline();
-        timelineIn.getKeyFrames().add(keyFrame1);
-        timelineIn.getKeyFrames().add(keyFrame2);
-        timelineIn.play();
+        timeline.play();
     }
     @FXML
     void updateNode(ActionEvent event) {
@@ -487,10 +501,7 @@ public class ControllerV2 {
         });
         timeline.getKeyFrames().add(keyFrame1);
         timeline.getKeyFrames().add(keyFrame2);
-        Timeline timelineIn = new Timeline();
-        timelineIn.getKeyFrames().add(keyFrame1);
-        timelineIn.getKeyFrames().add(keyFrame2);
-        timelineIn.play();
+        timeline.play();
     }
 
 
@@ -523,6 +534,7 @@ public class ControllerV2 {
         int max = bfsSearchResult.size();
         resetProgressBar(max);
         timeline = listTraverseUIGeneric(bfsSearchResult, key);
+        timeline.play();
     }
 
     private List<GenericTreeNode> searchTimesGeneric(int key) {
@@ -558,6 +570,7 @@ public class ControllerV2 {
         System.out.println(max);
         resetProgressBar(max);
         timeline = listTraverseUIBST(dfsSearchResult, key);
+        timeline.play();
     }
     private List<BinaryTreeNode> searchTimesBST(BinaryTreeNode node, int key, List<BinaryTreeNode> result) {
         if (node == null) {
@@ -591,14 +604,13 @@ public class ControllerV2 {
             counter.getAndIncrement();
             sliderProgress.setValue(counter.get());
             highLightNodeGreen(key);
-            if (pause) {
+            if (!isRunning) {
                 timeline.pause();
             }
         });
         Timeline timelineIn = new Timeline();
         timelineIn.getKeyFrames().add(keyFrame);
         timelineIn.setCycleCount(list.size());
-        timelineIn.play();
         return timelineIn;
     }
 
@@ -622,14 +634,13 @@ public class ControllerV2 {
             else {
                 highLightNodeRed(keyList);
             }
-            if (pause) {
+            if (!isRunning) {
                 timeline.pause();
             }
         });
         Timeline timelineIn = new Timeline();
         timelineIn.getKeyFrames().add(keyFrame);
         timelineIn.setCycleCount(list.size());
-        timelineIn.play();
         return timelineIn;
     }
     private Timeline listTraverseUIBST(List<BinaryTreeNode> list) {
@@ -647,14 +658,13 @@ public class ControllerV2 {
             counter.getAndIncrement();
             sliderProgress.setValue(counter.get());
             highLightNodeGreen(key);
-            if (pause) {
+            if (!isRunning) {
                 timeline.pause();
             }
         });
         Timeline timelineIn = new Timeline();
         timelineIn.getKeyFrames().add(keyFrame);
         timelineIn.setCycleCount(list.size());
-        timelineIn.play();
         return timelineIn;
     }
     private Timeline listTraverseUIBST(List<BinaryTreeNode> list, int key) {
@@ -677,14 +687,13 @@ public class ControllerV2 {
             else {
                 highLightNodeRed(keyList);
             }
-            if (pause) {
+            if (!isRunning) {
                 timeline.pause();
             }
         });
         Timeline timelineIn = new Timeline();
         timelineIn.getKeyFrames().add(keyFrame);
         timelineIn.setCycleCount(list.size());
-        timelineIn.play();
         return timelineIn;
     }
 
@@ -984,6 +993,7 @@ public class ControllerV2 {
         if (!(tree instanceof GenericTree)) {
             updateButton.setVisible(false);
         }
+        playButton.setVisible(false);
     }
 
     private void clearPane() {
@@ -1003,16 +1013,26 @@ public class ControllerV2 {
     }
 
     @FXML
-    private void pause() {
-        if (pause) {
-            System.out.println("Play");
-            pause = false;
-            timeline.play();
-        }
-        else {
+    private void pause(ActionEvent event) {
+        System.out.println("\nPause button pressed");
+        if (isRunning) {
             System.out.println("Pause");
-            pause = true;
+            isRunning = false;
             timeline.pause();
+            playButton.setVisible(true);
+            pauseButton.setVisible(false);
+        }
+    }
+
+    @FXML
+    private void play(ActionEvent event) {
+        System.out.println("\nPlay button pressed");
+        if (!isRunning) {
+            System.out.println("Play");
+            isRunning = true;
+            timeline.play();
+            playButton.setVisible(false);
+            pauseButton.setVisible(true);
         }
     }
 }

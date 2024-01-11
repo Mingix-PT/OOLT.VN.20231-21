@@ -59,7 +59,7 @@
                   </VBox>
                   <VBox prefHeight="101.0" prefWidth="145.0">
                      <children>
-                        <Label fx:id="speedLabel" prefHeight="35.0" prefWidth="98.0" text="1x" textFill="WHITE" wrapText="true">
+                        <Label fx:id="speedLabel" prefHeight="51.0" prefWidth="41.0" text="1x" textFill="WHITE" wrapText="true">
                            <font>
                               <Font size="24.0" />
                            </font>
@@ -69,62 +69,68 @@
                         </Label>
                      </children>
                   </VBox>
-                  <Button mnemonicParsing="false" prefHeight="31.0" prefWidth="0.0" style="-fx-background-color: black;" text="Button">
-                     <HBox.margin>
-                        <Insets bottom="30.0" top="30.0" />
-                     </HBox.margin>
-                     <graphic>
-                        <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../resources/backButton.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </Button>
-                  <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pause" prefHeight="26.0" prefWidth="63.0" style="-fx-background-color: black;" text="Button">
-                     <HBox.margin>
-                        <Insets bottom="30.0" top="30.0" />
-                     </HBox.margin>
-                     <graphic>
-                        <ImageView fitHeight="32.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../resources/pauseButton.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </Button>
-                  <Button mnemonicParsing="false" prefHeight="69.0" prefWidth="78.0" style="-fx-background-color: black;" text="Button">
-                     <HBox.margin>
-                        <Insets bottom="30.0" top="30.0" />
-                     </HBox.margin>
-                     <graphic>
-                        <ImageView fitHeight="33.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../../resources/nextButton.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                  </Button>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Button fx:id="pauseButton" mnemonicParsing="false" onAction="#pause" prefHeight="26.0" prefWidth="63.0" style="-fx-background-color: black;" text="Button">
+                           <HBox.margin>
+                              <Insets bottom="30.0" top="30.0" />
+                           </HBox.margin>
+                           <graphic>
+                              <ImageView fitHeight="32.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../resources/pauseButton.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <Button fx:id="playButton" mnemonicParsing="false" onAction="#play" style="-fx-background-color: black;">
+                           <HBox.margin>
+                              <Insets bottom="30.0" top="30.0" />
+                           </HBox.margin>
+                           <graphic>
+                              <ImageView fitHeight="26.0" fitWidth="39.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../../resources/playButton.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
                   <Slider fx:id="sliderProgress" blockIncrement="1.0" majorTickUnit="1.0" max="1.0" min="1.0" minorTickCount="0" prefHeight="38.0" prefWidth="442.0" showTickMarks="true" snapToTicks="true" value="1.0">
                      <HBox.margin>
                         <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
                      </HBox.margin>
                   </Slider>
-                  <Button fx:id="undoButton" mnemonicParsing="false" onAction="#undo" prefHeight="40.0" prefWidth="122.0" text="Undo">
+                  <Button fx:id="undoButton" mnemonicParsing="false" onAction="#undo" prefHeight="40.0" prefWidth="122.0" style="-fx-background-color: black;">
                      <HBox.margin>
                         <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
                      </HBox.margin>
                      <font>
                         <Font size="14.0" />
                      </font>
+                     <graphic>
+                        <ImageView fitHeight="99.0" fitWidth="39.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../resources/undoButton.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
                   </Button>
-                  <Button fx:id="redoButton" layoutX="857.0" layoutY="40.0" mnemonicParsing="false" onAction="#redo" prefHeight="39.0" prefWidth="130.0" text="Redo">
+                  <Button fx:id="redoButton" layoutX="857.0" layoutY="40.0" mnemonicParsing="false" onAction="#redo" prefHeight="39.0" prefWidth="130.0" style="-fx-background-color: black;">
                      <HBox.margin>
                         <Insets bottom="30.0" left="5.0" right="5.0" top="30.0" />
                      </HBox.margin>
                      <font>
                         <Font size="14.0" />
                      </font>
+                     <graphic>
+                        <ImageView fitHeight="90.0" fitWidth="38.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../resources/redoButton.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
                   </Button>
                   <VBox prefHeight="200.0" prefWidth="100.0" />
                   <Region prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />

@@ -83,8 +83,14 @@ public class BinarySearchTree extends Tree {
     }
 
     @Override
-    public void createTree(int height) {
+    public void createTree(int height) throws IllegalArgumentException {
         treeRoot = null;
+        if (height == 0) {
+            return;
+        }
+        if (height < 0) {
+            throw new IllegalArgumentException("Height must be non-negative!");
+        }
         // Create random tree with height h
         while (height() < height) {
             double random = Math.random();

@@ -209,9 +209,12 @@ public class GenericTree extends Tree {
         createRandomTree(treeRoot, height);
     }
 
-    private void createRandomTree(GenericTreeNode root, int height) {
+    private void createRandomTree(GenericTreeNode root, int height) throws IllegalArgumentException{
         if (height == 0) {
             return;
+        }
+        if (height < 0) {
+            throw new IllegalArgumentException("Height must be non-negative");
         }
         Random random = new Random();
         int numberOfChildren = random.nextInt(2) + 1;
