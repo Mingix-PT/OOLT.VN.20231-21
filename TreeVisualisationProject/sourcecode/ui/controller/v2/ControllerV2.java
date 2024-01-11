@@ -45,7 +45,6 @@ public class ControllerV2 {
     private String lastActionRedo = "nothing";
     private int lastKey = -999;
     private int lastParentKey = -999;
-    private List<ObservableList<Node>> sceneNodes = new ArrayList<>();
     private boolean isRunning = true;
 
     Timeline timeline = new Timeline();
@@ -158,7 +157,7 @@ public class ControllerV2 {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error");
             alert.setHeaderText("Invalid height");
-            alert.setContentText("Height must be a positive integer");
+            alert.setContentText(e.getMessage());
             alert.showAndWait();
         }
     }

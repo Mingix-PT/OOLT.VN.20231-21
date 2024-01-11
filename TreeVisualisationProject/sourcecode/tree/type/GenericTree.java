@@ -216,6 +216,9 @@ public class GenericTree extends Tree {
         if (height < 0) {
             throw new IllegalArgumentException("Height must be non-negative");
         }
+        if (height >= 8) {
+            throw new IllegalArgumentException("Height must be less than 8!");
+        }
         Random random = new Random();
         int numberOfChildren = random.nextInt(2) + 1;
         for (int i = 0; i < numberOfChildren; i++) {

@@ -91,6 +91,9 @@ public class BinarySearchTree extends Tree {
         if (height < 0) {
             throw new IllegalArgumentException("Height must be non-negative!");
         }
+        if (height >= 8) {
+            throw new IllegalArgumentException("Height must be less than 8!");
+        }
         // Create random tree with height h
         while (height() < height) {
             double random = Math.random();
