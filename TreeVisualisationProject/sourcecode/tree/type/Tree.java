@@ -1,10 +1,14 @@
-package ui.test;
+package tree.type;
+
+import tree.node.TreeNode;
 
 public abstract class Tree {
 
-    public abstract Tree createTree();
+    public abstract void createTree(int height);
 
     public abstract int height();
+
+    public abstract boolean search(int key);
 
     public abstract int depth(int key);
 
@@ -19,4 +23,9 @@ public abstract class Tree {
     public abstract void bfsTraverse();
 
     public abstract boolean update(int currentKey, int newKey);
+    public abstract TreeNode getTreeRoot();
+
+    public abstract boolean areIdentical(Tree tree);
+    public abstract void copy(Tree tree);
+    public abstract void print();
 }

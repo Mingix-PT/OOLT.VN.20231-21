@@ -1,4 +1,7 @@
-package tree;
+package tree.type;
+
+import tree.node.GenericTreeNode;
+import tree.node.TreeNode;
 
 import java.util.*;
 
@@ -14,10 +17,11 @@ public class GenericTree extends Tree {
     }
 
     @Override
-    public Tree createTree() {
-        return null;
+    public void createTree(int height) {
+        createRandomTree(height);
     }
 
+    @Override
     public GenericTreeNode getTreeRoot() {
         return treeRoot;
     }
@@ -58,7 +62,7 @@ public class GenericTree extends Tree {
     public GenericTreeNode search(GenericTreeNode root, int key) {
         // Search using BFS traverse
         Queue<GenericTreeNode> queueTree = new ArrayDeque<>();
-        queueTree.add(treeRoot);
+        queueTree.add(root);
         while (!queueTree.isEmpty()) {
             GenericTreeNode topNode = queueTree.poll();
             if (topNode.key == key) {
@@ -201,23 +205,29 @@ public class GenericTree extends Tree {
 
     public void createRandomTree(int height) {
         treeRoot = new GenericTreeNode(new Random().nextInt(100));
+        print();
         createRandomTree(treeRoot, height);
     }
 
-    private void createRandomTree(GenericTreeNode root, int height) {
+    private void createRandomTree(GenericTreeNode root, int height) throws IllegalArgumentException{
         if (height == 0) {
             return;
         }
+        if (height < 0) {
+            throw new IllegalArgumentException("Height must be non-negative");
+        }
+        if (height >= 8) {
+            throw new IllegalArgumentException("Height must be less than 8!");
+        }
         Random random = new Random();
         int numberOfChildren = random.nextInt(2) + 1;
-        if (numberOfChildren == 0) {
-            numberOfChildren++;
-        }
         for (int i = 0; i < numberOfChildren; i++) {
             int randomKey = 1;
+            Random randomKeyGenerator = new Random();
             while (search(randomKey)) {
-                randomKey = random.nextInt(100);
+                randomKey = randomKeyGenerator.nextInt(100);
             }
+            System.out.println("Inserting key " + randomKey + " under parent key " + root.key);
             root.children.add(new GenericTreeNode(randomKey));
             createRandomTree(root.children.get(i), height - 1);
         }
@@ -230,7 +240,7 @@ public class GenericTree extends Tree {
     }
 
     // Print tree - idea by Copilot Chat
-    public void printTree() {
+    public void print() {
         if (treeRoot != null) {
             printNode(treeRoot, "");
         }
@@ -266,8 +276,11 @@ public class GenericTree extends Tree {
         return maxWidth;
     }
 
-    public boolean areIdentical(GenericTree otherTree) {
-        return areIdentical(treeRoot, otherTree.treeRoot);
+    public boolean areIdentical(Tree otherTree) {
+        if (!(otherTree instanceof GenericTree)) {
+            return false;
+        }
+        return areIdentical(treeRoot,(GenericTreeNode) otherTree.getTreeRoot());
     }
 
     private boolean areIdentical(GenericTreeNode root1,  GenericTreeNode root2) {
@@ -289,8 +302,11 @@ public class GenericTree extends Tree {
         return false;
     }
 
-    public void copy(GenericTree otherTree) {
-        treeRoot = copy(otherTree.treeRoot);
+    public void copy(Tree otherTree) {
+        if (!(otherTree instanceof GenericTree)) {
+            return;
+        }
+        treeRoot = copy((GenericTreeNode) otherTree.getTreeRoot());
     }
 
     private GenericTreeNode copy(GenericTreeNode root) {

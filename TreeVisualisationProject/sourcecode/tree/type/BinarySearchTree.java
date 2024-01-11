@@ -1,9 +1,12 @@
-package tree;
+package tree.type;
+
+import tree.node.BinaryTreeNode;
+import tree.node.TreeNode;
 
 import java.util.*;
 
 public class BinarySearchTree extends Tree {
-
+    protected BinaryTreeNode treeRoot;
     protected List<Integer> inorderTraverseList = new ArrayList<>();
 
     public BinarySearchTree(int key) {
@@ -30,7 +33,10 @@ public class BinarySearchTree extends Tree {
 
     @Override
     public int height() {
-        return height(treeRoot);
+        if (treeRoot != null) {
+            return height(treeRoot);
+        }
+        return 0;
     }
 
     @Override
@@ -42,11 +48,11 @@ public class BinarySearchTree extends Tree {
         if (root == null || root.isLeaf()) {
             return 0;
         }
+
         return 1 + Math.max(height(root.leftChild), height(root.rightChild));
     }
 
-    protected BinaryTreeNode treeRoot;
-
+    @Override
     public BinaryTreeNode getTreeRoot () {
         return treeRoot;
     }
@@ -77,8 +83,25 @@ public class BinarySearchTree extends Tree {
     }
 
     @Override
-    public Tree createTree() {
-        return null;
+    public void createTree(int height) throws IllegalArgumentException {
+        treeRoot = null;
+        if (height == 0) {
+            return;
+        }
+        if (height < 0) {
+            throw new IllegalArgumentException("Height must be non-negative!");
+        }
+        if (height >= 8) {
+            throw new IllegalArgumentException("Height must be less than 8!");
+        }
+        // Create random tree with height h
+        while (height() < height) {
+            double random = Math.random();
+            System.out.println(random);
+            int key = (int) (random * 100);
+            System.out.println(key);
+            insert(key);
+        }
     }
 
     protected void setNodeToChild(BinaryTreeNode node) {
@@ -158,7 +181,8 @@ public class BinarySearchTree extends Tree {
         }
         if (root.key == key) {
             return false;
-        } else if (key < root.key) {
+        }
+        else if (key < root.key) {
             if (root.leftChild == null) {
                 root.leftChild = new BinaryTreeNode(key);
                 return true;
@@ -207,14 +231,6 @@ public class BinarySearchTree extends Tree {
     }
 
     protected void updateNode(BinaryTreeNode currentNode, BinaryTreeNode newNode) {
-//        BinaryTreeNode parent = searchParent(treeRoot, currentNode.key);
-//        if (parent != null) {
-//            if (parent.leftChild == currentNode) {
-//                parent.leftChild = newNode;
-//            } else {
-//                parent.rightChild = newNode;
-//            }
-//        }
         currentNode.key = newNode.key;
     }
 
@@ -352,8 +368,11 @@ public class BinarySearchTree extends Tree {
     }
 
     // Method to compare two BSTs
-    public boolean areIdentical(BinarySearchTree bst) {
-        return areIdentical(this.treeRoot, bst.treeRoot);
+    public boolean areIdentical(Tree tree) {
+        if (!(tree instanceof BinarySearchTree)) {
+            return false;
+        }
+        return areIdentical(this.treeRoot, ((BinarySearchTree) tree).getTreeRoot());
     }
 
     private boolean areIdentical(BinaryTreeNode node1, BinaryTreeNode node2) {
@@ -373,8 +392,11 @@ public class BinarySearchTree extends Tree {
         return false;
     }
 
-    public void copy(BinarySearchTree bst) {
-        this.treeRoot = copy(bst.treeRoot);
+    public void copy(Tree bst) {
+        if (!(bst instanceof BinarySearchTree)) {
+            return;
+        }
+        this.treeRoot = copy(((BinarySearchTree) bst).getTreeRoot());
     }
 
     private BinaryTreeNode copy(BinaryTreeNode node) {

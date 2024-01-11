@@ -1,6 +1,6 @@
 package test.avl;
 
-import tree.AVLTree;
+import tree.type.AVLTree;
 
 
 public class TestAVL {

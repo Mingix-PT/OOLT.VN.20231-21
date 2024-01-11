@@ -1,18 +1,13 @@
-package tree;
+package tree.node;
 
-public class BinaryTreeNode {
-    public int key;
+public class BinaryTreeNode extends TreeNode {
     public BinaryTreeNode leftChild;
     public BinaryTreeNode rightChild;
 
     public BinaryTreeNode(int key) {
-        this.key = key;
+        super(key);
         this.leftChild = null;
         this.rightChild = null;
-    }
-
-    public int getKey() {
-        return key;
     }
 
     public boolean isLeaf() {

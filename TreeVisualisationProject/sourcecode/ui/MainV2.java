@@ -1,30 +1,27 @@
 package ui;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import tree.type.CompleteBalanceBinarySearchTree;
 import ui.controller.ultility.MenuController;
+import ui.controller.v2.MenuControllerV2;
 
-public class Main extends Application {
-    private CompleteBalanceBinarySearchTree tree;
+public class MainV2 extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        final String BST_FXML_FILE_PATH = "/ui/view/BST.fxml";
-        final String MENU_FXML_FILE_PATH = "/ui/view/Menu.fxml";
+        final String MENU_FXML_FILE_PATH = "/ui/view/common/Menu.fxml";
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource(MENU_FXML_FILE_PATH));
-        MenuController menuController = new MenuController();
+        MenuControllerV2 menuController = new MenuControllerV2();
         fxmlLoader.setController(menuController);
-//        CBBSTController cbBSTController = new CBBSTController();
-//        fxmlLoader.setController(cbBSTController);
         Parent parent = fxmlLoader.load();
 
         Scene scene = new Scene(parent);
         stage.setScene(scene);
-        stage.setTitle("Tree Visualisation");
+        stage.setTitle("Tree Visualisation Application");
         stage.show();
     }
 
