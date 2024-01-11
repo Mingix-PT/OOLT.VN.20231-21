@@ -21,6 +21,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import tree.node.BinaryTreeNode;
 import tree.node.GenericTreeNode;
+import tree.node.TreeNode;
 import tree.type.BinarySearchTree;
 import tree.type.GenericTree;
 import tree.type.Tree;
@@ -171,67 +172,38 @@ public class ControllerV2 {
         setLastAction("bfs");
     }
 
-    private void bfsUI () {
-        if (tree instanceof GenericTree) {
-            bfsUIGeneric();
-        }
-        else {
-            bfsUIBST();
-        }
-    }
-
-    private void bfsUIGeneric () {
-        List<GenericTreeNode> bfsList = bfsGenericList();
+    private void bfsUI() {
+        List<TreeNode> bfsList = bfsList();
         if (bfsList == null) {
             return;
         }
         int max = bfsList.size();
         resetProgressBar(max);
-        timeline = listTraverseUIGeneric(bfsList);
+        timeline = listTraverseUI(bfsList);
         timeline.play();
     }
 
-    private List<GenericTreeNode> bfsGenericList() {
+    private List<TreeNode> bfsList() {
         if (tree == null) {
             return null;
         }
-        List<GenericTreeNode> bfsList = new ArrayList<>();
-        Queue<GenericTreeNode> queueTree = new ArrayDeque<>();
-        queueTree.add((GenericTreeNode) tree.getTreeRoot());
+        List<TreeNode> bfsList = new ArrayList<>();
+        Queue<TreeNode> queueTree = new ArrayDeque<>();
+        queueTree.add(tree.getTreeRoot());
         while (!queueTree.isEmpty()) {
-            GenericTreeNode node = queueTree.poll();
+            TreeNode node = queueTree.poll();
             bfsList.add(node);
-            queueTree.addAll(node.children);
-        }
-        return bfsList;
-    }
-
-    private void bfsUIBST() {
-        List<BinaryTreeNode> bfsList = bfsBSTList();
-        if (bfsList == null) {
-            return;
-        }
-        int max = bfsList.size();
-        resetProgressBar(max);
-        timeline = listTraverseUIBST(bfsList);
-        timeline.play();
-    }
-
-    private List<BinaryTreeNode> bfsBSTList() {
-        if (tree == null) {
-            return null;
-        }
-        List<BinaryTreeNode> bfsList = new ArrayList<>();
-        Queue<BinaryTreeNode> queueTree = new ArrayDeque<>();
-        queueTree.add((BinaryTreeNode) tree.getTreeRoot());
-        while (!queueTree.isEmpty()) {
-            BinaryTreeNode node = queueTree.poll();
-            bfsList.add(node);
-            if (node.leftChild != null) {
-                queueTree.add(node.leftChild);
+            if (node instanceof BinaryTreeNode)
+            {
+                if (((BinaryTreeNode) node).leftChild != null) {
+                    queueTree.add(((BinaryTreeNode) node).leftChild);
+                }
+                if (((BinaryTreeNode) node).rightChild != null) {
+                    queueTree.add(((BinaryTreeNode) node).rightChild);
+                }
             }
-            if (node.rightChild != null) {
-                queueTree.add(node.rightChild);
+            else {
+                queueTree.addAll(((GenericTreeNode) node).children);
             }
         }
         return bfsList;
@@ -248,61 +220,32 @@ public class ControllerV2 {
     }
 
     private void dfsUI() {
-        if (tree instanceof GenericTree) {
-            dfsUIGeneric();
+        List<TreeNode> dfsList = dfsList(tree.getTreeRoot(), new ArrayList<>());
+        if (dfsList == null) {
+            return;
         }
+        for (TreeNode node : dfsList) {
+            System.out.print(node.key + " ");
+        }
+        int max = dfsList.size();
+        resetProgressBar(max);
+        timeline = listTraverseUI(dfsList);
+        timeline.play();
+    }
+
+    private List<TreeNode> dfsList(TreeNode node, List<TreeNode> dfsList) {
+        if (node == null) {
+            return dfsList;
+        }
+        dfsList.add(node);
+        if (node instanceof GenericTreeNode)
+            for (GenericTreeNode child : ((GenericTreeNode) node).children) {
+                dfsList(child, dfsList);
+            }
         else {
-            dfsUIBST();
+            dfsList(((BinaryTreeNode) node).leftChild, dfsList);
+            dfsList(((BinaryTreeNode) node).rightChild, dfsList);
         }
-    }
-
-    private void dfsUIGeneric() {
-        List<GenericTreeNode> dfsList = dfsGenericList((GenericTreeNode) tree.getTreeRoot(), new ArrayList<>());
-        if (dfsList == null) {
-            return;
-        }
-        for (GenericTreeNode node : dfsList) {
-            System.out.print(node.key + " ");
-        }
-        int max = dfsList.size();
-        resetProgressBar(max);
-        AtomicInteger counter = new AtomicInteger(0);
-        timeline = listTraverseUIGeneric(dfsList);
-        timeline.play();
-    }
-
-    private List<GenericTreeNode> dfsGenericList(GenericTreeNode node, List<GenericTreeNode> dfsList) {
-        if (node == null) {
-            return dfsList;
-        }
-        dfsList.add(node);
-        for (GenericTreeNode child : node.children) {
-            dfsGenericList(child, dfsList);
-        }
-        return dfsList;
-    }
-
-    private void dfsUIBST() {
-        List<BinaryTreeNode> dfsList = dfsBSTList((BinaryTreeNode) tree.getTreeRoot(), new ArrayList<>());
-        if (dfsList == null) {
-            return;
-        }
-        for (BinaryTreeNode node : dfsList) {
-            System.out.print(node.key + " ");
-        }
-        int max = dfsList.size();
-        resetProgressBar(max);
-        timeline = listTraverseUIBST(dfsList);
-        timeline.play();
-    }
-
-    private List<BinaryTreeNode> dfsBSTList(BinaryTreeNode node, List<BinaryTreeNode> dfsList) {
-        if (node == null) {
-            return dfsList;
-        }
-        dfsList.add(node);
-        dfsBSTList(node.leftChild, dfsList);
-        dfsBSTList(node.rightChild, dfsList);
         return dfsList;
     }
 
@@ -323,14 +266,15 @@ public class ControllerV2 {
     private void deleteUI(int key) {
         Duration timeDelay = Duration.ZERO;
         int step;
+        List<TreeNode> listSearchResult;
         if (tree instanceof GenericTree) {
-            deleteUIGeneric(key);
-            step = searchTimesGeneric(key).size();
+            listSearchResult = searchTimes(key);
         }
         else {
-            deleteUIBST(key);
-            step = searchTimesBST((BinaryTreeNode) tree.getTreeRoot(), key, new ArrayList<>()).size();
+            listSearchResult = searchTimes(tree.getTreeRoot(), key, new ArrayList<>());
         }
+        step = listSearchResult.size();
+        timeline = listTraverseUI(listSearchResult, key);
         System.out.println(step);
         timeDelay = timeDelay.add(millis(timeDelaySet * (step+1)));
         System.out.println(timeDelay);
@@ -342,19 +286,6 @@ public class ControllerV2 {
         timeline.getKeyFrames().add(keyFrame1);
         System.out.println(timeline.getKeyFrames());
         timeline.play();
-    }
-
-    private void deleteUIGeneric(int key) {
-        List<GenericTreeNode> bfsSearchResult = searchTimesGeneric(key);
-        timeline = listTraverseUIGeneric(bfsSearchResult, key);
-    }
-
-    private void deleteUIBST(int key) {
-        List<BinaryTreeNode> dfsSearchResult = searchTimesBST((BinaryTreeNode) tree.getTreeRoot(), key, new ArrayList<>());
-        if (dfsSearchResult == null) {
-            return;
-        }
-        timeline = listTraverseUIBST(dfsSearchResult, key);
     }
 
     @FXML
@@ -397,16 +328,13 @@ public class ControllerV2 {
             alert.showAndWait();
             return;
         }
-        List<GenericTreeNode> bfsSearchResult = searchTimesGeneric(parent);
-        if (bfsSearchResult == null) {
-            return;
-        }
-        for (GenericTreeNode node : bfsSearchResult) {
+        List<TreeNode> bfsSearchResult = searchTimes(parent);
+        for (TreeNode node : bfsSearchResult) {
             System.out.print(node.key + " ");
         }
         System.out.println(bfsSearchResult.size());
-        timeline = listTraverseUIGeneric(bfsSearchResult, parent);
-        long step = (bfsSearchResult.size()+1)*timeDelaySet;
+        timeline = listTraverseUI(bfsSearchResult, parent);
+        int step = (bfsSearchResult.size()+1)*timeDelaySet;
         Duration timeDelay = Duration.ZERO;
         timeDelay = timeDelay.add(Duration.millis((step)));
         System.out.println(timeDelay);
@@ -428,11 +356,11 @@ public class ControllerV2 {
     }
 
     private void insertUI(int key) {
-        List<BinaryTreeNode> dfsSearchResult = searchTimesBST((BinaryTreeNode) tree.getTreeRoot(), key, new ArrayList<>());
+        List<TreeNode> dfsSearchResult = searchTimes(tree.getTreeRoot(), key, new ArrayList<>());
         if (dfsSearchResult == null) {
             return;
         }
-        timeline = listTraverseUIBST(dfsSearchResult, key);
+        timeline = listTraverseUI(dfsSearchResult, key);
         Duration timeDelay = Duration.ZERO;
         timeDelay = timeDelay.add(millis(timeDelaySet*(dfsSearchResult.size()+1)));
         System.out.println(timeDelay);
@@ -485,7 +413,7 @@ public class ControllerV2 {
         if (tree == null) {
             return;
         }
-        timeline = listTraverseUIGeneric(searchTimesGeneric(oldKey), oldKey);
+        timeline = listTraverseUI(searchTimes(oldKey), oldKey);
         Duration timeDelay = Duration.ZERO;
         for (KeyFrame keyFrame : timeline.getKeyFrames()) {
             timeDelay = timeDelay.add(keyFrame.getTime());
@@ -523,60 +451,75 @@ public class ControllerV2 {
     }
 
     private void searchUI(int key) {
+        List<TreeNode> listSearchResult;
         if (tree instanceof GenericTree) {
-            searchUIGeneric(key);
+            listSearchResult = searchTimes(key);
         }
         else {
-            searchUIBST(key);
+            listSearchResult = searchTimes(tree.getTreeRoot(), key, new ArrayList<>());
         }
-    }
-    private void searchUIGeneric(int key){
-        List<GenericTreeNode> bfsSearchResult = searchTimesGeneric(key);
-        if (bfsSearchResult == null) {
-            return;
-        }
-        int max = bfsSearchResult.size();
+        int max = listSearchResult.size();
         resetProgressBar(max);
-        timeline = listTraverseUIGeneric(bfsSearchResult, key);
+        timeline = listTraverseUI(listSearchResult, key);
         timeline.play();
     }
 
-    private List<GenericTreeNode> searchTimesGeneric(int key) {
+    private Timeline listTraverseUI(List<TreeNode> list) {
+        resetProgressBar(list.size());
+        Timeline timelineIn = new Timeline();
+        for (int i = 0; i < list.size(); i++) {
+            int index = i; // Need a effectively final variable for the lambda
+            KeyFrame keyFrame = new KeyFrame(Duration.millis(timeDelaySet * (i + 1)), event -> {
+                int keyList = list.get(index).key;
+                sliderProgress.setValue(index + 1);
+                highLightNodeGreen(keyList);
+            });
+            timelineIn.getKeyFrames().add(keyFrame);
+        }
+        return timelineIn;
+    }
+
+    private Timeline listTraverseUI(List<TreeNode> list, int key) {
+        resetProgressBar(list.size());
+        Timeline timelineIn = new Timeline();
+        for (int i = 0; i < list.size(); i++) {
+            int index = i; // Need a effectively final variable for the lambda
+            KeyFrame keyFrame = new KeyFrame(Duration.millis(timeDelaySet * (i + 1)), event -> {
+                int keyList = list.get(index).key;
+                sliderProgress.setValue(index + 1);
+                if (keyList == key) {
+                    highLightNodeGreen(key);
+                } else {
+                    highLightNodeRed(keyList);
+                }
+            });
+            timelineIn.getKeyFrames().add(keyFrame);
+        }
+        return timelineIn;
+    }
+
+
+    private List<TreeNode> searchTimes(int key) {
         if (tree == null) {
             return new ArrayList<>();
         }
-        List<GenericTreeNode> bfsSearchResult = new ArrayList<>();
-        Queue<GenericTreeNode> queueTree = new ArrayDeque<>();
-        queueTree.add((GenericTreeNode) tree.getTreeRoot());
+        List<TreeNode> bfsSearchResult = new ArrayList<>();
+        Queue<TreeNode> queueTree = new ArrayDeque<>();
+        queueTree.add(tree.getTreeRoot());
         while (!queueTree.isEmpty()) {
-            GenericTreeNode node = queueTree.poll();
+            TreeNode node = queueTree.poll();
             bfsSearchResult.add(node);
             if (node.key == key) {
                 break;
             }
             else {
-                queueTree.addAll(node.children);
+                queueTree.addAll(((GenericTreeNode) node).children);
             }
         }
         return bfsSearchResult;
     }
 
-    private void searchUIBST(int key) {
-        List<BinaryTreeNode> dfsSearchResult = searchTimesBST((BinaryTreeNode) tree.getTreeRoot(), key, new ArrayList<>());
-        if (dfsSearchResult == null) {
-            return;
-        }
-        System.out.print("Search result: ");
-        for (BinaryTreeNode node : dfsSearchResult) {
-            System.out.println(node.key);
-        }
-        int max = dfsSearchResult.size();
-        System.out.println(max);
-        resetProgressBar(max);
-        timeline = listTraverseUIBST(dfsSearchResult, key);
-        timeline.play();
-    }
-    private List<BinaryTreeNode> searchTimesBST(BinaryTreeNode node, int key, List<BinaryTreeNode> result) {
+    private List<TreeNode> searchTimes(TreeNode node, int key, List<TreeNode> result) {
         if (node == null) {
             return result;
         }
@@ -586,109 +529,13 @@ public class ControllerV2 {
         }
         else if (node.key > key) {
             result.add(node);
-            return searchTimesBST(node.leftChild, key, result);
+            return searchTimes(((BinaryTreeNode)node).leftChild, key, result);
         }
         else {
             result.add(node);
-            return searchTimesBST(node.rightChild, key, result);
+            return searchTimes(((BinaryTreeNode)node).rightChild, key, result);
         }
     }
-    private Timeline listTraverseUIGeneric(List<GenericTreeNode> list) {
-        resetProgressBar(list.size());
-        AtomicInteger counter = new AtomicInteger(0);
-        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
-            if (counter.get() >= list.size()) {
-                counter.set(0);
-            }
-            if (list.isEmpty()) {
-                timeline.stop();
-                return;
-            }
-            int key = list.get(counter.get()).key;
-            counter.getAndIncrement();
-            sliderProgress.setValue(counter.get());
-            highLightNodeGreen(key);
-        });
-        Timeline timelineIn = new Timeline();
-        timelineIn.getKeyFrames().add(keyFrame);
-        timelineIn.setCycleCount(list.size());
-        return timelineIn;
-    }
-
-    private Timeline listTraverseUIGeneric(List<GenericTreeNode> list, int key) {
-        resetProgressBar(list.size());
-        AtomicInteger counter = new AtomicInteger(0);
-        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
-            if (counter.get() >= list.size()) {
-                counter.set(0);
-            }
-            if (list.isEmpty()) {
-                timeline.stop();
-                return;
-            }
-            int keyList = list.get(counter.get()).key;
-            counter.getAndIncrement();
-            sliderProgress.setValue(counter.get());
-            if (keyList == key) {
-                highLightNodeGreen(key);
-            }
-            else {
-                highLightNodeRed(keyList);
-            }
-        });
-        Timeline timelineIn = new Timeline();
-        timelineIn.getKeyFrames().add(keyFrame);
-        timelineIn.setCycleCount(list.size());
-        return timelineIn;
-    }
-    private Timeline listTraverseUIBST(List<BinaryTreeNode> list) {
-        resetProgressBar(list.size());
-        AtomicInteger counter = new AtomicInteger(0);
-        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
-            if (counter.get() >= list.size()) {
-                counter.set(0);
-            }
-            if (list.isEmpty()) {
-                timeline.stop();
-                return;
-            }
-            int key = list.get(counter.get()).key;
-            counter.getAndIncrement();
-            sliderProgress.setValue(counter.get());
-            highLightNodeGreen(key);
-        });
-        Timeline timelineIn = new Timeline();
-        timelineIn.getKeyFrames().add(keyFrame);
-        timelineIn.setCycleCount(list.size());
-        return timelineIn;
-    }
-    private Timeline listTraverseUIBST(List<BinaryTreeNode> list, int key) {
-        resetProgressBar(list.size());
-        AtomicInteger counter = new AtomicInteger(0);
-        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
-            if (counter.get() >= list.size()) {
-                counter.set(0);
-            }
-            if (list.isEmpty()) {
-                timeline.stop();
-                return;
-            }
-            int keyList = list.get(counter.get()).key;
-            counter.getAndIncrement();
-            sliderProgress.setValue(counter.get());
-            if (keyList == key) {
-                highLightNodeGreen(key);
-            }
-            else {
-                highLightNodeRed(keyList);
-            }
-        });
-        Timeline timelineIn = new Timeline();
-        timelineIn.getKeyFrames().add(keyFrame);
-        timelineIn.setCycleCount(list.size());
-        return timelineIn;
-    }
-
 
     private void drawWholeTree() {
         treePane.getChildren().clear();

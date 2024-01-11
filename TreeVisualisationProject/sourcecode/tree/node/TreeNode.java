@@ -11,5 +11,6 @@ public abstract class TreeNode {
         return key;
     }
 
-    protected abstract boolean isLeaf();
+    public abstract boolean isLeaf();
+
 }
