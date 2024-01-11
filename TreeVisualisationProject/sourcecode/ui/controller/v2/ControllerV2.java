@@ -279,119 +279,6 @@ public class ControllerV2 {
         return dfsList;
     }
 
-    private Timeline listTraverseUIGeneric(List<GenericTreeNode> list) {
-        resetProgressBar(list.size());
-        AtomicInteger counter = new AtomicInteger(0);
-        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
-            if (counter.get() >= list.size()) {
-                counter.set(0);
-            }
-            if (list.isEmpty()) {
-                timeline.stop();
-                return;
-            }
-            int key = list.get(counter.get()).key;
-            counter.getAndIncrement();
-            sliderProgress.setValue(counter.get());
-            highLightNodeGreen(key);
-            if (pause) {
-                timeline.pause();
-            }
-        });
-        Timeline timelineIn = new Timeline();
-        timelineIn.getKeyFrames().add(keyFrame);
-        timelineIn.setCycleCount(list.size());
-        timelineIn.play();
-        return timelineIn;
-    }
-
-    private Timeline listTraverseUIGeneric(List<GenericTreeNode> list, int key) {
-        resetProgressBar(list.size());
-        AtomicInteger counter = new AtomicInteger(0);
-        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
-            if (counter.get() >= list.size()) {
-                counter.set(0);
-            }
-            if (list.isEmpty()) {
-                timeline.stop();
-                return;
-            }
-            int keyList = list.get(counter.get()).key;
-            counter.getAndIncrement();
-            sliderProgress.setValue(counter.get());
-            if (keyList == key) {
-                highLightNodeGreen(key);
-            }
-            else {
-                highLightNodeRed(keyList);
-            }
-            if (pause) {
-                timeline.pause();
-            }
-        });
-        Timeline timelineIn = new Timeline();
-        timelineIn.getKeyFrames().add(keyFrame);
-        timelineIn.setCycleCount(list.size());
-        timelineIn.play();
-        return timelineIn;
-    }
-    private Timeline listTraverseUIBST(List<BinaryTreeNode> list) {
-        resetProgressBar(list.size());
-        AtomicInteger counter = new AtomicInteger(0);
-        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
-            if (counter.get() >= list.size()) {
-                counter.set(0);
-            }
-            if (list.isEmpty()) {
-                timeline.stop();
-                return;
-            }
-            int key = list.get(counter.get()).key;
-            counter.getAndIncrement();
-            sliderProgress.setValue(counter.get());
-            highLightNodeGreen(key);
-            if (pause) {
-                timeline.pause();
-            }
-        });
-        Timeline timelineIn = new Timeline();
-        timelineIn.getKeyFrames().add(keyFrame);
-        timelineIn.setCycleCount(list.size());
-        timelineIn.play();
-        return timelineIn;
-    }
-    private Timeline listTraverseUIBST(List<BinaryTreeNode> list, int key) {
-        resetProgressBar(list.size());
-        AtomicInteger counter = new AtomicInteger(0);
-        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
-            if (counter.get() >= list.size()) {
-                counter.set(0);
-            }
-            if (list.isEmpty()) {
-                timeline.stop();
-                return;
-            }
-            int keyList = list.get(counter.get()).key;
-            counter.getAndIncrement();
-            sliderProgress.setValue(counter.get());
-            if (keyList == key) {
-                highLightNodeGreen(key);
-            }
-            else {
-                highLightNodeRed(keyList);
-            }
-            if (pause) {
-                timeline.pause();
-            }
-        });
-        Timeline timelineIn = new Timeline();
-        timelineIn.getKeyFrames().add(keyFrame);
-        timelineIn.setCycleCount(list.size());
-        timelineIn.play();
-        return timelineIn;
-    }
-
-
     @FXML
     void deleteNode(ActionEvent event) {
         resetHighlight();
@@ -547,6 +434,65 @@ public class ControllerV2 {
         timelineIn.getKeyFrames().add(keyFrame2);
         timelineIn.play();
     }
+    @FXML
+    void updateNode(ActionEvent event) {
+        resetHighlight();
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Update");
+        dialog.setHeaderText("Enter the key to update");
+        dialog.setContentText("Key: ");
+        dialog.showAndWait();
+        int oldKey = Integer.parseInt(dialog.getEditor().getText());
+        dialog = new TextInputDialog();
+        dialog.setTitle("Update");
+        dialog.setHeaderText("Enter the new key");
+        dialog.setContentText("Key: ");
+        dialog.showAndWait();
+        int newKey = Integer.parseInt(dialog.getEditor().getText());
+        updateUI(oldKey, newKey);
+    }
+
+    private void updateUI(int oldKey, int newKey) {
+        if (!(tree instanceof GenericTree)) {
+            return;
+        }
+        if (tree.search(newKey)) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText("Key already exists");
+            alert.setContentText("Key " + newKey + " already exists in the tree");
+            alert.showAndWait();
+            return;
+        }
+        if (tree == null) {
+            return;
+        }
+        timeline = listTraverseUIGeneric(searchTimesGeneric(oldKey), oldKey);
+        Duration timeDelay = Duration.ZERO;
+        for (KeyFrame keyFrame : timeline.getKeyFrames()) {
+            timeDelay = timeDelay.add(keyFrame.getTime());
+        }
+        timeDelay = timeDelay.add(millis(timeDelaySet));
+        KeyFrame keyFrame1 = new KeyFrame(timeDelay, event -> {
+            resetScreen();
+            tree.update(oldKey, newKey);
+            drawWholeTree();
+            highLightNodeGreen(newKey);
+        });
+        timeDelay.add(millis(timeDelaySet));
+        timeDelay.add(keyFrame1.getTime());
+        KeyFrame keyFrame2 = new KeyFrame(timeDelay, event -> {
+            resetScreen();
+            drawWholeTree();
+        });
+        timeline.getKeyFrames().add(keyFrame1);
+        timeline.getKeyFrames().add(keyFrame2);
+        Timeline timelineIn = new Timeline();
+        timelineIn.getKeyFrames().add(keyFrame1);
+        timelineIn.getKeyFrames().add(keyFrame2);
+        timelineIn.play();
+    }
+
 
     @FXML
     void searchNode(ActionEvent event) throws InterruptedException {
@@ -630,65 +576,118 @@ public class ControllerV2 {
             return searchTimesBST(node.rightChild, key, result);
         }
     }
-
-    @FXML
-    void updateNode(ActionEvent event) {
-        resetHighlight();
-        TextInputDialog dialog = new TextInputDialog();
-        dialog.setTitle("Update");
-        dialog.setHeaderText("Enter the key to update");
-        dialog.setContentText("Key: ");
-        dialog.showAndWait();
-        int oldKey = Integer.parseInt(dialog.getEditor().getText());
-        dialog = new TextInputDialog();
-        dialog.setTitle("Update");
-        dialog.setHeaderText("Enter the new key");
-        dialog.setContentText("Key: ");
-        dialog.showAndWait();
-        int newKey = Integer.parseInt(dialog.getEditor().getText());
-        updateUI(oldKey, newKey);
-    }
-
-    private void updateUI(int oldKey, int newKey) {
-        if (!(tree instanceof GenericTree)) {
-            return;
-        }
-        if (tree.search(newKey)) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText("Key already exists");
-            alert.setContentText("Key " + newKey + " already exists in the tree");
-            alert.showAndWait();
-            return;
-        }
-        if (tree == null) {
-            return;
-        }
-        timeline = listTraverseUIGeneric(searchTimesGeneric(oldKey), oldKey);
-        Duration timeDelay = Duration.ZERO;
-        for (KeyFrame keyFrame : timeline.getKeyFrames()) {
-            timeDelay = timeDelay.add(keyFrame.getTime());
-        }
-        timeDelay = timeDelay.add(millis(timeDelaySet));
-        KeyFrame keyFrame1 = new KeyFrame(timeDelay, event -> {
-            resetScreen();
-            tree.update(oldKey, newKey);
-            drawWholeTree();
-            highLightNodeGreen(newKey);
+    private Timeline listTraverseUIGeneric(List<GenericTreeNode> list) {
+        resetProgressBar(list.size());
+        AtomicInteger counter = new AtomicInteger(0);
+        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
+            if (counter.get() >= list.size()) {
+                counter.set(0);
+            }
+            if (list.isEmpty()) {
+                timeline.stop();
+                return;
+            }
+            int key = list.get(counter.get()).key;
+            counter.getAndIncrement();
+            sliderProgress.setValue(counter.get());
+            highLightNodeGreen(key);
+            if (pause) {
+                timeline.pause();
+            }
         });
-        timeDelay.add(millis(timeDelaySet));
-        timeDelay.add(keyFrame1.getTime());
-        KeyFrame keyFrame2 = new KeyFrame(timeDelay, event -> {
-            resetScreen();
-            drawWholeTree();
-        });
-        timeline.getKeyFrames().add(keyFrame1);
-        timeline.getKeyFrames().add(keyFrame2);
         Timeline timelineIn = new Timeline();
-        timelineIn.getKeyFrames().add(keyFrame1);
-        timelineIn.getKeyFrames().add(keyFrame2);
+        timelineIn.getKeyFrames().add(keyFrame);
+        timelineIn.setCycleCount(list.size());
         timelineIn.play();
+        return timelineIn;
     }
+
+    private Timeline listTraverseUIGeneric(List<GenericTreeNode> list, int key) {
+        resetProgressBar(list.size());
+        AtomicInteger counter = new AtomicInteger(0);
+        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
+            if (counter.get() >= list.size()) {
+                counter.set(0);
+            }
+            if (list.isEmpty()) {
+                timeline.stop();
+                return;
+            }
+            int keyList = list.get(counter.get()).key;
+            counter.getAndIncrement();
+            sliderProgress.setValue(counter.get());
+            if (keyList == key) {
+                highLightNodeGreen(key);
+            }
+            else {
+                highLightNodeRed(keyList);
+            }
+            if (pause) {
+                timeline.pause();
+            }
+        });
+        Timeline timelineIn = new Timeline();
+        timelineIn.getKeyFrames().add(keyFrame);
+        timelineIn.setCycleCount(list.size());
+        timelineIn.play();
+        return timelineIn;
+    }
+    private Timeline listTraverseUIBST(List<BinaryTreeNode> list) {
+        resetProgressBar(list.size());
+        AtomicInteger counter = new AtomicInteger(0);
+        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
+            if (counter.get() >= list.size()) {
+                counter.set(0);
+            }
+            if (list.isEmpty()) {
+                timeline.stop();
+                return;
+            }
+            int key = list.get(counter.get()).key;
+            counter.getAndIncrement();
+            sliderProgress.setValue(counter.get());
+            highLightNodeGreen(key);
+            if (pause) {
+                timeline.pause();
+            }
+        });
+        Timeline timelineIn = new Timeline();
+        timelineIn.getKeyFrames().add(keyFrame);
+        timelineIn.setCycleCount(list.size());
+        timelineIn.play();
+        return timelineIn;
+    }
+    private Timeline listTraverseUIBST(List<BinaryTreeNode> list, int key) {
+        resetProgressBar(list.size());
+        AtomicInteger counter = new AtomicInteger(0);
+        KeyFrame keyFrame = new KeyFrame(millis(timeDelaySet), event -> {
+            if (counter.get() >= list.size()) {
+                counter.set(0);
+            }
+            if (list.isEmpty()) {
+                timeline.stop();
+                return;
+            }
+            int keyList = list.get(counter.get()).key;
+            counter.getAndIncrement();
+            sliderProgress.setValue(counter.get());
+            if (keyList == key) {
+                highLightNodeGreen(key);
+            }
+            else {
+                highLightNodeRed(keyList);
+            }
+            if (pause) {
+                timeline.pause();
+            }
+        });
+        Timeline timelineIn = new Timeline();
+        timelineIn.getKeyFrames().add(keyFrame);
+        timelineIn.setCycleCount(list.size());
+        timelineIn.play();
+        return timelineIn;
+    }
+
 
     private void drawWholeTree() {
         treePane.getChildren().clear();
@@ -1005,6 +1004,15 @@ public class ControllerV2 {
 
     @FXML
     private void pause() {
-        pause = !pause;
+        if (pause) {
+            System.out.println("Play");
+            pause = false;
+            timeline.play();
+        }
+        else {
+            System.out.println("Pause");
+            pause = true;
+            timeline.pause();
+        }
     }
 }
