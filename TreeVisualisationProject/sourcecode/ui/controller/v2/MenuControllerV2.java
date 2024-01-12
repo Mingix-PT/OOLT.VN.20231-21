@@ -62,7 +62,7 @@ public class MenuControllerV2 {
 
     @FXML
     void openHelp(ActionEvent event) throws IOException {
-        final String BST_FXML_FILE_PATH = "/ui/view/HelpMenu.fxml";
+        final String BST_FXML_FILE_PATH = "/ui/view/common/HelpMenu.fxml";
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(getClass().getResource(BST_FXML_FILE_PATH));
         HelpController helpController = new HelpController();
