@@ -17,7 +17,6 @@ import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import tree.node.GenericTreeNode;
 import tree.type.GenericTree;
-import ui.controller.ultility.MenuController;
 import ui.controller.ultility.TreeNodeController;
 
 import java.io.IOException;

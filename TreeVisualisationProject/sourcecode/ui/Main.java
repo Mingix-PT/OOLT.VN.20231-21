@@ -5,7 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import tree.type.CompleteBalanceBinarySearchTree;
-import ui.controller.ultility.MenuController;
+import ui.controller.v1.MenuController;
 
 public class Main extends Application {
     private CompleteBalanceBinarySearchTree tree;

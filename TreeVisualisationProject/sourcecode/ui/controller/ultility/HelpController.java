@@ -9,6 +9,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
+import ui.controller.v1.MenuController;
+import ui.controller.v2.MenuControllerV2;
 
 import java.io.IOException;
 
@@ -23,12 +25,12 @@ public class HelpController {
 
     @FXML
     private void backToMainMenu(ActionEvent event) {
-        final String MENU_FXML_FILE_PATH = "/ui/view/Menu.fxml";
+        final String MENU_FXML_FILE_PATH = "/ui/view/common/Menu.fxml";
         try {
             FXMLLoader fxmlLoader = new FXMLLoader();
             fxmlLoader.setLocation(getClass().getResource(MENU_FXML_FILE_PATH));
-            MenuController menuController = new MenuController();
-            fxmlLoader.setController(menuController);
+            MenuControllerV2 menuControllerV2 = new MenuControllerV2();
+            fxmlLoader.setController(menuControllerV2);
             Parent parent = fxmlLoader.load();
             Stage stage = (Stage)((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(parent));

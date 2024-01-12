@@ -29,7 +29,7 @@
                      <graphic>
                         <ImageView fitHeight="37.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../resources/backButton.png" />
+                              <Image url="@../../resources/image/backButton.png" />
                            </image>
                         </ImageView>
                      </graphic>
@@ -47,7 +47,7 @@
          <right>
             <ImageView fitHeight="360.0" fitWidth="356.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
                <image>
-                  <Image url="@../resources/tree.png" />
+                  <Image url="@../../resources/image/tree.png" />
                </image>
             </ImageView>
          </right>

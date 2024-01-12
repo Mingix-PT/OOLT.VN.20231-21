@@ -1,4 +1,4 @@
-package ui.controller.ultility;
+package ui.controller.v1;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -9,6 +9,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
 import javafx.scene.*;
+import ui.controller.ultility.HelpController;
 import ui.controller.v1.AVLController;
 import ui.controller.v1.BSTController;
 import ui.controller.v1.CBBSTController;
