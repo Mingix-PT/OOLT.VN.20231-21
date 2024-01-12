@@ -5,8 +5,8 @@ Topic 1: Visualization of operations on tree data structures
 
 Team members and assignment:
   1. Lê Quang Minh 20215088 (Leader): Algorithm and UI
-  2. Nguyễn Phúc Mạnh 20215087: Not fully completed the tasks
   > [!CAUTION]
+  > 2. ~~Nguyễn Phúc Mạnh 20215087~~: Not fully completed the tasks <br>
   > 3. ~~Đoàn Quang Minh 20210606~~: Didn't contribute to the project <br>
   > 4. ~~Hoàng Nhật Minh 20210607~~: Didn't contribute to the project
 
